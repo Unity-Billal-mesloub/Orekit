@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="13.2" date="TBD" description="TBD">
+        <action dev="serrof" type="update" issue="1787">
+            Introduce Archunit as test dependency.
+        </action>
         <action dev="serrof" type="fix" issue="1784">
             Compute derivatives properly in mean-to-eccentric conversions.
         </action>
