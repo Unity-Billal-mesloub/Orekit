@@ -135,7 +135,7 @@ public class FieldCircularLatitudeArgumentUtility {
             alphaEMalphaM  = alphaEMalphaM.subtract(shift);
             alphaE         = alphaM.add(alphaEMalphaM);
 
-            hasConverged = FastMath.abs(shift.getReal()) <= TOLERANCE_CONVERGENCE;
+            hasConverged = FastMath.norm(shift) <= TOLERANCE_CONVERGENCE;
         } while (++iter < MAXIMUM_ITERATION && !hasConverged);
 
         if (!hasConverged) {

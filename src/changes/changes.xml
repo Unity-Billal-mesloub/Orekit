@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="13.2" date="TBD" description="TBD">
+        <action dev="serrof" type="fix" issue="1784">
+            Compute derivatives properly in mean-to-eccentric conversions.
+        </action>
     </release>
     <release version="13.1" date="2025-08-01" description="13.1 is a minor release.">
         <action dev="serrof" type="fix" issue="1782">
