@@ -27,7 +27,6 @@ import org.hipparchus.ode.events.Action;
 import org.orekit.errors.OrekitException;
 import org.orekit.errors.OrekitMessages;
 import org.orekit.frames.Frame;
-import org.orekit.orbits.Orbit;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.EventDetector;
 import org.orekit.propagation.events.FieldEventDetector;
@@ -35,10 +34,8 @@ import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.FieldTimeInterpolator;
 import org.orekit.time.TimeInterpolator;
-import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.AngularDerivativesFilter;
 import org.orekit.utils.FieldPVCoordinatesProvider;
-import org.orekit.utils.DataDictionary;
 import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.TimeStampedAngularCoordinates;
 import org.orekit.utils.TimeStampedAngularCoordinatesHermiteInterpolator;
@@ -265,22 +262,17 @@ public class AttitudesSequence extends AbstractSwitchingAttitudeProvider {
                     // estimate state at transition start, according to the past attitude law
                     final double dt = -transitionTime;
                     final AbsoluteDate shiftedDate = date.shiftedBy(dt);
-                    SpacecraftState sState;
+                    final SpacecraftState shiftedState = s.shiftedBy(dt);
+                    final Attitude sAttitude;
                     if (s.isOrbitDefined()) {
-                        final Orbit     sOrbit    = s.getOrbit().shiftedBy(dt);
-                        final Attitude  sAttitude = getPast().getAttitude(sOrbit, shiftedDate, s.getFrame());
-                        sState    = new SpacecraftState(sOrbit, sAttitude).withMass(s.getMass());
+                        sAttitude = getPast().getAttitude(shiftedState.getOrbit(), shiftedDate, s.getFrame());
                     } else {
-                        final AbsolutePVCoordinates sAPV    = s.getAbsPVA().shiftedBy(dt);
-                        final Attitude  sAttitude = getPast().getAttitude(sAPV, shiftedDate, s.getFrame());
-                        sState    = new SpacecraftState(sAPV, sAttitude).withMass(s.getMass());
+                        sAttitude = getPast().getAttitude(shiftedState.getAbsPVA(), shiftedDate, s.getFrame());
                     }
-                    for (final DataDictionary.Entry entry : s.getAdditionalDataValues().getData()) {
-                        sState = sState.addAdditionalData(entry.getKey(), entry.getValue());
-                    }
+                    final SpacecraftState sState    = shiftedState.withAttitude(sAttitude).withMass(s.getMass());
 
                     // prepare transition
-                    getActivated().addValidBefore(new TransitionProvider(sState.getAttitude(), date), date, false);
+                    getActivated().addValidBefore(new TransitionProvider(sAttitude, date), date, false);
 
                     // prepare past law before transition
                     getActivated().addValidBefore(getPast(), shiftedDate, false);
