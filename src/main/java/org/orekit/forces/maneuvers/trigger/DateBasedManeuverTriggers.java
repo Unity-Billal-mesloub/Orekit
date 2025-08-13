@@ -149,9 +149,8 @@ public class DateBasedManeuverTriggers extends IntervalEventTrigger<ParameterDri
     /** {@inheritDoc} */
     @Override
     public List<ParameterDriver> getParametersDrivers() {
-        return Collections.unmodifiableList(Arrays.asList(getFiringIntervalDetector().getStartDriver(),
-                                                          getFiringIntervalDetector().getStopDriver(),
-                                                          getFiringIntervalDetector().getMedianDriver(),
-                                                          getFiringIntervalDetector().getDurationDriver()));
+        final ParameterDrivenDateIntervalDetector firingIntervalDetector = getFiringIntervalDetector();
+        return Collections.unmodifiableList(Arrays.asList(firingIntervalDetector.getStartDriver(), firingIntervalDetector.getStopDriver(),
+                                                          firingIntervalDetector.getMedianDriver(), firingIntervalDetector.getDurationDriver()));
     }
 }
