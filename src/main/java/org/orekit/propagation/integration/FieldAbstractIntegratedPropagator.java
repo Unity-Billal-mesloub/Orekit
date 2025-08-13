@@ -398,6 +398,24 @@ public abstract class FieldAbstractIntegratedPropagator<T extends CalculusFieldE
         return storingHandler;
     }
 
+    /**
+     * Clean force models that have time applicability outside the propagation span.
+     * @param tStart propagation start
+     * @param tEnd propagation end
+     * @since 13.1.1
+     */
+    protected void cleanForceModelsNotApplicableInsidePropagationSpan(final FieldAbsoluteDate<T> tStart, final FieldAbsoluteDate<T> tEnd) {
+        // nothing to do by default
+    }
+
+    /**
+     * Restore force models that have time applicability outside the propagation span.
+     * @since 13.1.1
+     */
+    protected void restoreForceModelsNotApplicableInsidePropagationSpan() {
+        // nothing to do by default
+    }
+
     /** Create a mapper between raw double components and spacecraft state.
     /** Simple constructor.
      * <p>
@@ -446,6 +464,9 @@ public abstract class FieldAbstractIntegratedPropagator<T extends CalculusFieldE
         // make sure the integrator will be reset properly even if we change its events handlers and step handlers
         try (IntegratorResetter<T> resetter = new IntegratorResetter<>(integrator)) {
 
+            // clean force models that have time applicability outside the propagation span
+            cleanForceModelsNotApplicableInsidePropagationSpan(tStart, tEnd);
+
             // Initialize additional states
             initializeAdditionalData(tEnd);
 
@@ -474,6 +495,9 @@ public abstract class FieldAbstractIntegratedPropagator<T extends CalculusFieldE
 
             // Finalize event detectors
             getEventDetectors().forEach(detector -> detector.finish(state));
+
+            // Restore the potential cleaned force models
+            restoreForceModelsNotApplicableInsidePropagationSpan();
 
             return state;
         }

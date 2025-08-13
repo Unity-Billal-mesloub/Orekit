@@ -53,6 +53,52 @@ import java.util.List;
 class ManeuverTest {
 
     @Test
+    public void testManeuverFullyOutsidePropagationSpan() {
+        doTestManeuverInPropagationHorizon(AbsoluteDate.ARBITRARY_EPOCH.shiftedBy(-60.0), 10.0, AbsoluteDate.ARBITRARY_EPOCH, 60.0, false);
+    }
+
+    @Test
+    public void testManeuverStartOutsidePropagationSpanButEndInsidePropagationSpan() {
+        doTestManeuverInPropagationHorizon(AbsoluteDate.ARBITRARY_EPOCH.shiftedBy(-60.0), 120.0, AbsoluteDate.ARBITRARY_EPOCH, 60.0, true);
+    }
+
+    @Test
+    public void testManeuverFullyInsidePropagationSpan() {
+        doTestManeuverInPropagationHorizon(AbsoluteDate.ARBITRARY_EPOCH.shiftedBy(10.0), 10.0, AbsoluteDate.ARBITRARY_EPOCH, 60.0, true);
+    }
+
+    @Test
+    public void testManeuverStartInsidePropagationSpanButEndOutsidePropagationSpan() {
+        doTestManeuverInPropagationHorizon(AbsoluteDate.ARBITRARY_EPOCH.shiftedBy(50.0), 60.0, AbsoluteDate.ARBITRARY_EPOCH, 60.0, true);
+    }
+
+    @Test
+    public void testManeuverStartEqualsPropagationSpanStartButEndOutsidePropagationSpan() {
+        doTestManeuverInPropagationHorizon(AbsoluteDate.ARBITRARY_EPOCH, 120.0, AbsoluteDate.ARBITRARY_EPOCH, 60.0, true);
+    }
+
+    @Test
+    public void testManeuverStartBeforePropagationSpanStartButEndEqualsPropagationSpanStart() {
+        doTestManeuverInPropagationHorizon(AbsoluteDate.ARBITRARY_EPOCH.shiftedBy(-60.0), 60.0, AbsoluteDate.ARBITRARY_EPOCH, 60.0, false);
+    }
+
+    @Test
+    public void testRetroPropagationHorizon() {
+        doTestManeuverInPropagationHorizon(AbsoluteDate.ARBITRARY_EPOCH.shiftedBy(-50.0), 60.0, AbsoluteDate.ARBITRARY_EPOCH, -60.0, true);
+    }
+
+    private void doTestManeuverInPropagationHorizon(AbsoluteDate maneuverStart, double maneuverDuration,
+                                                    AbsoluteDate propagationStart, double propagationDuration,
+                                                    boolean isInHorizon) {
+        // Initialize
+        final DateBasedManeuverTriggers triggers = new DateBasedManeuverTriggers("trigger name", maneuverStart, maneuverDuration);
+        final PropulsionModel propulsion = new BasicConstantThrustPropulsionModel(1.0, 3500.0, Vector3D.PLUS_I, "maneuver name");
+        final Maneuver maneuver = new Maneuver(null, triggers, propulsion);
+        // Action and Verify
+        Assertions.assertEquals(isInHorizon, maneuver.isApplicableInsidePropagationSpan(propagationStart, propagationStart.shiftedBy(propagationDuration)));
+    }
+
+    @Test
     void testGetName() {
         // GIVEN
         final String tooShortName = "a";

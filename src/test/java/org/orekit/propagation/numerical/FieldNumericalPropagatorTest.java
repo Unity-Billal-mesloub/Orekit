@@ -67,6 +67,9 @@ import org.orekit.forces.gravity.potential.GRGSFormatReader;
 import org.orekit.forces.gravity.potential.GravityFieldFactory;
 import org.orekit.forces.gravity.potential.NormalizedSphericalHarmonicsProvider;
 import org.orekit.forces.gravity.potential.SHMFormatReader;
+import org.orekit.forces.maneuvers.Maneuver;
+import org.orekit.forces.maneuvers.propulsion.BasicConstantThrustPropulsionModel;
+import org.orekit.forces.maneuvers.trigger.DateBasedManeuverTriggers;
 import org.orekit.forces.radiation.IsotropicRadiationSingleCoefficient;
 import org.orekit.forces.radiation.SolarRadiationPressure;
 import org.orekit.frames.Frame;
@@ -95,6 +98,47 @@ import org.orekit.utils.*;
 public class FieldNumericalPropagatorTest {
 
     private double               mu;
+
+    @Test
+    void testPropagatorCanHandleForceModelsOutsidePropagationSpan() {
+        // Initialize
+        Field<Binary64> field = Binary64Field.getInstance();
+        FieldNumericalPropagator<Binary64> numericalPropagator = createPropagator(field);
+        numericalPropagator.addForceModel(new Maneuver(null, new DateBasedManeuverTriggers(numericalPropagator.getInitialState().getDate().toAbsoluteDate().shiftedBy(-10.0), 1.0),
+                                                       new BasicConstantThrustPropulsionModel(0.1, 10.0, Vector3D.PLUS_I, "")));
+        numericalPropagator.addForceModel(new Maneuver(null, new DateBasedManeuverTriggers(numericalPropagator.getInitialState().getDate().toAbsoluteDate(), 1.0),
+                                                       new BasicConstantThrustPropulsionModel(0.1, 10.0, Vector3D.PLUS_I, "")));
+        // Action
+        numericalPropagator.cleanForceModelsNotApplicableInsidePropagationSpan(numericalPropagator.getInitialState().getDate(),
+                                                                               numericalPropagator.getInitialState().getDate().shiftedBy(60.0));
+        // Verify
+        Assertions.assertEquals(2, numericalPropagator.getAllForceModels().size()); // 1 maneuver + Newtonian attraction which is automatically added for the Field class
+        // Action
+        numericalPropagator.restoreForceModelsNotApplicableInsidePropagationSpan();
+        // Verify
+        Assertions.assertEquals(3, numericalPropagator.getAllForceModels().size()); // 2 maneuvers + Newtonian attraction which is automatically added for the Field class
+    }
+
+    @Test
+    void testPropagationWithForceModelsOutsidePropagationSpan() {
+        // Initialize
+        Field<Binary64> field = Binary64Field.getInstance();
+        FieldNumericalPropagator<Binary64> numericalPropagator = createPropagator(field);
+        FieldSpacecraftState<Binary64> initialState = numericalPropagator.getInitialState();
+        numericalPropagator.addForceModel(new Maneuver(null, new DateBasedManeuverTriggers(initialState.getDate().toAbsoluteDate().shiftedBy(-10.0), 1.0),
+                                                       new BasicConstantThrustPropulsionModel(0.1, 10.0, Vector3D.PLUS_I, "")));
+        numericalPropagator.addForceModel(new Maneuver(null, new DateBasedManeuverTriggers(initialState.getDate().toAbsoluteDate(), 1.0),
+                                                       new BasicConstantThrustPropulsionModel(0.1, 10.0, Vector3D.PLUS_I, "")));
+        // Action
+        FieldSpacecraftState<Binary64> propagatedWithSinglePropagation = numericalPropagator.propagate(initialState.getDate().shiftedBy(3600.0));
+        numericalPropagator.setInitialState(initialState);
+        FieldSpacecraftState<Binary64> propagatedWithTwoPropagations = numericalPropagator.propagate(initialState.getDate().shiftedBy(1800.0));
+        propagatedWithTwoPropagations = numericalPropagator.propagate(propagatedWithTwoPropagations.getDate().shiftedBy(1800.0));
+        // Verify
+        Assertions.assertEquals(0.0, propagatedWithSinglePropagation.durationFrom(propagatedWithTwoPropagations).getReal(), 1.0e-15);
+        Assertions.assertEquals(0.0, propagatedWithSinglePropagation.getPosition().distance(propagatedWithTwoPropagations.getPosition()).getReal(), 1.0e-15);
+        Assertions.assertEquals(0.0, propagatedWithSinglePropagation.getVelocity().distance(propagatedWithTwoPropagations.getVelocity()).getReal(), 1.0e-15);
+    }
 
     @Test
     void testIssue1032() {

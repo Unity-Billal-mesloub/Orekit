@@ -165,6 +165,17 @@ public interface ForceModel extends ParameterDriversProvider, EventDetectorsProv
      */
     boolean dependsOnPositionOnly();
 
+    /**
+     * Verifies if a force model is suitable for orbit propagation according to the propagation horizon.
+     * @param tStart propagation start
+     * @param tEnd propagation end
+     * @return true if the force model is suitable for orbit propagation according to the propagation horizon
+     * @since 13.1.1
+     */
+    default boolean isApplicableInsidePropagationSpan(final AbsoluteDate tStart, final AbsoluteDate tEnd) {
+        return true;
+    }
+
     /** Check if force model depends on attitude's rotation rate or acceleration at a given, fixed date.
      * If false, it essentially means that at most the attitude's rotation is used when computing the acceleration vector.
      * The default implementation returns false as common forces do not.

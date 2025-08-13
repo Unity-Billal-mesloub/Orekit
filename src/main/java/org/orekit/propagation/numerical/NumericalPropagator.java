@@ -186,6 +186,9 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
     /** Force models used during the extrapolation of the orbit. */
     private final List<ForceModel> forceModels;
 
+    /** Force models outside the extrapolation span of the orbit. */
+    private List<ForceModel> forceModelsOutsidePropagationHorizon;
+
     /** boolean to ignore or not the creation of a NewtonianAttraction. */
     private boolean ignoreCentralAttraction;
 
@@ -234,6 +237,7 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
         super(integrator, PropagationType.OSCULATING);
         forceModels             = new ArrayList<>();
         ignoreCentralAttraction = false;
+        forceModelsOutsidePropagationHorizon = new ArrayList<>();
         initMapper();
         setAttitudeProvider(attitudeProvider);
         clearStepHandlers();
@@ -497,6 +501,22 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
 
         }
 
+    }
+
+    /** {@inheritDoc}. */
+    @Override
+    protected void cleanForceModelsNotApplicableInsidePropagationSpan(final AbsoluteDate tStart, final AbsoluteDate tEnd) {
+        forceModelsOutsidePropagationHorizon.clear();
+        forceModelsOutsidePropagationHorizon = forceModels.stream()
+                                                          .filter(forceModel -> !forceModel.isApplicableInsidePropagationSpan(tStart, tEnd))
+                                                          .collect(Collectors.toList());
+        forceModels.removeAll(forceModelsOutsidePropagationHorizon);
+    }
+
+    /** {@inheritDoc}. */
+    @Override
+    protected void restoreForceModelsNotApplicableInsidePropagationSpan() {
+        forceModelsOutsidePropagationHorizon.forEach(this::addForceModel);
     }
 
     /** Set up the State Transition Matrix Generator.

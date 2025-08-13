@@ -447,6 +447,9 @@ public abstract class AbstractIntegratedPropagator extends AbstractPropagator {
             // prepare handling of STM and Jacobian matrices
             setUpStmAndJacobianGenerators();
 
+            // clean force models that have time applicability outside the propagation span
+            cleanForceModelsNotApplicableInsidePropagationSpan(tStart, tEnd);
+
             // Initialize additional data
             initializeAdditionalData(tEnd);
 
@@ -476,6 +479,9 @@ public abstract class AbstractIntegratedPropagator extends AbstractPropagator {
             // Finalize event detectors
             getEventDetectors().forEach(detector -> detector.finish(finalState));
 
+            // Restore the potential cleaned force models
+            restoreForceModelsNotApplicableInsidePropagationSpan();
+
             return finalState;
         }
 
@@ -499,6 +505,24 @@ public abstract class AbstractIntegratedPropagator extends AbstractPropagator {
      * @since 11.1
      */
     protected void setUpStmAndJacobianGenerators() {
+        // nothing to do by default
+    }
+
+    /**
+     * Clean force models that have time applicability outside the propagation span.
+     * @param tStart propagation start
+     * @param tEnd propagation end
+     * @since 13.1.1
+     */
+    protected void cleanForceModelsNotApplicableInsidePropagationSpan(final AbsoluteDate tStart, final AbsoluteDate tEnd) {
+        // nothing to do by default
+    }
+
+    /**
+     * Restore force models that have time applicability outside the propagation span.
+     * @since 13.1.1
+     */
+    protected void restoreForceModelsNotApplicableInsidePropagationSpan() {
         // nothing to do by default
     }
 

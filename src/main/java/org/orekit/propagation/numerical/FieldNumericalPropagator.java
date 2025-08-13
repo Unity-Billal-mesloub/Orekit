@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import java.util.stream.Collectors;
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
@@ -151,6 +152,9 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
     /** Force models used during the extrapolation of the FieldOrbit<T>, without Jacobians. */
     private final List<ForceModel> forceModels;
 
+    /** Force models outside the extrapolation span of the orbit. */
+    private List<ForceModel> forceModelsOutsidePropagationHorizon;
+
     /** Field used by this class.*/
     private final Field<T> field;
 
@@ -203,6 +207,7 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
         super(field, integrator, PropagationType.OSCULATING);
         this.field = field;
         forceModels = new ArrayList<>();
+        forceModelsOutsidePropagationHorizon = new ArrayList<>();
         initMapper(field);
         setAttitudeProvider(attitudeProvider);
         setMu(field.getZero().add(Double.NaN));
@@ -381,6 +386,22 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
      */
     public void setInitialState(final FieldSpacecraftState<T> initialState) {
         resetInitialState(initialState);
+    }
+
+    /** {@inheritDoc}. */
+    @Override
+    protected void cleanForceModelsNotApplicableInsidePropagationSpan(final FieldAbsoluteDate<T> tStart, final FieldAbsoluteDate<T> tEnd) {
+        forceModelsOutsidePropagationHorizon.clear();
+        forceModelsOutsidePropagationHorizon = forceModels.stream()
+                                                          .filter(forceModel -> !forceModel.isApplicableInsidePropagationSpan(tStart.toAbsoluteDate(), tEnd.toAbsoluteDate()))
+                                                          .collect(Collectors.toList());
+        forceModels.removeAll(forceModelsOutsidePropagationHorizon);
+    }
+
+    /** {@inheritDoc}. */
+    @Override
+    protected void restoreForceModelsNotApplicableInsidePropagationSpan() {
+        forceModelsOutsidePropagationHorizon.forEach(this::addForceModel);
     }
 
     /** {@inheritDoc} */

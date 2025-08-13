@@ -33,6 +33,7 @@ import org.orekit.attitudes.AttitudeRotationModel;
 import org.orekit.attitudes.FieldAttitude;
 import org.orekit.forces.ForceModel;
 import org.orekit.forces.maneuvers.propulsion.PropulsionModel;
+import org.orekit.forces.maneuvers.trigger.DateBasedManeuverTriggers;
 import org.orekit.forces.maneuvers.trigger.ManeuverTriggers;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
@@ -136,6 +137,30 @@ public class Maneuver implements ForceModel {
     @Override
     public boolean dependsOnPositionOnly() {
         return false;
+    }
+
+    /** {@inheritDoc}. **/
+    @Override
+    public boolean isApplicableInsidePropagationSpan(final AbsoluteDate tStart, final AbsoluteDate tEnd) {
+        return !(maneuverTriggers instanceof DateBasedManeuverTriggers) || isPropagationSpanInsideManeuverTriggerHorizon(tStart, tEnd, (DateBasedManeuverTriggers) maneuverTriggers);
+    }
+
+    /**
+     * Verifies if the propagation horizon is contained in the maneuver horizon.
+     * @param tStart propagation start
+     * @param tEnd propagation end
+     * @param dateBasedManeuverTriggers date-based maneuver trigger
+     * @return true if the propagation horizon is contained in the maneuver horizon
+     */
+    private boolean isPropagationSpanInsideManeuverTriggerHorizon(final AbsoluteDate tStart, final AbsoluteDate tEnd, final DateBasedManeuverTriggers dateBasedManeuverTriggers) {
+        // Handling of retro-propagation
+        final boolean isStartBeforeEnd = tStart.isBefore(tEnd);
+        final AbsoluteDate earlierPropagationEpoch = isStartBeforeEnd ? tStart : tEnd;
+        final AbsoluteDate latestPropagationEpoch = isStartBeforeEnd ? tEnd : tStart;
+        // Verify if propagation span is inside maneuver triggering span
+        final AbsoluteDate maneuverStart = dateBasedManeuverTriggers.getStartDate();
+        return maneuverStart.isBeforeOrEqualTo(earlierPropagationEpoch) ?
+               dateBasedManeuverTriggers.getEndDate().isAfter(earlierPropagationEpoch) : !maneuverStart.isAfter(latestPropagationEpoch);
     }
 
     /** {@inheritDoc} */

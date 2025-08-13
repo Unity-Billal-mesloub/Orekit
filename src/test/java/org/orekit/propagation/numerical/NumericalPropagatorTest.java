@@ -60,6 +60,7 @@ import org.orekit.forces.maneuvers.ConstantThrustManeuver;
 import org.orekit.forces.maneuvers.ImpulseManeuver;
 import org.orekit.forces.maneuvers.Maneuver;
 import org.orekit.forces.maneuvers.propulsion.BasicConstantThrustPropulsionModel;
+import org.orekit.forces.maneuvers.trigger.DateBasedManeuverTriggers;
 import org.orekit.forces.maneuvers.trigger.ManeuverTriggers;
 import org.orekit.forces.radiation.IsotropicRadiationSingleCoefficient;
 import org.orekit.forces.radiation.SolarRadiationPressure;
@@ -101,6 +102,49 @@ class NumericalPropagatorTest {
     private AbsoluteDate         initDate;
     private SpacecraftState      initialState;
     private NumericalPropagator  propagator;
+
+    @Test
+    void testPropagatorCanHandleForceModelsOutsidePropagationSpan() {
+        // Initialize
+        AbsoluteDate propagationStart = AbsoluteDate.J2000_EPOCH;
+        AbsoluteDate propagationEnd = AbsoluteDate.J2000_EPOCH.shiftedBy(60.0);
+        NumericalPropagator numericalPropagator = new NumericalPropagator(new ClassicalRungeKuttaIntegrator(10.0));
+        numericalPropagator.addForceModel(new Maneuver(null, new DateBasedManeuverTriggers(propagationStart.shiftedBy(-10.0), 1.0),
+                                                       new BasicConstantThrustPropulsionModel(0.1, 10.0, Vector3D.PLUS_I, "")));
+        numericalPropagator.addForceModel(new Maneuver(null, new DateBasedManeuverTriggers(propagationStart, 1.0),
+                                                       new BasicConstantThrustPropulsionModel(0.1, 10.0, Vector3D.PLUS_I, "")));
+        // Action
+        numericalPropagator.cleanForceModelsNotApplicableInsidePropagationSpan(propagationStart, propagationEnd);
+        // Verify
+        Assertions.assertEquals(1, numericalPropagator.getAllForceModels().size());
+        numericalPropagator.getAllForceModels().forEach(model -> Assertions.assertTrue(model instanceof Maneuver));
+        // Action
+        numericalPropagator.restoreForceModelsNotApplicableInsidePropagationSpan();
+        // Verify
+        Assertions.assertEquals(2, numericalPropagator.getAllForceModels().size());
+        numericalPropagator.getAllForceModels().forEach(model -> Assertions.assertTrue(model instanceof Maneuver));
+    }
+
+    @Test
+    public void testPropagationWithForceModelsOutsidePropagationSpan() {
+        // Initialize
+        AbsoluteDate targetDate = initialState.getDate().shiftedBy(3600.0);
+        NumericalPropagator numericalPropagator = new NumericalPropagator(new ClassicalRungeKuttaIntegrator(10.0));
+        numericalPropagator.setInitialState(initialState);
+        numericalPropagator.addForceModel(new Maneuver(null, new DateBasedManeuverTriggers(initialState.getDate().shiftedBy(-3600.0), 300.0),
+                                                       new BasicConstantThrustPropulsionModel(10.0, 3500.0, Vector3D.PLUS_I, "")));
+        numericalPropagator.addForceModel(new Maneuver(null, new DateBasedManeuverTriggers(initialState.getDate().shiftedBy(2000.0), 300.0),
+                                                       new BasicConstantThrustPropulsionModel(10.0, 3500.0, Vector3D.PLUS_I, "")));
+        // Action
+        SpacecraftState propagatedWithSinglePropagation = numericalPropagator.propagate(targetDate);
+        numericalPropagator.setInitialState(initialState);
+        SpacecraftState propagatedWithTwoPropagations = numericalPropagator.propagate(targetDate.shiftedBy(-1800.0));
+        propagatedWithTwoPropagations = numericalPropagator.propagate(targetDate);
+        // Verify
+        Assertions.assertEquals(0.0, propagatedWithSinglePropagation.durationFrom(propagatedWithTwoPropagations), 1.0e-15);
+        Assertions.assertEquals(0.0, propagatedWithSinglePropagation.getPosition().distance(propagatedWithTwoPropagations.getPosition()), 1.0e-15);
+        Assertions.assertEquals(0.0, propagatedWithSinglePropagation.getVelocity().distance(propagatedWithTwoPropagations.getVelocity()), 1.0e-15);
+    }
 
     @Test
     void testDependsOnTimeOnlyWrong() {
