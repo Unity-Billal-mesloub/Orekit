@@ -16,6 +16,7 @@
  */
 package org.orekit.utils;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import org.orekit.errors.OrekitException;
@@ -62,7 +63,7 @@ import org.orekit.time.TimeStamped;
  * @author Luc Maisonobe
  * @since 7.1
  */
-public class TimeSpanMap<T> {
+public class TimeSpanMap<T> extends CopyOnWriteArrayList<T> {
 
     /** Reference to last accessed data. */
     private Span<T> current;
@@ -146,12 +147,27 @@ public class TimeSpanMap<T> {
      * @param newExpungePolicy expunge policy to apply when capacity is exceeded
      * @since 13.1
      */
-    public synchronized void configureExpunge(final int newMaxNbSpans, final double newMaxRange, final ExpungePolicy newExpungePolicy) {
+    public void configureExpunge(final int newMaxNbSpans, final double newMaxRange, final ExpungePolicy newExpungePolicy) {
         this.maxNbSpans    = newMaxNbSpans;
         this.maxRange      = newMaxRange;
         this.expungePolicy = newExpungePolicy;
         this.expungedEarly = AbsoluteDate.PAST_INFINITY;
         this.expungedLate  = AbsoluteDate.FUTURE_INFINITY;
+    }
+
+    @Override
+    public TimeSpanMap<T> clone() {
+        final TimeSpanMap<T> cloned = (TimeSpanMap<T>) super.clone();
+        cloned.firstSpan = this.firstSpan;
+        cloned.lastSpan = this.lastSpan;
+        cloned.nbSpans = this.nbSpans;
+        cloned.current = this.current;
+        cloned.maxNbSpans = this.maxNbSpans;
+        cloned.maxRange = this.maxRange;
+        cloned.expungePolicy = this.expungePolicy;
+        cloned.expungedEarly = this.expungedEarly;
+        cloned.expungedLate = this.expungedLate;
+        return cloned;
     }
 
     /** Get the number of spans.
@@ -162,7 +178,7 @@ public class TimeSpanMap<T> {
      * @return number of spans
      * @since 11.1
      */
-    public synchronized int getSpansNumber() {
+    public int getSpansNumber() {
         return nbSpans;
     }
 
@@ -197,7 +213,7 @@ public class TimeSpanMap<T> {
      * @return span with added entry
      * @since 11.1
      */
-    public synchronized Span<T> addValidBefore(final T entry, final AbsoluteDate latestValidityDate, final boolean erasesEarlier) {
+    public Span<T> addValidBefore(final T entry, final AbsoluteDate latestValidityDate, final boolean erasesEarlier) {
 
         // update current reference to transition date
         locate(latestValidityDate);
@@ -277,7 +293,7 @@ public class TimeSpanMap<T> {
      * @return span with added entry
      * @since 11.1
      */
-    public synchronized Span<T> addValidAfter(final T entry, final AbsoluteDate earliestValidityDate, final boolean erasesLater) {
+    public Span<T> addValidAfter(final T entry, final AbsoluteDate earliestValidityDate, final boolean erasesLater) {
 
         // update current reference to transition date
         locate(earliestValidityDate);
@@ -332,7 +348,7 @@ public class TimeSpanMap<T> {
      * @return span with added entry
      * @since 11.1
      */
-    public synchronized Span<T> addValidBetween(final T entry, final AbsoluteDate earliestValidityDate, final AbsoluteDate latestValidityDate) {
+    public Span<T> addValidBetween(final T entry, final AbsoluteDate earliestValidityDate, final AbsoluteDate latestValidityDate) {
 
         // handle special cases
         if (AbsoluteDate.PAST_INFINITY.equals(earliestValidityDate)) {
@@ -406,7 +422,7 @@ public class TimeSpanMap<T> {
      * @return valid entry at specified date
      * @see #getSpan(AbsoluteDate)
      */
-    public synchronized T get(final AbsoluteDate date) {
+    public T get(final AbsoluteDate date) {
         return getSpan(date).getData();
     }
 
@@ -420,7 +436,7 @@ public class TimeSpanMap<T> {
      * @return time span containing the specified date
      * @since 9.3
      */
-    public synchronized Span<T> getSpan(final AbsoluteDate date) {
+    public Span<T> getSpan(final AbsoluteDate date) {
 
         // safety check
         if (date.isBefore(expungedEarly) || date.isAfter(expungedLate)) {
@@ -440,7 +456,7 @@ public class TimeSpanMap<T> {
      * </p>
      * @param date date belonging to the desired time span
      */
-    private synchronized void locate(final AbsoluteDate date) {
+    private void locate(final AbsoluteDate date) {
 
         while (current.getStart().isAfter(date)) {
             // the current span is too late
@@ -481,7 +497,7 @@ public class TimeSpanMap<T> {
      * @return first (earliest) transition, or null if there are no transitions
      * @since 11.1
      */
-    public synchronized Transition<T> getFirstTransition() {
+    public Transition<T> getFirstTransition() {
         return getFirstSpan().getEndTransition();
     }
 
@@ -489,7 +505,7 @@ public class TimeSpanMap<T> {
      * @return last (latest) transition, or null if there are no transitions
      * @since 11.1
      */
-    public synchronized Transition<T> getLastTransition() {
+    public Transition<T> getLastTransition() {
         return getLastSpan().getStartTransition();
     }
 
@@ -497,7 +513,7 @@ public class TimeSpanMap<T> {
      * @return first (earliest) span
      * @since 11.1
      */
-    public synchronized Span<T> getFirstSpan() {
+    public Span<T> getFirstSpan() {
         return firstSpan;
     }
 
@@ -505,7 +521,7 @@ public class TimeSpanMap<T> {
      * @return first (earliest) span with non-null data
      * @since 12.1
      */
-    public synchronized Span<T> getFirstNonNullSpan() {
+    public Span<T> getFirstNonNullSpan() {
         Span<T> span = getFirstSpan();
         while (span.getData() == null) {
             if (span.getEndTransition() == null) {
@@ -520,7 +536,7 @@ public class TimeSpanMap<T> {
      * @return last (latest) span
      * @since 11.1
      */
-    public synchronized Span<T> getLastSpan() {
+    public Span<T> getLastSpan() {
         return lastSpan;
     }
 
@@ -528,7 +544,7 @@ public class TimeSpanMap<T> {
      * @return last (latest) span with non-null data
      * @since 12.1
      */
-    public synchronized Span<T> getLastNonNullSpan() {
+    public Span<T> getLastNonNullSpan() {
         Span<T> span = getLastSpan();
         while (span.getData() == null) {
             if (span.getStartTransition() == null) {
@@ -561,7 +577,7 @@ public class TimeSpanMap<T> {
      * @return a new instance with all transitions restricted to the specified range
      * @since 9.2
      */
-    public synchronized TimeSpanMap<T> extractRange(final AbsoluteDate start, final AbsoluteDate end) {
+    public TimeSpanMap<T> extractRange(final AbsoluteDate start, final AbsoluteDate end) {
 
         Span<T> span = getSpan(start);
         final TimeSpanMap<T> range = new TimeSpanMap<>(span.getData());
@@ -582,7 +598,8 @@ public class TimeSpanMap<T> {
      * @param action action to perform on the non-null elements
      * @since 10.3
      */
-    public synchronized void forEach(final Consumer<T> action) {
+    @Override
+    public void forEach(final Consumer<? super T> action) {
         for (Span<T> span = getFirstSpan(); span != null; span = span.next()) {
             if (span.getData() != null) {
                 action.accept(span.getData());
@@ -594,7 +611,7 @@ public class TimeSpanMap<T> {
      * Expunge old data.
      * @param date date of the latest added data
      */
-    private synchronized void expungeOldData(final AbsoluteDate date) {
+    private void expungeOldData(final AbsoluteDate date) {
 
         while (nbSpans > maxNbSpans || lastSpan.getStart().durationFrom(firstSpan.getEnd()) > maxRange) {
             // capacity exceeded, we need to purge old data

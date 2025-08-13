@@ -16,6 +16,13 @@
  */
 package org.orekit.utils;
 
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -1056,6 +1063,104 @@ public class TimeSpanMapTest {
             Assertions.assertEquals(AbsoluteDate.ARBITRARY_EPOCH.shiftedBy(  40), oe.getParts()[0]);
             Assertions.assertEquals(AbsoluteDate.ARBITRARY_EPOCH.shiftedBy(3600), oe.getParts()[1]);
             Assertions.assertEquals(AbsoluteDate.ARBITRARY_EPOCH.shiftedBy(  50), oe.getParts()[2]);
+        }
+    }
+
+    @Test
+    public void testClone() {
+        // Initialize
+        final AbsoluteDate ref = AbsoluteDate.J2000_EPOCH;
+        TimeSpanMap<Integer> originalMap = new TimeSpanMap<>(0);
+        originalMap.addValidAfter(10, ref.shiftedBy(10.0), false);
+        originalMap.addValidAfter( 3, ref.shiftedBy( 2.0), false);
+        originalMap.addValidAfter( 9, ref.shiftedBy( 5.0), false);
+        originalMap.addValidBefore( 2, ref.shiftedBy( 3.0), false);
+        originalMap.addValidBefore( 5, ref.shiftedBy( 9.0), false);
+        // Clone
+        TimeSpanMap<Integer> clonedMap = originalMap.clone();
+        // Verify
+        Assertions.assertEquals(originalMap.get(ref.shiftedBy(10.0)), clonedMap.get(ref.shiftedBy(10.0)));
+        Assertions.assertEquals(originalMap.get(ref.shiftedBy( 2.0)), clonedMap.get(ref.shiftedBy( 2.0)));
+        Assertions.assertEquals(originalMap.get(ref.shiftedBy( 5.0)), clonedMap.get(ref.shiftedBy( 5.0)));
+        Assertions.assertEquals(originalMap.get(ref.shiftedBy( 3.0)), clonedMap.get(ref.shiftedBy( 3.0)));
+        Assertions.assertEquals(originalMap.get(ref.shiftedBy( 9.0)), clonedMap.get(ref.shiftedBy( 9.0)));
+        Assertions.assertEquals(originalMap.getSpansNumber(), clonedMap.getSpansNumber());
+        Assertions.assertEquals(originalMap.getFirstSpan().getData(), clonedMap.getFirstSpan().getData());
+        Assertions.assertEquals(originalMap.getLastSpan().getData(), clonedMap.getLastSpan().getData());
+        Assertions.assertEquals(originalMap.getSpan(ref.shiftedBy(8.0)).getData(), clonedMap.getSpan(ref.shiftedBy(8.0)).getData());
+
+
+    }
+
+    @Test
+    public void testConcurrentAccessAddValidBefore() {
+        // Initialize
+        int numberOfThreads = 2;
+        TimeSpanMap<String> timeSpanMap = new TimeSpanMap<>("Initial");
+        List<AbsoluteDate> dates = IntStream.range(0, numberOfThreads).mapToObj(i -> AbsoluteDate.J2000_EPOCH.shiftedBy(10 * i)).collect(Collectors.toList());
+        // Action (CountDownLatch used to be sure that the thread is stopped before checking results)
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (AbsoluteDate date : dates) {
+            executorService.execute(() -> {
+                timeSpanMap.addValidBefore("ConcurrentData @" + date.toString(), date, false);
+                latch.countDown();
+            });
+        }
+        try {
+            latch.await();
+            executorService.shutdown();
+            Assertions.assertTrue(executorService.awaitTermination(5, TimeUnit.SECONDS));
+        } catch (InterruptedException ie) {
+            Assertions.fail(ie.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void testConcurrentAccessAddValidAfter() {
+        // Initialize
+        int numberOfThreads = 2;
+        TimeSpanMap<String> timeSpanMap = new TimeSpanMap<>("Initial");
+        List<AbsoluteDate> dates = IntStream.range(0, numberOfThreads).mapToObj(i -> AbsoluteDate.J2000_EPOCH.shiftedBy(10 * i)).collect(Collectors.toList());
+        // Action (CountDownLatch used to be sure that the thread is stopped before checking results)
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (AbsoluteDate date : dates) {
+            executorService.execute(() -> {
+                timeSpanMap.addValidAfter("ConcurrentData @" + date.toString(), date, false);
+                latch.countDown();
+            });
+        }
+        try {
+            latch.await();
+            executorService.shutdown();
+            Assertions.assertTrue(executorService.awaitTermination(5, TimeUnit.SECONDS));
+        } catch (InterruptedException ie) {
+            Assertions.fail(ie.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void testConcurrentAccessAddValidBetween() {
+        // Initialize
+        int numberOfThreads = 2;
+        TimeSpanMap<String> timeSpanMap = new TimeSpanMap<>("Initial");
+        List<AbsoluteDate> dates = IntStream.range(0, numberOfThreads).mapToObj(i -> AbsoluteDate.J2000_EPOCH.shiftedBy(10 * i)).collect(Collectors.toList());
+        // Action (CountDownLatch used to be sure that the thread is stopped before checking results)
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (AbsoluteDate date : dates) {
+            executorService.execute(() -> {
+                timeSpanMap.addValidBetween("ConcurrentData @" + date.toString(), date, date.shiftedBy(1.0));
+                latch.countDown();
+            });
+        }
+        try {
+            latch.await();
+            executorService.shutdown();
+            Assertions.assertTrue(executorService.awaitTermination(5, TimeUnit.SECONDS));
+        } catch (InterruptedException ie) {
+            Assertions.fail(ie.getLocalizedMessage());
         }
     }
 
