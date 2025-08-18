@@ -16,6 +16,7 @@
  */
 package org.orekit.forces.maneuvers.trigger;
 
+import java.util.Arrays;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.ode.nonstiff.ClassicalRungeKuttaIntegrator;
 import org.hipparchus.util.Binary64;
@@ -87,7 +88,7 @@ class TimeIntervalsManeuverTriggerTest {
         final TimeInterval firstTimeInterval = TimeInterval.of(startFiring, startFiring.shiftedBy(duration));
         final AbsoluteDate secondFiring = firstTimeInterval.getEndDate().shiftedBy(30.);
         final TimeInterval secondTimeInterval = TimeInterval.of(secondFiring, secondFiring.shiftedBy(duration));
-        final TimeIntervalsManeuverTrigger trigger = TimeIntervalsManeuverTrigger.of(firstTimeInterval, secondTimeInterval);
+        final TimeIntervalsManeuverTrigger trigger = TimeIntervalsManeuverTrigger.of(Arrays.asList(firstTimeInterval, secondTimeInterval));
         final Orbit initialOrbit = TestUtils.getDefaultOrbit(epoch);
         final SpacecraftState initialState = new SpacecraftState(initialOrbit);
         final ThrustPropulsionModel propulsionModel = new BasicConstantThrustPropulsionModel(1e-2, 1000., Vector3D.MINUS_I, "");
