@@ -78,6 +78,16 @@ public class TimeIntervalsManeuverTrigger extends IntervalEventTrigger<BooleanDe
     }
 
     /**
+     * Build an instance based on the input time intervals. Detectors are created with default settings.
+     * @param timeIntervals intervals
+     * @return maneuver trigger
+     * @since 14.0
+     */
+    public static TimeIntervalsManeuverTrigger of(final List<TimeInterval> timeIntervals) {
+        return of(timeIntervals.toArray(new TimeInterval[0]));
+    }
+
+    /**
      * Build an instance based on the input time interval detectors.
      * @param timeIntervalDetectors detectors
      * @return maneuver trigger

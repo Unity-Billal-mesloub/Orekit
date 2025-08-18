@@ -101,4 +101,36 @@ class TimeIntervalTest {
         // THEN
         assertEquals(expectedDuration, actualDuration);
     }
+
+    @Test
+    void testIntervalWithPositiveDuration() {
+        // GIVEN
+        final AbsoluteDate date = AbsoluteDate.ARBITRARY_EPOCH;
+        final double expectedDuration = 42;
+        final TimeInterval timeInterval = TimeInterval.of(date, expectedDuration);
+        // WHEN
+        final double actualDuration = timeInterval.duration();
+        final AbsoluteDate end = timeInterval.getEndDate();
+        // THEN
+        assertEquals(expectedDuration, actualDuration);
+        assertEquals(expectedDuration, end.durationFrom(date));
+        assertEquals(0.0, end.durationFrom(date.shiftedBy(expectedDuration)));
+    }
+
+    @Test
+    void testIntervalWithNegativeDuration() {
+        // GIVEN
+        final AbsoluteDate date = AbsoluteDate.ARBITRARY_EPOCH;
+        final double duration = 42;
+        final TimeInterval timeInterval = TimeInterval.of(date, -duration);
+        // WHEN
+        final double actualDuration = timeInterval.duration();
+        final AbsoluteDate start = timeInterval.getStartDate();
+        final AbsoluteDate end = timeInterval.getEndDate();
+        // THEN
+        assertEquals(duration, actualDuration);
+        assertEquals(duration, end.durationFrom(start));
+        assertEquals(-duration, start.durationFrom(date));
+        assertEquals(0.0, end.durationFrom(date));
+    }
 }
