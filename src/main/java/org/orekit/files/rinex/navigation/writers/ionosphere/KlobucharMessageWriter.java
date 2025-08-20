@@ -21,6 +21,7 @@ import org.orekit.files.rinex.navigation.RecordType;
 import org.orekit.files.rinex.navigation.RinexNavigationHeader;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
 import org.orekit.files.rinex.navigation.writers.NavigationMessageWriter;
+import org.orekit.gnss.SatelliteSystem;
 
 import java.io.IOException;
 
@@ -37,7 +38,15 @@ public class KlobucharMessageWriter extends NavigationMessageWriter<IonosphereKl
         throws IOException {
 
         // TYPE / SV / MSG
-        writeTypeSvMsg(RecordType.ION, message.getIdentifier(), message, header, writer);
+        if (message.getSystem() == SatelliteSystem.BEIDOU && header.getFormatVersion() >= 4.02) {
+            writeTypeSvMsg(RecordType.ION, message.getIdentifier(),
+                           new IonosphereKlobucharMessage(message.getSystem(), message.getPrn(),
+                                                          message.getNavigationMessageType(),
+                                                          message.getRegionCode().getStringId()),
+                           header, writer);
+        } else {
+            writeTypeSvMsg(RecordType.ION, message.getIdentifier(), message, header, writer);
+        }
 
         // ION MESSAGE LINE - 0
         writer.writeDate(message.getTransmitTime(), message.getSystem());
@@ -57,6 +66,9 @@ public class KlobucharMessageWriter extends NavigationMessageWriter<IonosphereKl
         // ION MESSAGE LINE - 2
         writer.startLine();
         writer.writeDouble(message.getBeta()[3], IonosphereKlobucharMessage.S_PER_SC_N3);
+        if (header.getFormatVersion() <= 4.01) {
+            writer.writeInt(message.getRegionCode().getIntegerId());
+        }
         writer.finishLine();
 
     }

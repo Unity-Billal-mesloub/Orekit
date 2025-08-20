@@ -67,8 +67,15 @@ public class KlobucharParser extends RecordLineParser {
     @Override
     public void parseLine02() {
         message.setBetaI(3, parseInfo.parseDouble1(IonosphereBaseMessage.S_PER_SC_N3));
-        message.setRegionCode(parseInfo.parseDouble2(Unit.ONE) < 0.5 ?
-                              RegionCode.WIDE_AREA : RegionCode.JAPAN);
+        final RegionCode regionCode;
+        if (parseInfo.getHeader().getFormatVersion() <= 4.01) {
+            // up to version 4.01, the region code is encoded as either 0 or 1 in the last line
+            regionCode = RegionCode.parseRegionCode(parseInfo.parseInt2());
+        } else {
+            // starting with 4.02, the region code is the sub-type of the message
+            regionCode = RegionCode.parseRegionCode(message.getNavigationMessageSubType());
+        }
+        message.setRegionCode(regionCode);
         parseInfo.closePendingRecord();
     }
 
