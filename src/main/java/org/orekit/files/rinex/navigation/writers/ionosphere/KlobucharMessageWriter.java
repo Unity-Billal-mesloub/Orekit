@@ -37,7 +37,7 @@ public class KlobucharMessageWriter extends NavigationMessageWriter<IonosphereKl
         throws IOException {
 
         // TYPE / SV / MSG
-        writeTypeSvMsg(RecordType.ION, identifier, message, header, writer);
+        writeTypeSvMsg(RecordType.ION, message.getIdentifier(), message, header, writer);
 
         // ION MESSAGE LINE - 0
         writer.writeDate(message.getTransmitTime(), message.getSystem());

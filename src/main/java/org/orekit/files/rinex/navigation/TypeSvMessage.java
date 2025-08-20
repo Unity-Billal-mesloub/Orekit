@@ -16,14 +16,23 @@
  */
 package org.orekit.files.rinex.navigation;
 
+import org.orekit.errors.OrekitInternalError;
 import org.orekit.gnss.SatelliteSystem;
 import org.orekit.propagation.analytical.gnss.data.NavigationMessage;
+import org.orekit.utils.formatting.FastLongFormatter;
+
+import java.io.IOException;
 
 /** Container for data shared by several navigation messages.
  * @author Luc Maisonobe
  * @since 12.0
  */
 public abstract class TypeSvMessage implements NavigationMessage {
+
+    /** Formatter for identifier.
+     * @since 14.0
+     */
+    private static final FastLongFormatter TWO_DIGITS = new FastLongFormatter(2, true);
 
     /** Satellite system. */
     private final SatelliteSystem system;
@@ -51,7 +60,7 @@ public abstract class TypeSvMessage implements NavigationMessage {
         this.subType = subType;
     }
 
-    /** Get satellite system.
+    /** Get the satellite system.
      * @return the system
      */
     public SatelliteSystem getSystem() {
@@ -63,6 +72,22 @@ public abstract class TypeSvMessage implements NavigationMessage {
      */
     public int getPrn() {
         return prn;
+    }
+
+    /** Get the identifier.
+     * @return identifier
+     * @since 14.0
+     */
+    public String getIdentifier() {
+        try {
+            final StringBuilder sb = new StringBuilder();
+            sb.append(system.getKey());
+            TWO_DIGITS.appendTo(sb, prn);
+            return sb.toString();
+        } catch (IOException ioe) {
+            // this should never happen
+            throw new OrekitInternalError(ioe);
+        }
     }
 
     /** {@inheritDoc} */

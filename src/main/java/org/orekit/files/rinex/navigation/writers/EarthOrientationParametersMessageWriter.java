@@ -39,7 +39,7 @@ public class EarthOrientationParametersMessageWriter
         throws IOException {
 
         // TYPE / SV / MSG
-        writeTypeSvMsg(RecordType.EOP, identifier, message, header, writer);
+        writeTypeSvMsg(RecordType.EOP, message.getIdentifier(), message, header, writer);
 
         // EOP MESSAGE LINE - 0
         writer.writeDate(message.getReferenceEpoch(), message.getSystem());

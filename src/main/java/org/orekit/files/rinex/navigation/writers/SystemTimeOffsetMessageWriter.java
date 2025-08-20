@@ -39,7 +39,7 @@ public class SystemTimeOffsetMessageWriter
         throws IOException {
 
         // TYPE / SV / MSG
-        writeTypeSvMsg(RecordType.STO, identifier, message, header, writer);
+        writeTypeSvMsg(RecordType.STO, message.getIdentifier(), message, header, writer);
 
         // EPOCH / SYSTEM CORR TYPE / SBAS ID / UTC ID
         writer.writeDate(message.getReferenceEpoch(), message.getSystem());
