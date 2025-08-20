@@ -60,8 +60,8 @@ public class EarthOrientationParametersMessageWriter
         writer.startLine();
         writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
         writer.writeDouble(message.getDut1(), Unit.SECOND);
-        writer.writeDouble(message.getDut1Dot(), RinexNavigationParser.S_PER_S);
-        writer.writeDouble(message.getDut1DotDot(), RinexNavigationParser.S_PER_S2);
+        writer.writeDouble(message.getDut1Dot(), RinexNavigationParser.S_PER_DAY);
+        writer.writeDouble(message.getDut1DotDot(), RinexNavigationParser.S_PER_DAY2);
         writer.finishLine();
 
     }
