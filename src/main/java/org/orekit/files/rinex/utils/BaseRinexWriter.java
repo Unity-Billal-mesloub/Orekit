@@ -38,7 +38,7 @@ import java.util.List;
  * @author Luc Maisonobe
  * @since 14.0
  */
-public abstract class BaseRinexWriter<T extends RinexBaseHeader> {
+public abstract class BaseRinexWriter<T extends RinexBaseHeader> implements AutoCloseable {
 
     /** Format for one 2 digits integer field. */
     public static final FastLongFormatter TWO_DIGITS_INTEGER = new FastLongFormatter(2, false);
@@ -70,6 +70,9 @@ public abstract class BaseRinexWriter<T extends RinexBaseHeader> {
     /** Output name for error messages. */
     private final String outputName;
 
+    /** Indicator of closed output. */
+    private boolean closed;
+
     /** Saved header. */
     private T savedHeader;
 
@@ -93,6 +96,20 @@ public abstract class BaseRinexWriter<T extends RinexBaseHeader> {
         this.output        = output;
         this.outputName    = outputName;
         this.savedComments = Collections.emptyList();
+        this.closed        = false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() throws IOException {
+        try {
+            if (!closed && output instanceof AutoCloseable) {
+                ((AutoCloseable) output).close();
+            }
+            closed = true;
+        } catch (Exception ex) {
+            throw new IOException(ex);
+        }
     }
 
     /** Prepare comments to be emitted at specified lines.
@@ -138,6 +155,7 @@ public abstract class BaseRinexWriter<T extends RinexBaseHeader> {
      * @throws IOException if an I/O error occurs.
      */
     protected void finishHeaderLine(final Label label) throws IOException {
+        checkOutputNotClosed();
         for (int i = column; i < savedLabelIndex; ++i) {
             output.append(' ');
         }
@@ -149,6 +167,8 @@ public abstract class BaseRinexWriter<T extends RinexBaseHeader> {
      * @throws IOException if an I/O error occurs.
      */
     public void finishLine() throws IOException {
+
+        checkOutputNotClosed();
 
         // pending line
         output.append(System.lineSeparator());
@@ -284,6 +304,7 @@ public abstract class BaseRinexWriter<T extends RinexBaseHeader> {
         if (padding < 0) {
             throw new OrekitException(OrekitMessages.FIELD_TOO_LONG, field, next - column);
         }
+        checkOutputNotClosed();
         if (leftJustified && field != null) {
             output.append(field);
         }
@@ -294,6 +315,14 @@ public abstract class BaseRinexWriter<T extends RinexBaseHeader> {
             output.append(field);
         }
         column = next;
+    }
+
+    /** Check that output has not been closed.
+     */
+    private void checkOutputNotClosed() {
+        if (closed) {
+            throw new OrekitException(OrekitMessages.OUTPUT_ALREADY_CLOSED, outputName);
+        }
     }
 
 }

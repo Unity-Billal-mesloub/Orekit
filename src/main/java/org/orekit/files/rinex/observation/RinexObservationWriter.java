@@ -153,6 +153,7 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
     @Override
     public void close() throws IOException {
         processPending();
+        super.close();
     }
 
     /** Set receiver clock model.

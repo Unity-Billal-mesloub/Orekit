@@ -956,3 +956,6 @@ WRONG_SATELLITES_NUMBER=nombre de satellites erroné dans le fichier {0}, {1} at
 
 # invalid format: width = {0}, precision = {1}
 INVALID_FORMAT=format invalide : taille = {0}, précision = {1}
+
+# output {0} has already been closed
+OUTPUT_ALREADY_CLOSED=la sortie {0} a déjà été fermée

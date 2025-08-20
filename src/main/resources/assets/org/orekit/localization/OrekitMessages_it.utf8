@@ -956,3 +956,6 @@ WRONG_SATELLITES_NUMBER=
 
 # invalid format: width = {0}, precision = {1}
 INVALID_FORMAT=
+
+# output {0} has already been closed
+OUTPUT_ALREADY_CLOSED=

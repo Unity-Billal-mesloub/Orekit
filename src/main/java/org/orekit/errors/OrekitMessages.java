@@ -995,7 +995,10 @@ public enum OrekitMessages implements Localizable {
     WRONG_SATELLITES_NUMBER("wrong satellites numbers in file {0}, expected {1}, got {2}"),
 
     /** INVALID_FORMAT. */
-    INVALID_FORMAT("invalid format: width = {0}, precision = {1}");
+    INVALID_FORMAT("invalid format: width = {0}, precision = {1}"),
+
+    /** OUTPUT_ALREADY_CLOSED. */
+    OUTPUT_ALREADY_CLOSED("output {0} has already been closed");
 
     /** Base name of the resource bundle in classpath. */
     private static final String RESOURCE_BASE_NAME = "assets/org/orekit/localization/OrekitMessages";
