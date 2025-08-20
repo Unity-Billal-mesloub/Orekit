@@ -263,12 +263,18 @@ public class RinexObservationWriterTest {
         Assertions.assertEquals(first.getCreationDateComponents(), second.getCreationDateComponents());
         Assertions.assertEquals(first.getCreationTimeZone(),       second.getCreationTimeZone());
         checkDate(first.getCreationDate(), second.getCreationDate(), 0.0);
+        Assertions.assertEquals(first.getReceiverNumber(),         second.getReceiverNumber());
+        Assertions.assertEquals(first.getReceiverType(),           second.getReceiverType());
+        Assertions.assertEquals(first.getReceiverVersion(),        second.getReceiverVersion());
+        Assertions.assertEquals(first.getLeapSecondsGNSS(),        second.getLeapSecondsGNSS());
+        Assertions.assertEquals(first.getLeapSecondsFuture(),      second.getLeapSecondsFuture());
+        Assertions.assertEquals(first.getLeapSecondsWeekNum(),     second.getLeapSecondsWeekNum());
+        Assertions.assertEquals(first.getLeapSecondsDayNum(),      second.getLeapSecondsDayNum());
         Assertions.assertEquals(first.getDoi(),                    second.getDoi());
         Assertions.assertEquals(first.getLicense(),                second.getLicense());
         Assertions.assertEquals(first.getStationInformation(),     second.getStationInformation());
 
         // clock-obs header
-        Assertions.assertEquals(first.getLeapSecondsGNSS(),        second.getLeapSecondsGNSS());
         Assertions.assertEquals(first.getListAppliedDCBS().size(), second.getListAppliedDCBS().size());
         for (int i = 0; i < first.getListAppliedDCBS().size(); ++i) {
             checkDCB(first.getListAppliedDCBS().get(i), second.getListAppliedDCBS().get(i));
@@ -292,9 +298,6 @@ public class RinexObservationWriterTest {
         Assertions.assertEquals(first.getMarkerNumber(),           second.getMarkerNumber());
         Assertions.assertEquals(first.getObserverName(),           second.getObserverName());
         Assertions.assertEquals(first.getAgencyName(),             second.getAgencyName());
-        Assertions.assertEquals(first.getReceiverNumber(),         second.getReceiverNumber());
-        Assertions.assertEquals(first.getReceiverType(),           second.getReceiverType());
-        Assertions.assertEquals(first.getReceiverVersion(),        second.getReceiverVersion());
         Assertions.assertEquals(first.getAntennaNumber(),          second.getAntennaNumber());
         Assertions.assertEquals(first.getAntennaType(),            second.getAntennaType());
         checkVector(first.getApproxPos(), second.getApproxPos());
