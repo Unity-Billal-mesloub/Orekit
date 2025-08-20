@@ -301,10 +301,12 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
         writeProgramRunByDate(header);
 
         // REC # / TYPE / VERS
-        outputField(header.getReceiverNumber(),  20, true);
-        outputField(header.getReceiverType(),    40, true);
-        outputField(header.getReceiverVersion(), 60, true);
-        finishHeaderLine(ObservationLabel.REC_NB_TYPE_VERS);
+        if (header.getReceiverNumber() != null) {
+            outputField(header.getReceiverNumber(), 20, true);
+            outputField(header.getReceiverType(), 40, true);
+            outputField(header.getReceiverVersion(), 60, true);
+            finishHeaderLine(ObservationLabel.REC_NB_TYPE_VERS);
+        }
 
         // MERGED FILE
         if (header.getMergedFiles() > 0) {
