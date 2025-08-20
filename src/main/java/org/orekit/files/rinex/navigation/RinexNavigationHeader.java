@@ -142,7 +142,6 @@ public class RinexNavigationHeader extends RinexBaseHeader {
         checkType(line, 20, name);
     }
 
-
     /** {@inheritDoc} */
     @Override
     public int getLabelIndex() {
