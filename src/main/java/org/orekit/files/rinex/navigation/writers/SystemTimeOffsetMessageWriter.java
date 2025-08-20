@@ -44,8 +44,8 @@ public class SystemTimeOffsetMessageWriter
         // EPOCH / SYSTEM CORR TYPE / SBAS ID / UTC ID
         writer.writeDate(message.getReferenceEpoch(), message.getSystem());
         writer.outputField(' ', 24);
-        writer.outputField(message.getReferenceTimeSystem().getTwoLettersCode(), 26, true);
-        writer.outputField(message.getDefinedTimeSystem().getTwoLettersCode(),   43, true);
+        writer.outputField(message.getDefinedTimeSystem().getTwoLettersCode(), 26, true);
+        writer.outputField(message.getReferenceTimeSystem().getTwoLettersCode(),   43, true);
         writer.outputField(message.getSbasId() == null ? "" : message.getSbasId().name(), 62, true);
         writer.outputField(message.getUtcId()  == null ? "" : message.getUtcId().getId(), 80, true);
         writer.finishLine();
