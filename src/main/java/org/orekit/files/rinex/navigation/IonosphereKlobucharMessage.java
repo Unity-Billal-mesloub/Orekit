@@ -53,7 +53,6 @@ public class IonosphereKlobucharMessage extends IonosphereBaseMessage {
      * {@code IonosphereKlobucharMessage.S_PER_SC_N[i].fromSI(alpha[i])}
      * </p>
      * @return α coefficients (s/radⁿ)
-     * @see #S_PER_SC_N
      */
     public double[] getAlpha() {
         return alpha.clone();
@@ -67,7 +66,6 @@ public class IonosphereKlobucharMessage extends IonosphereBaseMessage {
      * </p>
      * @param i index of the coefficient
      * @param alphaI α coefficient to set (s/radⁿ)
-     * @see #S_PER_SC_N
      */
     public void setAlphaI(final int i, final double alphaI) {
         alpha[i] = alphaI;
@@ -80,7 +78,6 @@ public class IonosphereKlobucharMessage extends IonosphereBaseMessage {
      * {@code IonosphereKlobucharMessage.S_PER_SC_N[i].fromSI(beta[i])}
      * </p>
      * @return β coefficients (s/radⁿ)
-     * @see #S_PER_SC_N
      */
     public double[] getBeta() {
         return beta.clone();
@@ -94,7 +91,6 @@ public class IonosphereKlobucharMessage extends IonosphereBaseMessage {
      * </p>
      * @param i index of the coefficient
      * @param betaI β coefficient to set (s/radⁿ)
-     * @see #S_PER_SC_N
      */
     public void setBetaI(final int i, final double betaI) {
         beta[i] = betaI;
