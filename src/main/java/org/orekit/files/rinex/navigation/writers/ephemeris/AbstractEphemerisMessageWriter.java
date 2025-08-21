@@ -40,14 +40,16 @@ public abstract class AbstractEphemerisMessageWriter<T extends AbstractEphemeris
                              final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
 
-        // TYPE / SV / MSG
-        writeTypeSvMsg(RecordType.EPH, identifier, message, header, writer);
+        if (header.getFormatVersion() >= 4.0) {
+            // TYPE / SV / MSG
+            writeTypeSvMsg(RecordType.EPH, identifier, message, header, writer);
+        }
 
         // EPH MESSAGE LINE - 0
-        writeEphLine0(message, header, writer);
+        writeEphLine0(message, identifier, header, writer);
 
         // EPH MESSAGE LINE - 1
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getX(),       Unit.KILOMETRE);
         writer.writeDouble(message.getXDot(),    RinexNavigationParser.KM_PER_S);
         writer.writeDouble(message.getXDotDot(), RinexNavigationParser.KM_PER_S2);
@@ -55,7 +57,7 @@ public abstract class AbstractEphemerisMessageWriter<T extends AbstractEphemeris
         writer.finishLine();
 
         // EPH MESSAGE LINE - 2
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getY(),       Unit.KILOMETRE);
         writer.writeDouble(message.getYDot(),    RinexNavigationParser.KM_PER_S);
         writer.writeDouble(message.getYDotDot(), RinexNavigationParser.KM_PER_S2);
@@ -63,7 +65,7 @@ public abstract class AbstractEphemerisMessageWriter<T extends AbstractEphemeris
         writer.finishLine();
 
         // EPH MESSAGE LINE - 3
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getZ(),       Unit.KILOMETRE);
         writer.writeDouble(message.getZDot(),    RinexNavigationParser.KM_PER_S);
         writer.writeDouble(message.getZDotDot(), RinexNavigationParser.KM_PER_S2);
@@ -74,11 +76,12 @@ public abstract class AbstractEphemerisMessageWriter<T extends AbstractEphemeris
 
     /** Write the EPH MESSAGE LINE - 0.
      * @param message navigation message to write
+     * @param identifier identifier
      * @param header file header
      * @param writer global file writer
      * @throws IOException if an I/O error occurs.
      */
-    protected abstract void writeEphLine0(T message,
+    protected abstract void writeEphLine0(T message, String identifier,
                                           RinexNavigationHeader header, RinexNavigationWriter writer)
         throws IOException;
 

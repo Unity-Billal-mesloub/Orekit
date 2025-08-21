@@ -129,13 +129,13 @@ public class RinexNavigationWriterTest {
 
     @DefaultDataContext
     @Test
-    public void testRoundTripTableEopRinex400() throws IOException {
+    public void testRoundTripEopRinex400() throws IOException {
         doTestRoundTrip("gnss/navigation/Example_Eop_Rinex400.n");
     }
 
     @DefaultDataContext
     @Test
-    public void testRoundTripTableGalileoRinex302() throws IOException {
+    public void testRoundTripGalileoRinex302() throws IOException {
         doTestRoundTrip("gnss/navigation/Example_Galileo_Rinex302.n");
     }
 
@@ -293,6 +293,7 @@ public class RinexNavigationWriterTest {
         }
 
         // reparse the written file
+        System.out.println(caw);
         final byte[]          bytes   = caw.toString().getBytes(StandardCharsets.UTF_8);
         final DataSource      source  = new DataSource("", () -> new ByteArrayInputStream(bytes));
         final RinexNavigation rebuilt = new RinexNavigationParser(DataContext.getDefault().getTimeScales()).
@@ -444,7 +445,7 @@ public class RinexNavigationWriterTest {
         } else {
             Assertions.assertEquals(first.length, second.length);
             for (int i = 0; i < first.length; ++i) {
-                Assertions.assertEquals(first[i], second[i], FastMath.ulp(first[i]));
+                checkDouble(first[i], second[i]);
             }
         }
     }
@@ -487,10 +488,10 @@ public class RinexNavigationWriterTest {
         // check data specific to this message
         Assertions.assertEquals(first.getIODNav(), second.getIODNav());
         Assertions.assertEquals(first.getDataSource(), second.getDataSource());
-        Assertions.assertEquals(first.getBGDE1E5a(), second.getBGDE1E5a(), FastMath.ulp(first.getBGDE1E5a()));
-        Assertions.assertEquals(first.getBGDE5bE1(), second.getBGDE5bE1(), FastMath.ulp(first.getBGDE5bE1()));
-        Assertions.assertEquals(first.getSisa(), second.getSisa(), FastMath.ulp(first.getSisa()));
-        Assertions.assertEquals(first.getSvHealth(), second.getSvHealth(), FastMath.ulp(first.getSvHealth()));
+        checkDouble(first.getBGDE1E5a(), second.getBGDE1E5a());
+        checkDouble(first.getBGDE5bE1(), second.getBGDE5bE1());
+        checkDouble(first.getSisa(), second.getSisa());
+        checkDouble(first.getSvHealth(), second.getSvHealth());
 
     }
 
@@ -502,9 +503,9 @@ public class RinexNavigationWriterTest {
         // check data specific to this message
         Assertions.assertEquals(first.getAODC(), second.getAODC());
         Assertions.assertEquals(first.getAODE(), second.getAODE());
-        Assertions.assertEquals(first.getTGD1(), second.getTGD1(), FastMath.ulp(first.getTGD1()));
-        Assertions.assertEquals(first.getTGD2(), second.getTGD2(), FastMath.ulp(first.getTGD2()));
-        Assertions.assertEquals(first.getSvAccuracy(), second.getSvAccuracy(), FastMath.ulp(first.getSvAccuracy()));
+        checkDouble(first.getTGD1(), second.getTGD1());
+        checkDouble(first.getTGD2(), second.getTGD2());
+        checkDouble(first.getSvAccuracy(), second.getSvAccuracy());
         Assertions.assertEquals(first.getSatH1(), second.getSatH1());
 
     }
@@ -517,13 +518,13 @@ public class RinexNavigationWriterTest {
         // check data specific to this message
         Assertions.assertEquals(first.getRadioWave().getFrequency(), second.getRadioWave().getFrequency(),
                                 FastMath.ulp(first.getRadioWave().getFrequency()));
-        Assertions.assertEquals(first.getADot(), second.getADot(), FastMath.ulp(first.getADot()));
-        Assertions.assertEquals(first.getDeltaN0Dot(), second.getDeltaN0Dot(), FastMath.ulp(first.getDeltaN0Dot()));
+        checkDouble(first.getADot(), second.getADot());
+        checkDouble(first.getDeltaN0Dot(), second.getDeltaN0Dot());
         Assertions.assertEquals(first.getIODE(), second.getIODE());
         Assertions.assertEquals(first.getIODC(), second.getIODC());
-        Assertions.assertEquals(first.getIscB1CD(), second.getIscB1CD(), FastMath.ulp(first.getIscB1CD()));
-        Assertions.assertEquals(first.getIscB2AD(), second.getIscB2AD(), FastMath.ulp(first.getIscB2AD()));
-        Assertions.assertEquals(first.getIscB1CP(), second.getIscB1CP(), FastMath.ulp(first.getIscB1CP()));
+        checkDouble(first.getIscB1CD(), second.getIscB1CD());
+        checkDouble(first.getIscB2AD(), second.getIscB2AD());
+        checkDouble(first.getIscB1CP(), second.getIscB1CP());
         Assertions.assertEquals(first.getSisaiOe(), second.getSisaiOe());
         Assertions.assertEquals(first.getSisaiOcb(), second.getSisaiOcb());
         Assertions.assertEquals(first.getSisaiOc1(), second.getSisaiOc1());
@@ -531,9 +532,9 @@ public class RinexNavigationWriterTest {
         Assertions.assertEquals(first.getSismai(), second.getSismai());
         Assertions.assertEquals(first.getHealth(), second.getHealth());
         Assertions.assertEquals(first.getIntegrityFlags(), second.getIntegrityFlags());
-        Assertions.assertEquals(first.getTgdB1Cp(), second.getTgdB1Cp(), FastMath.ulp(first.getTgdB1Cp()));
-        Assertions.assertEquals(first.getTgdB1Cp(), second.getTgdB1Cp(), FastMath.ulp(first.getTgdB1Cp()));
-        Assertions.assertEquals(first.getTgdB2bI(), second.getTgdB2bI(), FastMath.ulp(first.getTgdB2bI()));
+        checkDouble(first.getTgdB1Cp(), second.getTgdB1Cp());
+        checkDouble(first.getTgdB1Cp(), second.getTgdB1Cp());
+        checkDouble(first.getTgdB2bI(), second.getTgdB2bI());
         Assertions.assertEquals(first.getSatelliteType(), second.getSatelliteType());
 
     }
@@ -572,11 +573,11 @@ public class RinexNavigationWriterTest {
 
         // check data specific to this message
         Assertions.assertEquals(first.getReferenceSignalFlag(), second.getReferenceSignalFlag());
-        Assertions.assertEquals(first.getTGDSL5(), second.getTGDSL5(), FastMath.ulp(first.getTGDSL5()));
-        Assertions.assertEquals(first.getIscSL1P(), second.getIscSL1P(), FastMath.ulp(first.getIscSL1P()));
-        Assertions.assertEquals(first.getIscL1DL1P(), second.getIscL1DL1P(), FastMath.ulp(first.getIscL1DL1P()));
-        Assertions.assertEquals(first.getIscL1PS(), second.getIscL1PS(), FastMath.ulp(first.getIscL1PS()));
-        Assertions.assertEquals(first.getIscL1DS(), second.getIscL1DS(), FastMath.ulp(first.getIscL1DS()));
+        checkDouble(first.getTGDSL5(), second.getTGDSL5());
+        checkDouble(first.getIscSL1P(), second.getIscSL1P());
+        checkDouble(first.getIscL1DL1P(), second.getIscL1DL1P());
+        checkDouble(first.getIscL1PS(), second.getIscL1PS());
+        checkDouble(first.getIscL1DS(), second.getIscL1DS());
 
     }
 
@@ -589,14 +590,14 @@ public class RinexNavigationWriterTest {
         checkNavigationMessage(first, second);
 
         // check data specific to this message
-        Assertions.assertEquals(first.getTN(), second.getTN(), FastMath.ulp(first.getTN()));
-        Assertions.assertEquals(first.getGammaN(), second.getGammaN(), FastMath.ulp(first.getGammaN()));
+        checkDouble(first.getTN(), second.getTN());
+        checkDouble(first.getGammaN(), second.getGammaN());
         Assertions.assertEquals(first.getFrequencyNumber(), second.getFrequencyNumber());
-        Assertions.assertEquals(first.getTime(), second.getTime(), FastMath.ulp(first.getTime()));
+        checkDouble(first.getTime(), second.getTime());
         Assertions.assertEquals(first.getStatusFlags(), second.getStatusFlags());
         Assertions.assertEquals(first.getHealthFlags(), second.getHealthFlags());
-        Assertions.assertEquals(first.getGroupDelayDifference(), second.getGroupDelayDifference(), FastMath.ulp(first.getGroupDelayDifference()));
-        Assertions.assertEquals(first.getURA(), second.getURA(), FastMath.ulp(first.getURA()));
+        checkDouble(first.getGroupDelayDifference(), second.getGroupDelayDifference());
+        checkDouble(first.getURA(), second.getURA());
 
     }
 
@@ -610,11 +611,11 @@ public class RinexNavigationWriterTest {
 
         // check data specific to this message
         Assertions.assertEquals(first.getWeek(), second.getWeek());
-        Assertions.assertEquals(first.getTime(), second.getTime(), FastMath.ulp(first.getTime()));
+        checkDouble(first.getTime(), second.getTime());
         Assertions.assertEquals(first.getIODN(), second.getIODN());
-        Assertions.assertEquals(first.getAGf0(), second.getAGf0(), FastMath.ulp(first.getAGf0()));
-        Assertions.assertEquals(first.getAGf1(), second.getAGf1(), FastMath.ulp(first.getAGf1()));
-        Assertions.assertEquals(first.getURA(), second.getURA(), FastMath.ulp(first.getURA()));
+        checkDouble(first.getAGf0(), second.getAGf0());
+        checkDouble(first.getAGf1(), second.getAGf1());
+        checkDouble(first.getURA(), second.getURA());
 
     }
 
@@ -627,7 +628,7 @@ public class RinexNavigationWriterTest {
         // check data specific to this message
         Assertions.assertEquals(first.getIODE(), second.getIODE());
         Assertions.assertEquals(first.getIODC(), second.getIODC());
-        Assertions.assertEquals(first.getSvAccuracy(), second.getSvAccuracy(), FastMath.ulp(first.getSvAccuracy()));
+        checkDouble(first.getSvAccuracy(), second.getSvAccuracy());
         Assertions.assertEquals(first.getSvHealth(), second.getSvHealth());
         Assertions.assertEquals(first.getFitInterval(), second.getFitInterval());
         Assertions.assertEquals(first.getL2Codes(), second.getL2Codes());
@@ -643,16 +644,16 @@ public class RinexNavigationWriterTest {
 
         // check data specific to this message
         Assertions.assertEquals(first.isCnv2(), second.isCnv2());
-        Assertions.assertEquals(first.getADot(), second.getADot(), FastMath.ulp(first.getADot()));
-        Assertions.assertEquals(first.getDeltaN0Dot(), second.getDeltaN0Dot(), FastMath.ulp(first.getDeltaN0Dot()));
-        Assertions.assertEquals(first.getSvAccuracy(), second.getSvAccuracy(), FastMath.ulp(first.getSvAccuracy()));
+        checkDouble(first.getADot(), second.getADot());
+        checkDouble(first.getDeltaN0Dot(), second.getDeltaN0Dot());
+        checkDouble(first.getSvAccuracy(), second.getSvAccuracy());
         Assertions.assertEquals(first.getSvHealth(), second.getSvHealth());
-        Assertions.assertEquals(first.getIscL1CA(), second.getIscL1CA(), FastMath.ulp(first.getIscL1CA()));
-        Assertions.assertEquals(first.getIscL1CD(), second.getIscL1CD(), FastMath.ulp(first.getIscL1CD()));
-        Assertions.assertEquals(first.getIscL1CP(), second.getIscL1CP(), FastMath.ulp(first.getIscL1CP()));
-        Assertions.assertEquals(first.getIscL2C(), second.getIscL2C(), FastMath.ulp(first.getIscL2C()));
-        Assertions.assertEquals(first.getIscL5I5(), second.getIscL5I5(), FastMath.ulp(first.getIscL5I5()));
-        Assertions.assertEquals(first.getIscL5Q5(), second.getIscL5Q5(), FastMath.ulp(first.getIscL5Q5()));
+        checkDouble(first.getIscL1CA(), second.getIscL1CA());
+        checkDouble(first.getIscL1CD(), second.getIscL1CD());
+        checkDouble(first.getIscL1CP(), second.getIscL1CP());
+        checkDouble(first.getIscL2C(), second.getIscL2C());
+        checkDouble(first.getIscL5I5(), second.getIscL5I5());
+        checkDouble(first.getIscL5Q5(), second.getIscL5Q5());
         Assertions.assertEquals(first.getUraiEd(), second.getUraiEd());
         Assertions.assertEquals(first.getUraiNed0(), second.getUraiNed0());
         Assertions.assertEquals(first.getUraiNed1(), second.getUraiNed1());
@@ -672,10 +673,10 @@ public class RinexNavigationWriterTest {
         checkNavigationMessage(first, second);
 
         // check data specific to this message
-        Assertions.assertEquals(first.getSqrtA(), second.getSqrtA(), FastMath.ulp(first.getSqrtA()));
-        Assertions.assertEquals(first.getDeltaN0(), second.getDeltaN0(), FastMath.ulp(first.getDeltaN0()));
+        checkDouble(first.getSqrtA(), second.getSqrtA());
+        checkDouble(first.getDeltaN0(), second.getDeltaN0());
         checkDate(first.getEpochToc(), second.getEpochToc());
-        Assertions.assertEquals(first.getTransmissionTime(), second.getTransmissionTime(), FastMath.ulp(first.getTransmissionTime()));
+        checkDouble(first.getTransmissionTime(), second.getTransmissionTime());
 
     }
 
@@ -702,11 +703,11 @@ public class RinexNavigationWriterTest {
         checkGNSSOrbitalElements(first, second);
 
         // check data specific to this message
-        Assertions.assertEquals(first.getAf0(), second.getAf0(), FastMath.ulp(first.getAf0()));
-        Assertions.assertEquals(first.getAf1(), second.getAf1(), FastMath.ulp(first.getAf1()));
-        Assertions.assertEquals(first.getAf2(), second.getAf2(), FastMath.ulp(first.getAf2()));
-        Assertions.assertEquals(first.getTGD(), second.getTGD(), FastMath.ulp(first.getTGD()));
-        Assertions.assertEquals(first.getToc(), second.getToc(), FastMath.ulp(first.getToc()));
+        checkDouble(first.getAf0(), second.getAf0());
+        checkDouble(first.getAf1(), second.getAf1());
+        checkDouble(first.getAf2(), second.getAf2());
+        checkDouble(first.getTGD(), second.getTGD());
+        checkDouble(first.getToc(), second.getToc());
 
     }
 
@@ -718,12 +719,12 @@ public class RinexNavigationWriterTest {
 
         // check data specific to this message
         checkDate(first.getDate(), second.getDate());
-        Assertions.assertEquals(first.getMu(), second.getMu(), FastMath.ulp(first.getMu()));
+        checkDouble(first.getMu(), second.getMu());
         checkParameterDriver(first.getSmaDriver(), second.getSmaDriver());
-        Assertions.assertEquals(first.getADot(), second.getADot(), FastMath.ulp(first.getADot()));
-        Assertions.assertEquals(first.getMeanMotion0(), second.getMeanMotion0(), FastMath.ulp(first.getMeanMotion0()));
-        Assertions.assertEquals(first.getDeltaN0(), second.getDeltaN0(), FastMath.ulp(first.getDeltaN0()));
-        Assertions.assertEquals(first.getDeltaN0Dot(), second.getDeltaN0Dot(), FastMath.ulp(first.getDeltaN0Dot()));
+        checkDouble(first.getADot(), second.getADot());
+        checkDouble(first.getMeanMotion0(), second.getMeanMotion0());
+        checkDouble(first.getDeltaN0(), second.getDeltaN0());
+        checkDouble(first.getDeltaN0Dot(), second.getDeltaN0Dot());
         checkParameterDriver(first.getEDriver(), second.getEDriver());
         checkParameterDriver(first.getI0Driver(), second.getI0Driver());
         checkParameterDriver(first.getOmega0Driver(), second.getOmega0Driver());
@@ -755,16 +756,16 @@ public class RinexNavigationWriterTest {
         checkDate(first.getDate(),    second.getDate());
         checkDate(first.getEpochToc(),    second.getEpochToc());
         Assertions.assertEquals(first.getPRN(), second.getPRN());
-        Assertions.assertEquals(first.getX(), second.getX(), FastMath.ulp(first.getX()));
-        Assertions.assertEquals(first.getXDot(), second.getXDot(), FastMath.ulp(first.getXDot()));
-        Assertions.assertEquals(first.getXDotDot(), second.getXDotDot(), FastMath.ulp(first.getXDotDot()));
-        Assertions.assertEquals(first.getY(), second.getY(), FastMath.ulp(first.getY()));
-        Assertions.assertEquals(first.getYDot(), second.getYDot(), FastMath.ulp(first.getYDot()));
-        Assertions.assertEquals(first.getYDotDot(), second.getYDotDot(), FastMath.ulp(first.getYDotDot()));
-        Assertions.assertEquals(first.getZ(), second.getZ(), FastMath.ulp(first.getZ()));
-        Assertions.assertEquals(first.getZDot(), second.getZDot(), FastMath.ulp(first.getZDot()));
-        Assertions.assertEquals(first.getZDotDot(), second.getZDotDot(), FastMath.ulp(first.getZDotDot()));
-        Assertions.assertEquals(first.getHealth(), second.getHealth(), FastMath.ulp(first.getHealth()));
+        checkDouble(first.getX(), second.getX());
+        checkDouble(first.getXDot(), second.getXDot());
+        checkDouble(first.getXDotDot(), second.getXDotDot());
+        checkDouble(first.getY(), second.getY());
+        checkDouble(first.getYDot(), second.getYDot());
+        checkDouble(first.getYDotDot(), second.getYDotDot());
+        checkDouble(first.getZ(), second.getZ());
+        checkDouble(first.getZDot(), second.getZDot());
+        checkDouble(first.getZDotDot(), second.getZDotDot());
+        checkDouble(first.getHealth(), second.getHealth());
     }
 
     private void checkParameterDriver(final ParameterDriver first, final ParameterDriver second) {
@@ -787,25 +788,25 @@ public class RinexNavigationWriterTest {
         Assertions.assertEquals(first.getReferenceTimeSystem().getKey(), second.getReferenceTimeSystem().getKey());
         Assertions.assertEquals(first.getSbasId(), second.getSbasId());
         Assertions.assertEquals(first.getUtcId(), second.getUtcId());
-        Assertions.assertEquals(first.getA0(), second.getA0(), FastMath.ulp(first.getA0()));
-        Assertions.assertEquals(first.getA1(), second.getA1(), FastMath.ulp(first.getA1()));
-        Assertions.assertEquals(first.getA2(), second.getA2(), FastMath.ulp(first.getA2()));
-        Assertions.assertEquals(first.getTransmissionTime(), second.getTransmissionTime(), FastMath.ulp(first.getTransmissionTime()));
+        checkDouble(first.getA0(), second.getA0());
+        checkDouble(first.getA1(), second.getA1());
+        checkDouble(first.getA2(), second.getA2());
+        checkDouble(first.getTransmissionTime(), second.getTransmissionTime());
     }
 
     private void checkEOP(final EarthOrientationParameterMessage first, final EarthOrientationParameterMessage second) {
         checkDate(first.getDate(), second.getDate());
         checkDate(first.getReferenceEpoch(), second.getReferenceEpoch());
-        Assertions.assertEquals(first.getXp(), second.getXp(), FastMath.ulp(first.getXp()));
-        Assertions.assertEquals(first.getXpDot(), second.getXpDot(), FastMath.ulp(first.getXpDot()));
-        Assertions.assertEquals(first.getXpDotDot(), second.getXpDotDot(), FastMath.ulp(first.getXpDotDot()));
-        Assertions.assertEquals(first.getYp(), second.getYp(), FastMath.ulp(first.getYp()));
-        Assertions.assertEquals(first.getYpDot(), second.getYpDot(), FastMath.ulp(first.getYpDot()));
-        Assertions.assertEquals(first.getYpDotDot(), second.getYpDotDot(), FastMath.ulp(first.getYpDotDot()));
-        Assertions.assertEquals(first.getDut1(), second.getDut1(), FastMath.ulp(first.getDut1()));
-        Assertions.assertEquals(first.getDut1Dot(), second.getDut1Dot(), FastMath.ulp(first.getDut1Dot()));
-        Assertions.assertEquals(first.getDut1DotDot(), second.getDut1DotDot(), FastMath.ulp(first.getDut1DotDot()));
-        Assertions.assertEquals(first.getTransmissionTime(), second.getTransmissionTime(), FastMath.ulp(first.getTransmissionTime()));
+        checkDouble(first.getXp(), second.getXp());
+        checkDouble(first.getXpDot(), second.getXpDot());
+        checkDouble(first.getXpDotDot(), second.getXpDotDot());
+        checkDouble(first.getYp(), second.getYp());
+        checkDouble(first.getYpDot(), second.getYpDot());
+        checkDouble(first.getYpDotDot(), second.getYpDotDot());
+        checkDouble(first.getDut1(), second.getDut1());
+        checkDouble(first.getDut1Dot(), second.getDut1Dot());
+        checkDouble(first.getDut1DotDot(), second.getDut1DotDot());
+        checkDouble(first.getTransmissionTime(), second.getTransmissionTime());
     }
 
     private void checkKlobuchar(final IonosphereKlobucharMessage first, final IonosphereKlobucharMessage second) {
@@ -850,10 +851,10 @@ public class RinexNavigationWriterTest {
         Assertions.assertEquals(first.getIOD(), second.getIOD());
         checkArray(first.getAlpha(), second.getAlpha());
         checkArray(first.getBeta(), second.getBeta());
-        Assertions.assertEquals(first.getLonMin(), second.getLonMin(), FastMath.ulp(first.getLonMin()));
-        Assertions.assertEquals(first.getLonMax(), second.getLonMax(), FastMath.ulp(first.getLonMax()));
-        Assertions.assertEquals(first.getModipMin(), second.getModipMin(), FastMath.ulp(first.getModipMin()));
-        Assertions.assertEquals(first.getModipMax(), second.getModipMax(), FastMath.ulp(first.getModipMax()));
+        checkDouble(first.getLonMin(), second.getLonMin());
+        checkDouble(first.getLonMax(), second.getLonMax());
+        checkDouble(first.getModipMin(), second.getModipMin());
+        checkDouble(first.getModipMax(), second.getModipMax());
 
     }
 
@@ -876,9 +877,9 @@ public class RinexNavigationWriterTest {
         checkIonosphereBase(first, second);
 
         // check data specific to this message
-        Assertions.assertEquals(first.getCA(), second.getCA(), FastMath.ulp(first.getCA()));
-        Assertions.assertEquals(first.getCF107(), second.getCF107(), FastMath.ulp(first.getCF107()));
-        Assertions.assertEquals(first.getCAP(), second.getCAP(), FastMath.ulp(first.getCAP()));
+        checkDouble(first.getCA(), second.getCA());
+        checkDouble(first.getCF107(), second.getCF107());
+        checkDouble(first.getCAP(), second.getCAP());
 
     }
 
@@ -893,18 +894,26 @@ public class RinexNavigationWriterTest {
         checkIonosphereAij(first, second);
 
         // check data specific to this message
-        Assertions.assertEquals(first.getIDF(), second.getIDF(), FastMath.ulp(first.getIDF()));
-        Assertions.assertEquals(first.getLonMin(), second.getLonMin(), FastMath.ulp(first.getLonMin()));
-        Assertions.assertEquals(first.getLonMax(), second.getLonMax(), FastMath.ulp(first.getLonMax()));
-        Assertions.assertEquals(first.getModipMin(), second.getModipMin(), FastMath.ulp(first.getModipMin()));
-        Assertions.assertEquals(first.getModipMax(), second.getModipMax(), FastMath.ulp(first.getModipMax()));
+        checkDouble(first.getIDF(), second.getIDF());
+        checkDouble(first.getLonMin(), second.getLonMin());
+        checkDouble(first.getLonMax(), second.getLonMax());
+        checkDouble(first.getModipMin(), second.getModipMin());
+        checkDouble(first.getModipMax(), second.getModipMax());
 
     }
 
     private void checkIonosphereAij(final IonosphereAij first, final IonosphereAij second) {
-        Assertions.assertEquals(first.getAi0(), second.getAi0(), FastMath.ulp(first.getAi0()));
-        Assertions.assertEquals(first.getAi1(), second.getAi1(), FastMath.ulp(first.getAi1()));
-        Assertions.assertEquals(first.getAi2(), second.getAi2(), FastMath.ulp(first.getAi2()));
+        checkDouble(first.getAi0(), second.getAi0());
+        checkDouble(first.getAi1(), second.getAi1());
+        checkDouble(first.getAi2(), second.getAi2());
+    }
+
+    private void checkDouble(final double first, final double second) {
+        if (Double.isNaN(first)) {
+            Assertions.assertTrue(Double.isNaN(second));
+        } else {
+            Assertions.assertEquals(first, second, FastMath.ulp(first));
+        }
     }
 
 }

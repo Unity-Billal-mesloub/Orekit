@@ -19,7 +19,6 @@ package org.orekit.files.rinex.navigation.writers.ephemeris;
 import org.orekit.files.rinex.navigation.RinexNavigationHeader;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
 import org.orekit.files.rinex.utils.BaseRinexWriter;
-import org.orekit.gnss.SatelliteSystem;
 import org.orekit.propagation.analytical.gnss.data.GLONASSFdmaNavigationMessage;
 import org.orekit.time.DateTimeComponents;
 import org.orekit.utils.formatting.FastDecimalFormatter;
@@ -40,11 +39,9 @@ public class GlonassFdmaNavigationMessageWriter
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine0(final GLONASSFdmaNavigationMessage message,
+    protected void writeEphLine0(final GLONASSFdmaNavigationMessage message, final String identifier,
                                  final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-
-        writer.startLine();
 
         final DateTimeComponents dtc = message.getEpochToc().getComponents(writer.getTimeScales().getUTC());
         if (header.getFormatVersion() < 3.0) {
@@ -66,9 +63,7 @@ public class GlonassFdmaNavigationMessageWriter
             writer.writeDouble(message.getGammaN(), Unit.NONE);
 
         } else {
-            writer.outputField(SatelliteSystem.GLONASS.getKey(), 1);
-            writer.outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, message.getPRN(), 3);
-            writer.outputField(' ', 4);
+            writer.outputField(identifier, 4, true);
             writer.writeDate(dtc);
             writer.writeDouble(-message.getTN(),    Unit.SECOND);
             writer.writeDouble(message.getGammaN(), Unit.NONE);
@@ -110,7 +105,7 @@ public class GlonassFdmaNavigationMessageWriter
 
         if (header.getFormatVersion() > 3.045) {
             // EPH MESSAGE LINE - 4
-            writer.startLine();
+            writer.indentLine();
             writer.writeDouble(message.getStatusFlags(), Unit.NONE);
             writer.writeDouble(message.getGroupDelayDifference(), Unit.NONE);
             writer.writeDouble(message.getURA(), Unit.NONE);

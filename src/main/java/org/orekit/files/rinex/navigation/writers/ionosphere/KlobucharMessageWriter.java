@@ -39,16 +39,18 @@ public class KlobucharMessageWriter extends NavigationMessageWriter<IonosphereKl
 
         // TYPE / SV / MSG
         if (message.getSystem() == SatelliteSystem.BEIDOU && header.getFormatVersion() >= 4.02) {
+            final String subType = message.getRegionCode() == null ? "" : message.getRegionCode().getStringId();
             writeTypeSvMsg(RecordType.ION, message.getIdentifier(),
                            new IonosphereKlobucharMessage(message.getSystem(), message.getPrn(),
                                                           message.getNavigationMessageType(),
-                                                          message.getRegionCode().getStringId()),
+                                                          subType),
                            header, writer);
         } else {
             writeTypeSvMsg(RecordType.ION, message.getIdentifier(), message, header, writer);
         }
 
         // ION MESSAGE LINE - 0
+        writer.indentLine();
         writer.writeDate(message.getTransmitTime(), message.getSystem());
         writer.writeDouble(message.getAlpha()[0], IonosphereKlobucharMessage.S_PER_SC_N0);
         writer.writeDouble(message.getAlpha()[1], IonosphereKlobucharMessage.S_PER_SC_N1);
@@ -56,7 +58,7 @@ public class KlobucharMessageWriter extends NavigationMessageWriter<IonosphereKl
         writer.finishLine();
 
         // ION MESSAGE LINE - 1
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getAlpha()[3], IonosphereKlobucharMessage.S_PER_SC_N3);
         writer.writeDouble(message.getBeta()[0], IonosphereKlobucharMessage.S_PER_SC_N0);
         writer.writeDouble(message.getBeta()[1], IonosphereKlobucharMessage.S_PER_SC_N1);
@@ -64,7 +66,7 @@ public class KlobucharMessageWriter extends NavigationMessageWriter<IonosphereKl
         writer.finishLine();
 
         // ION MESSAGE LINE - 2
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getBeta()[3], IonosphereKlobucharMessage.S_PER_SC_N3);
         if (header.getFormatVersion() < 4.015) {
             writer.writeInt(message.getRegionCode().getIntegerId());

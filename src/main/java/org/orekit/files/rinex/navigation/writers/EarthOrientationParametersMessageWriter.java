@@ -42,6 +42,7 @@ public class EarthOrientationParametersMessageWriter
         writeTypeSvMsg(RecordType.EOP, message.getIdentifier(), message, header, writer);
 
         // EOP MESSAGE LINE - 0
+        writer.indentLine();
         writer.writeDate(message.getReferenceEpoch(), message.getSystem());
         writer.writeDouble(message.getXp(), Unit.ARC_SECOND);
         writer.writeDouble(message.getXpDot(), RinexNavigationParser.AS_PER_DAY);
@@ -49,7 +50,7 @@ public class EarthOrientationParametersMessageWriter
         writer.finishLine();
 
         // EOP MESSAGE LINE - 1
-        writer.startLine();
+        writer.indentLine();
         writer.outputField(' ', 23);
         writer.writeDouble(message.getYp(), Unit.ARC_SECOND);
         writer.writeDouble(message.getYpDot(), RinexNavigationParser.AS_PER_DAY);
@@ -57,7 +58,7 @@ public class EarthOrientationParametersMessageWriter
         writer.finishLine();
 
         // EOP MESSAGE LINE - 2
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
         writer.writeDouble(message.getDut1(), Unit.SECOND);
         writer.writeDouble(message.getDut1Dot(), RinexNavigationParser.S_PER_DAY);

@@ -43,7 +43,7 @@ public class GalileoNavigationMessageWriter
     public void writeEphLine5(final GalileoNavigationMessage message,
                               final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeInt(message.getDataSource());
         writer.writeInt(message.getWeek());
@@ -55,7 +55,7 @@ public class GalileoNavigationMessageWriter
     public void writeEphLine6(final GalileoNavigationMessage message,
                               final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getSisa(),     Unit.METRE);
         writer.writeDouble(message.getSvHealth(), Unit.NONE);
         writer.writeDouble(message.getBGDE1E5a(), Unit.SECOND);
@@ -68,7 +68,7 @@ public class GalileoNavigationMessageWriter
     public void writeEphLine7(final GalileoNavigationMessage message,
                               final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
         writer.finishLine();
 

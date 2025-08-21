@@ -16,6 +16,7 @@
  */
 package org.orekit.files.rinex.navigation.writers.ephemeris;
 
+import org.orekit.files.rinex.navigation.RinexNavigationHeader;
 import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
 import org.orekit.files.rinex.navigation.parsers.ephemeris.NavICLnavParser;
@@ -33,9 +34,26 @@ public class NavICL1NVNavigationMessageWriter
 
     /** {@inheritDoc} */
     @Override
+    public void writeMessage(final String identifier, final NavICL1NvNavigationMessage message,
+                             final RinexNavigationHeader header, final RinexNavigationWriter writer)
+        throws IOException {
+
+        // TYPE / SV / MSG, and lines 0 to 7
+        super.writeMessage(identifier, message, header, writer);
+
+        // EPH MESSAGE LINE - 8
+        writer.indentLine();
+        writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
+        writer.writeInt(message.getWeek());
+        writer.finishLine();
+
+    }
+
+    /** {@inheritDoc} */
+    @Override
     protected void writeEphLine5(NavICL1NvNavigationMessage message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeDouble(message.getDeltaN0Dot(), RinexNavigationParser.RAD_PER_S2);
         writer.writeEmpty();
@@ -47,7 +65,7 @@ public class NavICL1NVNavigationMessageWriter
     @Override
     protected void writeEphLine6(NavICL1NvNavigationMessage message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
 
         // convert accuracy to index
         int index = 0;
@@ -69,7 +87,7 @@ public class NavICL1NVNavigationMessageWriter
     @Override
     protected void writeEphLine7(NavICL1NvNavigationMessage message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getIscSL1P(),   Unit.SECOND);
         writer.writeDouble(message.getIscL1DL1P(), Unit.SECOND);
         writer.writeDouble(message.getIscL1PS(),   Unit.SECOND);

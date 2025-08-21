@@ -16,11 +16,12 @@
  */
 package org.orekit.files.rinex.navigation.writers.ephemeris;
 
+import org.hipparchus.util.FastMath;
 import org.orekit.files.rinex.navigation.RinexNavigationHeader;
 import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
-import org.orekit.gnss.SatelliteSystem;
 import org.orekit.propagation.analytical.gnss.data.SBASNavigationMessage;
+import org.orekit.time.TimeScale;
 import org.orekit.utils.units.Unit;
 
 import java.io.IOException;
@@ -34,11 +35,17 @@ public class SBASNavigationMessageWriter
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine0(final SBASNavigationMessage message,
+    protected void writeEphLine0(final SBASNavigationMessage message, final String identifier,
                                  final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
-        writer.writeDate(message.getEpochToc(), SatelliteSystem.SBAS);
+        writer.outputField(identifier, 4, true);
+
+        // Time scale (UTC for Rinex 3.01 and GPS for other RINEX versions)
+        final int version100 = (int) FastMath.rint(header.getFormatVersion() * 100);
+        final TimeScale timeScale = (version100 == 301) ?
+                                    writer.getTimeScales().getUTC() :
+                                    writer.getTimeScales().getGPS();
+        writer.writeDate(message.getEpochToc().getComponents(timeScale));
         writer.writeDouble(message.getAGf0(), Unit.SECOND);
         writer.writeDouble(message.getAGf1(), RinexNavigationParser.S_PER_S);
         writer.writeDouble(message.getTime(), Unit.SECOND);

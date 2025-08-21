@@ -43,12 +43,13 @@ public class NavICNeQuickNMessageWriter
         writeTypeSvMsg(RecordType.ION, message.getIdentifier(), message, header, writer);
 
         // ION MESSAGE LINE - 0
+        writer.indentLine();
         writer.writeDate(message.getTransmitTime(), message.getSystem());
         writer.writeDouble(message.getIOD(), Unit.ONE);
         writer.finishLine();
 
         // ION MESSAGE LINE - 1
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getRegion1().getAi0(), IonosphereAij.SFU);
         writer.writeDouble(message.getRegion1().getAi1(), IonosphereAij.SFU_PER_DEG);
         writer.writeDouble(message.getRegion1().getAi2(), IonosphereAij.SFU_PER_DEG2);
@@ -56,7 +57,7 @@ public class NavICNeQuickNMessageWriter
         writer.finishLine();
 
         // ION MESSAGE LINE - 2
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getRegion1().getLonMin(), Unit.DEGREE);
         writer.writeDouble(message.getRegion1().getLonMax(), Unit.DEGREE);
         writer.writeDouble(message.getRegion1().getModipMin(), Unit.DEGREE);
@@ -64,7 +65,7 @@ public class NavICNeQuickNMessageWriter
         writer.finishLine();
 
         // ION MESSAGE LINE - 3
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getRegion2().getAi0(), IonosphereAij.SFU);
         writer.writeDouble(message.getRegion2().getAi1(), IonosphereAij.SFU_PER_DEG);
         writer.writeDouble(message.getRegion2().getAi2(), IonosphereAij.SFU_PER_DEG2);
@@ -72,7 +73,7 @@ public class NavICNeQuickNMessageWriter
         writer.finishLine();
 
         // ION MESSAGE LINE - 4
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getRegion2().getLonMin(), Unit.DEGREE);
         writer.writeDouble(message.getRegion2().getLonMax(), Unit.DEGREE);
         writer.writeDouble(message.getRegion2().getModipMin(), Unit.DEGREE);
@@ -80,7 +81,7 @@ public class NavICNeQuickNMessageWriter
         writer.finishLine();
 
         // ION MESSAGE LINE - 5
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getRegion3().getAi0(), IonosphereAij.SFU);
         writer.writeDouble(message.getRegion3().getAi1(), IonosphereAij.SFU_PER_DEG);
         writer.writeDouble(message.getRegion3().getAi2(), IonosphereAij.SFU_PER_DEG2);
@@ -88,7 +89,7 @@ public class NavICNeQuickNMessageWriter
         writer.finishLine();
 
         // ION MESSAGE LINE - 6
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getRegion3().getLonMin(), Unit.DEGREE);
         writer.writeDouble(message.getRegion3().getLonMax(), Unit.DEGREE);
         writer.writeDouble(message.getRegion3().getModipMin(), Unit.DEGREE);

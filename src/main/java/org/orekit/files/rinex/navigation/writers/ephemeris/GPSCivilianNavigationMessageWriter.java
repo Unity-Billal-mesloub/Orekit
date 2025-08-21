@@ -41,12 +41,12 @@ public class GPSCivilianNavigationMessageWriter
 
         // EPH MESSAGE LINE - 8/9
         if (message.isCnv2()) {
-            writer.startLine();
+            writer.indentLine();
             writer.writeDouble(message.getIscL1CD(), Unit.SECOND);
             writer.writeDouble(message.getIscL1CP(), Unit.SECOND);
             writer.finishLine();
         }
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
         writer.writeInt(message.getWeek());
         writer.writeInt(message.getFlags());

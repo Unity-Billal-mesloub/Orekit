@@ -42,7 +42,7 @@ public abstract class CivilianNavigationMessageWriter<T extends CivilianNavigati
     @Override
     protected void writeEphLine5(T message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeDouble(message.getDeltaN0Dot(), RinexNavigationParser.RAD_PER_S2);
         writer.writeInt(message.getUraiNed0());
@@ -54,7 +54,7 @@ public abstract class CivilianNavigationMessageWriter<T extends CivilianNavigati
     @Override
     protected void writeEphLine6(T message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeInt(message.getUraiEd());
         writer.writeInt(message.getSvHealth());
         writer.writeDouble(message.getTGD(), Unit.SECOND);
@@ -66,7 +66,7 @@ public abstract class CivilianNavigationMessageWriter<T extends CivilianNavigati
     @Override
     protected void writeEphLine7(T message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getIscL1CA(), Unit.SECOND);
         writer.writeDouble(message.getIscL2C(),  Unit.SECOND);
         writer.writeDouble(message.getIscL5I5(), Unit.SECOND);

@@ -71,7 +71,7 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
     /** Format for one 9 digits integer field. */
     protected static final FastLongFormatter NINE_DIGITS_INTEGER = new FastLongFormatter(9, false);
 
-    /** Format for one 12digits float field. */
+    /** Format for one 12 digits float field. */
     public static final FastDoubleFormatter TWELVE_DIGITS_SCIENTIFIC = new FastScientificFormatter(12);
 
     /** Format for one 16 digits float field. */
@@ -365,7 +365,12 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
 
             // TIME SYSTEM CORR
             for (final TimeSystemCorrection correction : header.getTimeSystemCorrections()) {
-                final GNSSDate date = new GNSSDate(correction.getReferenceDate(), header.getSatelliteSystem());
+                final SatelliteSystem system = header.getSatelliteSystem() == SatelliteSystem.BEIDOU ?
+                                               header.getSatelliteSystem() :
+                                               SatelliteSystem.GPS;
+                final GNSSDate date = correction.getReferenceDate()  == null ?
+                                      new GNSSDate(0, 0, system) :
+                                      new GNSSDate(correction.getReferenceDate(), system);
                 outputField(correction.getTimeSystemCorrectionType(), 5, true);
                 outputField(SEVENTEEN_DIGITS_SCIENTIFIC, correction.getTimeSystemCorrectionA0(), 22);
                 outputField(SIXTEEN_DIGITS_SCIENTIFIC,   correction.getTimeSystemCorrectionA1(), 38);
@@ -443,19 +448,18 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
     public void writeDate(final DateTimeComponents dtc) throws IOException {
         final DateTimeComponents rounded = dtc.roundIfNeeded(60, 0);
         final int start = getColumn();
-        outputField(' ', start + 4);
-        outputField(BaseRinexWriter.FOUR_DIGITS_INTEGER, rounded.getDate().getYear(), start + 8);
-        outputField(' ', start + 9);
-        outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, rounded.getDate().getMonth(), start + 11);
-        outputField(' ', start + 12);
-        outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, rounded.getDate().getDay(), start + 14);
-        outputField(' ', start + 15);
-        outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, rounded.getTime().getHour(), start + 17);
-        outputField(' ', start + 18);
-        outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, rounded.getTime().getMinute(), start + 20);
-        outputField(' ', start + 21);
+        outputField(BaseRinexWriter.FOUR_DIGITS_INTEGER, rounded.getDate().getYear(), start + 4);
+        outputField(' ', start + 5);
+        outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, rounded.getDate().getMonth(), start + 7);
+        outputField(' ', start + 8);
+        outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, rounded.getDate().getDay(), start + 10);
+        outputField(' ', start + 11);
+        outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, rounded.getTime().getHour(), start + 13);
+        outputField(' ', start + 14);
+        outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, rounded.getTime().getMinute(), start + 16);
+        outputField(' ', start + 17);
         outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER,
-                    (int) FastMath.round(rounded.getTime().getSecond()), start + 23);
+                    (int) FastMath.round(rounded.getTime().getSecond()), start + 19);
     }
 
     /** Write a double field.
@@ -494,7 +498,7 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
     /** Start (indent) a new line.
      * @exception IOException if an I/O error occurs.
      */
-    public void startLine() throws IOException {
+    public void indentLine() throws IOException {
         outputField("    ", 4, true);
     }
 

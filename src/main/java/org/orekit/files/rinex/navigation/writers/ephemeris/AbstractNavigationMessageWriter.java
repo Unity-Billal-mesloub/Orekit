@@ -40,11 +40,13 @@ public abstract class AbstractNavigationMessageWriter<T extends AbstractNavigati
                              final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
 
-        // TYPE / SV / MSG
-        writeTypeSvMsg(RecordType.EPH, identifier, message, header, writer);
+        if (header.getFormatVersion() >= 4.0) {
+            // TYPE / SV / MSG
+            writeTypeSvMsg(RecordType.EPH, identifier, message, header, writer);
+        }
 
         // EPH MESSAGE LINE - 0
-        writeEphLine0(message, writer);
+        writeEphLine0(message, identifier, writer);
 
         // EPH MESSAGE LINE - 1
         writeEphLine1(message, writer);
@@ -71,12 +73,14 @@ public abstract class AbstractNavigationMessageWriter<T extends AbstractNavigati
 
     /** Write the EPH MESSAGE LINE - 0.
      * @param message navigation message to write
+     * @param identifier identifier
      * @param writer global file writer
      * @throws IOException if an I/O error occurs.
      */
-    protected void writeEphLine0(final AbstractNavigationMessage<?> message, final RinexNavigationWriter writer)
+    protected void writeEphLine0(final AbstractNavigationMessage<?> message, final String identifier,
+                                 final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.outputField(identifier, 4, true);
         writer.writeDate(message.getEpochToc(), message.getSystem());
         writer.writeDouble(message.getAf0(), Unit.SECOND);
         writer.writeDouble(message.getAf1(), RinexNavigationParser.S_PER_S);
@@ -91,7 +95,7 @@ public abstract class AbstractNavigationMessageWriter<T extends AbstractNavigati
      */
     protected void writeEphLine1(final T message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writeField1Line1(message, writer);
         writer.writeDouble(message.getCrs(), Unit.METRE);
         writer.writeDouble(message.getDeltaN0(), RinexNavigationParser.RAD_PER_S);
@@ -114,7 +118,7 @@ public abstract class AbstractNavigationMessageWriter<T extends AbstractNavigati
      */
     protected void writeEphLine2(T message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getCuc(), Unit.RADIAN);
         writer.writeDouble(message.getE(), Unit.NONE);
         writer.writeDouble(message.getCus(), Unit.RADIAN);
@@ -129,7 +133,7 @@ public abstract class AbstractNavigationMessageWriter<T extends AbstractNavigati
      */
     protected void writeEphLine3(T message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getTime(), Unit.SECOND);
         writer.writeDouble(message.getCic(), Unit.RADIAN);
         writer.writeDouble(message.getOmega0(), Unit.RADIAN);
@@ -144,7 +148,7 @@ public abstract class AbstractNavigationMessageWriter<T extends AbstractNavigati
      */
     protected void writeEphLine4(T message, RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getI0(), Unit.RADIAN);
         writer.writeDouble(message.getCrc(), Unit.METRE);
         writer.writeDouble(message.getPa(), Unit.RADIAN);

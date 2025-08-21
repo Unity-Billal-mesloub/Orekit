@@ -44,7 +44,7 @@ public class BeidouCivilianNavigationMessageWriter
     protected void writeEphLine5(final BeidouCivilianNavigationMessage message,
                                  final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeDouble(message.getDeltaN0Dot(), RinexNavigationParser.RAD_PER_S2);
         writer.writeInt(message.getSatelliteType().getIntegerId());
@@ -57,7 +57,7 @@ public class BeidouCivilianNavigationMessageWriter
     protected void writeEphLine6(final BeidouCivilianNavigationMessage message,
                                  final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeInt(message.getSisaiOe());
         writer.writeInt(message.getSisaiOcb());
         writer.writeInt(message.getSisaiOc1());
@@ -70,7 +70,7 @@ public class BeidouCivilianNavigationMessageWriter
     protected void writeEphLine7(final BeidouCivilianNavigationMessage message,
                                  final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         if (BeidouCivilianNavigationMessage.CNV1.equals(message.getNavigationMessageType())) {
             writer.writeDouble(message.getIscB1CD(), Unit.SECOND);
             writer.writeEmpty();
@@ -98,18 +98,18 @@ public class BeidouCivilianNavigationMessageWriter
 
         if (BeidouCivilianNavigationMessage.CNV3.equals(message.getNavigationMessageType())) {
             // EPH MESSAGE LINE - 8
-            writer.startLine();
+            writer.indentLine();
             writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
             writer.finishLine();
         } else {
 
             // EPH MESSAGE LINE - 8
-            writer.startLine();
+            writer.indentLine();
             writeSismaiHealthIntegrity(message, writer);
             writer.finishLine();
 
             // EPH MESSAGE LINE - 9
-            writer.startLine();
+            writer.indentLine();
             writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
             writer.writeEmpty();
             writer.writeEmpty();

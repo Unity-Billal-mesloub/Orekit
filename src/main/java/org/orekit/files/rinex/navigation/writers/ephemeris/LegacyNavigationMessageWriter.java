@@ -41,7 +41,7 @@ public abstract class LegacyNavigationMessageWriter<O extends LegacyNavigationMe
     @Override
     protected void writeEphLine5(O message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeInt(message.getL2Codes());
         writer.writeInt(message.getWeek());
@@ -53,7 +53,7 @@ public abstract class LegacyNavigationMessageWriter<O extends LegacyNavigationMe
     @Override
     protected void writeEphLine6(O message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writeURA(message, writer);
         writer.writeInt(message.getSvHealth());
         writer.writeDouble(message.getTGD(), Unit.SECOND);
@@ -65,7 +65,7 @@ public abstract class LegacyNavigationMessageWriter<O extends LegacyNavigationMe
     @Override
     protected void writeEphLine7(O message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
         writer.writeInt(message.getFitInterval());
         writer.finishLine();

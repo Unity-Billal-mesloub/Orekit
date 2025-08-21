@@ -38,10 +38,13 @@ public class GlonassCDMSMessageWriter
                              final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
 
-        // TYPE / SV / MSG
-        writeTypeSvMsg(RecordType.ION, message.getIdentifier(), message, header, writer);
+        if (header.getFormatVersion() >= 4.0) {
+            // TYPE / SV / MSG
+            writeTypeSvMsg(RecordType.ION, message.getIdentifier(), message, header, writer);
+        }
 
         // MESSAGE LINE - 0
+        writer.indentLine();
         writer.writeDate(message.getTransmitTime(), message.getSystem());
         writer.writeDouble(message.getCA(), Unit.ONE);
         writer.writeDouble(message.getCF107(), Unit.ONE);

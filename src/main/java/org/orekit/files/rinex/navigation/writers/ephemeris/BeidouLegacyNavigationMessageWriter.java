@@ -41,7 +41,7 @@ public class BeidouLegacyNavigationMessageWriter
     @Override
     protected void writeEphLine5(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeEmpty();
         writer.writeInt(message.getWeek());
@@ -53,7 +53,7 @@ public class BeidouLegacyNavigationMessageWriter
     @Override
     protected void writeEphLine6(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getSvAccuracy(), Unit.METRE);
         writer.writeInt(message.getSatH1());
         writer.writeDouble(message.getTGD1(), Unit.SECOND);
@@ -65,7 +65,7 @@ public class BeidouLegacyNavigationMessageWriter
     @Override
     protected void writeEphLine7(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.startLine();
+        writer.indentLine();
         writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
         writer.writeDouble(message.getAODC(),             Unit.SECOND);
         writer.finishLine();
