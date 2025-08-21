@@ -44,7 +44,7 @@ public class GlonassCDMSMessageWriter
         }
 
         // MESSAGE LINE - 0
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDate(message.getTransmitTime(), message.getSystem());
         writer.writeDouble(message.getCA(), Unit.ONE);
         writer.writeDouble(message.getCF107(), Unit.ONE);

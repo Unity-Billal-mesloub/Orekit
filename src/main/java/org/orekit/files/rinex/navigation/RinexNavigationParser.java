@@ -299,7 +299,7 @@ public class RinexNavigationParser {
                              final double minusTau = ParsingUtils.parseDouble(pi.getLine(), 21, 19);
 
                              // convert date
-                             final SatelliteSystem satSystem = pi.getHeader().getSatelliteSystem();
+                             final SatelliteSystem satSystem = SatelliteSystem.GLONASS;
                              final TimeScale       timeScale = satSystem.getObservationTimeScale().getTimeScale(pi.getTimeScales());
                              final AbsoluteDate    date      = new AbsoluteDate(year, month, day, timeScale);
 

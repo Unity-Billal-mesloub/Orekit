@@ -50,7 +50,7 @@ public class KlobucharMessageWriter extends NavigationMessageWriter<IonosphereKl
         }
 
         // ION MESSAGE LINE - 0
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDate(message.getTransmitTime(), message.getSystem());
         writer.writeDouble(message.getAlpha()[0], IonosphereKlobucharMessage.S_PER_SC_N0);
         writer.writeDouble(message.getAlpha()[1], IonosphereKlobucharMessage.S_PER_SC_N1);
@@ -58,7 +58,7 @@ public class KlobucharMessageWriter extends NavigationMessageWriter<IonosphereKl
         writer.finishLine();
 
         // ION MESSAGE LINE - 1
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getAlpha()[3], IonosphereKlobucharMessage.S_PER_SC_N3);
         writer.writeDouble(message.getBeta()[0], IonosphereKlobucharMessage.S_PER_SC_N0);
         writer.writeDouble(message.getBeta()[1], IonosphereKlobucharMessage.S_PER_SC_N1);
@@ -66,7 +66,7 @@ public class KlobucharMessageWriter extends NavigationMessageWriter<IonosphereKl
         writer.finishLine();
 
         // ION MESSAGE LINE - 2
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getBeta()[3], IonosphereKlobucharMessage.S_PER_SC_N3);
         if (header.getFormatVersion() < 4.015) {
             writer.writeInt(message.getRegionCode().getIntegerId());

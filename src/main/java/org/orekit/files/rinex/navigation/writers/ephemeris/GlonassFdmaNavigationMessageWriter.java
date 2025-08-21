@@ -48,19 +48,20 @@ public class GlonassFdmaNavigationMessageWriter
 
             writer.outputField(BaseRinexWriter.TWO_DIGITS_INTEGER, message.getPRN(), 2);
             writer.outputField(' ', 3);
-            writer.outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, dtc.getDate().getYear() % 100, 5);
+            writer.outputField(BaseRinexWriter.TWO_DIGITS_INTEGER, dtc.getDate().getYear() % 100, 5);
             writer.outputField(' ', 6);
-            writer.outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, dtc.getDate().getMonth(), 8);
+            writer.outputField(BaseRinexWriter.TWO_DIGITS_INTEGER, dtc.getDate().getMonth(), 8);
             writer.outputField(' ', 9);
-            writer.outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, dtc.getDate().getDay(), 11);
+            writer.outputField(BaseRinexWriter.TWO_DIGITS_INTEGER, dtc.getDate().getDay(), 11);
             writer.outputField(' ', 12);
-            writer.outputField(BaseRinexWriter.PADDED_TWO_DIGITS_INTEGER, dtc.getTime().getHour(), 14);
+            writer.outputField(BaseRinexWriter.TWO_DIGITS_INTEGER, dtc.getTime().getHour(), 14);
             writer.outputField(' ', 15);
-            writer.outputField(FIVE_ONE_DIGITS_FLOAT, dtc.getTime().getSecond(), 20);
+            writer.outputField(BaseRinexWriter.TWO_DIGITS_INTEGER, dtc.getTime().getMinute(), 17);
+            writer.outputField(FIVE_ONE_DIGITS_FLOAT, dtc.getTime().getSecond(), 22);
 
-            writer.outputField(' ', 22);
-            writer.writeDouble(-message.getTN(),    Unit.SECOND);
-            writer.writeDouble(message.getGammaN(), Unit.NONE);
+            writer.outputField(BaseRinexWriter.NINETEEN_SCIENTIFIC_FLOAT, -message.getTN(),    41);
+            writer.outputField(BaseRinexWriter.NINETEEN_SCIENTIFIC_FLOAT, message.getGammaN(), 60);
+            writer.outputField(BaseRinexWriter.NINETEEN_SCIENTIFIC_FLOAT, 0.0,                 79);
 
         } else {
             writer.outputField(identifier, 4, true);
@@ -105,7 +106,7 @@ public class GlonassFdmaNavigationMessageWriter
 
         if (header.getFormatVersion() > 3.045) {
             // EPH MESSAGE LINE - 4
-            writer.indentLine();
+            writer.indentLine(header);
             writer.writeDouble(message.getStatusFlags(), Unit.NONE);
             writer.writeDouble(message.getGroupDelayDifference(), Unit.NONE);
             writer.writeDouble(message.getURA(), Unit.NONE);

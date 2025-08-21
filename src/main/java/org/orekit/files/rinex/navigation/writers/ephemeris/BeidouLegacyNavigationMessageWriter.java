@@ -16,6 +16,7 @@
  */
 package org.orekit.files.rinex.navigation.writers.ephemeris;
 
+import org.orekit.files.rinex.navigation.RinexNavigationHeader;
 import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
 import org.orekit.propagation.analytical.gnss.data.BeidouLegacyNavigationMessage;
@@ -39,9 +40,10 @@ public class BeidouLegacyNavigationMessageWriter
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine5(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
+    protected void writeEphLine5(final BeidouLegacyNavigationMessage message,
+                                 final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeEmpty();
         writer.writeInt(message.getWeek());
@@ -51,9 +53,10 @@ public class BeidouLegacyNavigationMessageWriter
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine6(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
+    protected void writeEphLine6(final BeidouLegacyNavigationMessage message,
+                                 final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getSvAccuracy(), Unit.METRE);
         writer.writeInt(message.getSatH1());
         writer.writeDouble(message.getTGD1(), Unit.SECOND);
@@ -63,9 +66,10 @@ public class BeidouLegacyNavigationMessageWriter
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine7(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
+    protected void writeEphLine7(final BeidouLegacyNavigationMessage message,
+                                 final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
         writer.writeDouble(message.getAODC(),             Unit.SECOND);
         writer.finishLine();

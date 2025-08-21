@@ -42,7 +42,7 @@ public class NequickGMessageWriter extends NavigationMessageWriter<IonosphereNeq
         writeTypeSvMsg(RecordType.ION, message.getIdentifier(), message, header, writer);
 
         // ION MESSAGE LINE - 0
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDate(message.getTransmitTime(), message.getSystem());
         writer.writeDouble(message.getAij().getAi0(), IonosphereAij.SFU);
         writer.writeDouble(message.getAij().getAi1(), IonosphereAij.SFU_PER_DEG);
@@ -50,7 +50,7 @@ public class NequickGMessageWriter extends NavigationMessageWriter<IonosphereNeq
         writer.finishLine();
 
         // ION MESSAGE LINE - 1
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getFlags(), Unit.ONE);
         writer.finishLine();
 

@@ -46,6 +46,7 @@ import org.orekit.gnss.PredefinedObservationType;
 import org.orekit.gnss.SatelliteSystem;
 import org.orekit.propagation.analytical.gnss.data.NavigationMessage;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.DateComponents;
 import org.orekit.time.DateTimeComponents;
 import org.orekit.time.GNSSDate;
 import org.orekit.time.TimeScale;
@@ -320,14 +321,66 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
         // RINEX VERSION / TYPE
         outputField(NINE_TWO_DIGITS_FLOAT, header.getFormatVersion(), 9);
         outputField("",                20, true);
-        outputField("NAVIGATION DATA", 40, true);
+        if (header.getFormatVersion() < 3.0 && header.getSatelliteSystem() == SatelliteSystem.GLONASS) {
+            outputField("GLONASS NAV DATA", 40, true);
+        } else {
+            outputField("NAVIGATION DATA", 40, true);
+        }
         outputField(header.getSatelliteSystem().getKey(), 41);
         finishHeaderLine(CommonLabel.VERSION);
 
         // PGM / RUN BY / DATE
         writeProgramRunByDate(header);
 
-        if (header.getFormatVersion() < 4.0) {
+        if (header.getFormatVersion() < 3.0) {
+
+            // IONOSPHERIC CORR
+            for (final IonosphericCorrection correction : header.getIonosphericCorrections()) {
+                if (correction.getType() != IonosphericCorrectionType.GAL) {
+                    // Rinex 2 only supports Klobuchar
+                    final KlobucharIonosphericCorrection klobuchar = (KlobucharIonosphericCorrection) correction;
+                    final double[] alpha = klobuchar.getKlobucharAlpha();
+                    final double[] beta  = klobuchar.getKlobucharBeta();
+                    outputField(' ', 2);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[0], 14);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[1], 26);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[2], 38);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[3], 50);
+                    finishHeaderLine(NavigationLabel.ION_ALPHA);
+                    outputField(' ', 2);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, beta[0], 14);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, beta[1], 26);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, beta[2], 38);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, beta[3], 50);
+                    finishHeaderLine(NavigationLabel.ION_BETA);
+                }
+            }
+
+            // TIME SYSTEM CORR
+            for (final TimeSystemCorrection correction : header.getTimeSystemCorrections()) {
+                if ("GPUT".equals(correction.getTimeSystemCorrectionType())) {
+                    final GNSSDate date = new GNSSDate(correction.getReferenceDate(), SatelliteSystem.GPS);
+                    outputField(' ', 3);
+                    outputField(NINETEEN_SCIENTIFIC_FLOAT, correction.getTimeSystemCorrectionA0(), 22);
+                    outputField(NINETEEN_SCIENTIFIC_FLOAT, correction.getTimeSystemCorrectionA1(), 41);
+                    outputField(NINE_DIGITS_INTEGER, (int) FastMath.rint(date.getSecondsInWeek()), 50);
+                    outputField(NINE_DIGITS_INTEGER, date.getWeekNumber(), 59);
+                    finishHeaderLine(NavigationLabel.DELTA_UTC);
+                } else {
+                    final DateComponents dt = correction.getReferenceDate().
+                                              getComponents(getTimeScales().getGLONASS()).
+                                              getDate();
+                    outputField(SIX_DIGITS_INTEGER, dt.getYear(),   6);
+                    outputField(SIX_DIGITS_INTEGER, dt.getMonth(), 12);
+                    outputField(SIX_DIGITS_INTEGER, dt.getDay(),   18);
+                    outputField(' ', 21);
+                    outputField(NINETEEN_SCIENTIFIC_FLOAT, correction.getTimeSystemCorrectionA0(), 40);
+                    finishHeaderLine(NavigationLabel.CORR_TO_SYSTEM_TIME);
+                }
+            }
+
+        } else if (header.getFormatVersion() < 4.0) {
+
             // IONOSPHERIC CORR
             for (final IonosphericCorrection correction : header.getIonosphericCorrections()) {
                 if (correction.getType() == IonosphericCorrectionType.GAL) {
@@ -496,10 +549,17 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
     }
 
     /** Start (indent) a new line.
+     * @param header header
      * @exception IOException if an I/O error occurs.
      */
-    public void indentLine() throws IOException {
-        outputField("    ", 4, true);
+    public void indentLine(final RinexNavigationHeader header)
+        throws
+        IOException {
+        if (header.getFormatVersion() < 3.0) {
+            outputField("   ",  3, true);
+        } else {
+            outputField("    ", 4, true);
+        }
     }
 
     /** Container for navigation messages iterator.

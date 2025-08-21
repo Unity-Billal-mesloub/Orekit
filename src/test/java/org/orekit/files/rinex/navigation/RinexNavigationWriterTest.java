@@ -293,7 +293,6 @@ public class RinexNavigationWriterTest {
         }
 
         // reparse the written file
-        System.out.println(caw);
         final byte[]          bytes   = caw.toString().getBytes(StandardCharsets.UTF_8);
         final DataSource      source  = new DataSource("", () -> new ByteArrayInputStream(bytes));
         final RinexNavigation rebuilt = new RinexNavigationParser(DataContext.getDefault().getTimeScales()).
@@ -753,19 +752,19 @@ public class RinexNavigationWriterTest {
 
     private  void checkAbstractEphemeris(final AbstractEphemerisMessage first,
                                          final AbstractEphemerisMessage second) {
-        checkDate(first.getDate(),    second.getDate());
-        checkDate(first.getEpochToc(),    second.getEpochToc());
+        checkDate(first.getDate(),              second.getDate());
+        checkDate(first.getEpochToc(),          second.getEpochToc());
         Assertions.assertEquals(first.getPRN(), second.getPRN());
-        checkDouble(first.getX(), second.getX());
-        checkDouble(first.getXDot(), second.getXDot());
-        checkDouble(first.getXDotDot(), second.getXDotDot());
-        checkDouble(first.getY(), second.getY());
-        checkDouble(first.getYDot(), second.getYDot());
-        checkDouble(first.getYDotDot(), second.getYDotDot());
-        checkDouble(first.getZ(), second.getZ());
-        checkDouble(first.getZDot(), second.getZDot());
-        checkDouble(first.getZDotDot(), second.getZDotDot());
-        checkDouble(first.getHealth(), second.getHealth());
+        checkDouble(first.getX(),               second.getX());
+        checkDouble(first.getXDot(),            second.getXDot());
+        checkDouble(first.getXDotDot(),         second.getXDotDot());
+        checkDouble(first.getY(),               second.getY());
+        checkDouble(first.getYDot(),            second.getYDot());
+        checkDouble(first.getYDotDot(),         second.getYDotDot());
+        checkDouble(first.getZ(),               second.getZ());
+        checkDouble(first.getZDot(),            second.getZDot());
+        checkDouble(first.getZDotDot(),         second.getZDotDot());
+        checkDouble(first.getHealth(),          second.getHealth());
     }
 
     private void checkParameterDriver(final ParameterDriver first, final ParameterDriver second) {

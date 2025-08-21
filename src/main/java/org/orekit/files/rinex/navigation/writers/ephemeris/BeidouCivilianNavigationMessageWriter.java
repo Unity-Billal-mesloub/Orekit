@@ -42,9 +42,10 @@ public class BeidouCivilianNavigationMessageWriter
     /** {@inheritDoc} */
     @Override
     protected void writeEphLine5(final BeidouCivilianNavigationMessage message,
+                                 final RinexNavigationHeader header,
                                  final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeDouble(message.getDeltaN0Dot(), RinexNavigationParser.RAD_PER_S2);
         writer.writeInt(message.getSatelliteType().getIntegerId());
@@ -55,9 +56,10 @@ public class BeidouCivilianNavigationMessageWriter
     /** {@inheritDoc} */
     @Override
     protected void writeEphLine6(final BeidouCivilianNavigationMessage message,
+                                 final RinexNavigationHeader header,
                                  final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeInt(message.getSisaiOe());
         writer.writeInt(message.getSisaiOcb());
         writer.writeInt(message.getSisaiOc1());
@@ -68,9 +70,10 @@ public class BeidouCivilianNavigationMessageWriter
     /** {@inheritDoc} */
     @Override
     protected void writeEphLine7(final BeidouCivilianNavigationMessage message,
+                                 final RinexNavigationHeader header,
                                  final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         if (BeidouCivilianNavigationMessage.CNV1.equals(message.getNavigationMessageType())) {
             writer.writeDouble(message.getIscB1CD(), Unit.SECOND);
             writer.writeEmpty();
@@ -98,18 +101,18 @@ public class BeidouCivilianNavigationMessageWriter
 
         if (BeidouCivilianNavigationMessage.CNV3.equals(message.getNavigationMessageType())) {
             // EPH MESSAGE LINE - 8
-            writer.indentLine();
+            writer.indentLine(header);
             writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
             writer.finishLine();
         } else {
 
             // EPH MESSAGE LINE - 8
-            writer.indentLine();
+            writer.indentLine(header);
             writeSismaiHealthIntegrity(message, writer);
             writer.finishLine();
 
             // EPH MESSAGE LINE - 9
-            writer.indentLine();
+            writer.indentLine(header);
             writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
             writer.writeEmpty();
             writer.writeEmpty();

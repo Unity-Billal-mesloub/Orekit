@@ -43,13 +43,13 @@ public class NavICKlobucharMessageWriter
         writeTypeSvMsg(RecordType.ION, message.getIdentifier(), message, header, writer);
 
         // ION MESSAGE LINE - 0
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDate(message.getTransmitTime(), message.getSystem());
         writer.writeDouble(message.getIOD(), Unit.ONE);
         writer.finishLine();
 
         // ION MESSAGE LINE - 1
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getAlpha()[0], IonosphereKlobucharMessage.S_PER_SC_N0);
         writer.writeDouble(message.getAlpha()[1], IonosphereKlobucharMessage.S_PER_SC_N1);
         writer.writeDouble(message.getAlpha()[2], IonosphereKlobucharMessage.S_PER_SC_N2);
@@ -57,7 +57,7 @@ public class NavICKlobucharMessageWriter
         writer.finishLine();
 
         // ION MESSAGE LINE - 2
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getBeta()[0], IonosphereKlobucharMessage.S_PER_SC_N0);
         writer.writeDouble(message.getBeta()[1], IonosphereKlobucharMessage.S_PER_SC_N1);
         writer.writeDouble(message.getBeta()[2], IonosphereKlobucharMessage.S_PER_SC_N2);
@@ -65,7 +65,7 @@ public class NavICKlobucharMessageWriter
         writer.finishLine();
 
         // ION MESSAGE LINE - 3
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getLonMin(), Unit.DEGREE);
         writer.writeDouble(message.getLonMax(), Unit.DEGREE);
         writer.writeDouble(message.getModipMin(), Unit.DEGREE);

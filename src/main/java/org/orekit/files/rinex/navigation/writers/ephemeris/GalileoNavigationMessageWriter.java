@@ -16,6 +16,7 @@
  */
 package org.orekit.files.rinex.navigation.writers.ephemeris;
 
+import org.orekit.files.rinex.navigation.RinexNavigationHeader;
 import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
 import org.orekit.propagation.analytical.gnss.data.GalileoNavigationMessage;
@@ -41,9 +42,10 @@ public class GalileoNavigationMessageWriter
     /** {@inheritDoc} */
     @Override
     public void writeEphLine5(final GalileoNavigationMessage message,
+                              final RinexNavigationHeader header,
                               final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeInt(message.getDataSource());
         writer.writeInt(message.getWeek());
@@ -53,9 +55,10 @@ public class GalileoNavigationMessageWriter
     /** {@inheritDoc} */
     @Override
     public void writeEphLine6(final GalileoNavigationMessage message,
+                              final RinexNavigationHeader header,
                               final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getSisa(),     Unit.METRE);
         writer.writeDouble(message.getSvHealth(), Unit.NONE);
         writer.writeDouble(message.getBGDE1E5a(), Unit.SECOND);
@@ -66,9 +69,10 @@ public class GalileoNavigationMessageWriter
     /** {@inheritDoc} */
     @Override
     public void writeEphLine7(final GalileoNavigationMessage message,
+                              final RinexNavigationHeader header,
                               final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
         writer.finishLine();
 

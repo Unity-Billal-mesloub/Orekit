@@ -16,6 +16,7 @@
  */
 package org.orekit.files.rinex.navigation.writers.ephemeris;
 
+import org.orekit.files.rinex.navigation.RinexNavigationHeader;
 import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
 import org.orekit.propagation.analytical.gnss.data.LegacyNavigationMessage;
@@ -32,16 +33,17 @@ public abstract class LegacyNavigationMessageWriter<O extends LegacyNavigationMe
 
     /** {@inheritDoc} */
     @Override
-    protected void writeField1Line1(O message, final RinexNavigationWriter writer)
+    protected void writeField1Line1(final O message, final RinexNavigationWriter writer)
         throws IOException {
         writer.writeDouble(message.getIODE(), Unit.SECOND);
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine5(O message, final RinexNavigationWriter writer)
+    protected void writeEphLine5(final O message,
+                                 final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeInt(message.getL2Codes());
         writer.writeInt(message.getWeek());
@@ -51,9 +53,10 @@ public abstract class LegacyNavigationMessageWriter<O extends LegacyNavigationMe
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine6(O message, final RinexNavigationWriter writer)
+    protected void writeEphLine6(final O message,
+                                 final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writeURA(message, writer);
         writer.writeInt(message.getSvHealth());
         writer.writeDouble(message.getTGD(), Unit.SECOND);
@@ -63,9 +66,10 @@ public abstract class LegacyNavigationMessageWriter<O extends LegacyNavigationMe
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine7(O message, final RinexNavigationWriter writer)
+    protected void writeEphLine7(final O message,
+                                 final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
         writer.writeInt(message.getFitInterval());
         writer.finishLine();

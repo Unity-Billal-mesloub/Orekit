@@ -16,6 +16,7 @@
  */
 package org.orekit.files.rinex.navigation.writers.ephemeris;
 
+import org.orekit.files.rinex.navigation.RinexNavigationHeader;
 import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
 import org.orekit.propagation.analytical.gnss.data.CivilianNavigationMessage;
@@ -33,16 +34,17 @@ public abstract class CivilianNavigationMessageWriter<T extends CivilianNavigati
 
     /** {@inheritDoc} */
     @Override
-    protected void writeField1Line1(T message, final RinexNavigationWriter writer)
+    protected void writeField1Line1(final T message, final RinexNavigationWriter writer)
         throws IOException {
         writer.writeDouble(message.getADot(), RinexNavigationParser.M_PER_S);
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine5(T message, final RinexNavigationWriter writer)
+    protected void writeEphLine5(final T message,
+                                 final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
         writer.writeDouble(message.getDeltaN0Dot(), RinexNavigationParser.RAD_PER_S2);
         writer.writeInt(message.getUraiNed0());
@@ -52,9 +54,10 @@ public abstract class CivilianNavigationMessageWriter<T extends CivilianNavigati
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine6(T message, final RinexNavigationWriter writer)
+    protected void writeEphLine6(final T message,
+                                 final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeInt(message.getUraiEd());
         writer.writeInt(message.getSvHealth());
         writer.writeDouble(message.getTGD(), Unit.SECOND);
@@ -64,9 +67,10 @@ public abstract class CivilianNavigationMessageWriter<T extends CivilianNavigati
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine7(T message, final RinexNavigationWriter writer)
+    protected void writeEphLine7(final T message,
+                                 final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getIscL1CA(), Unit.SECOND);
         writer.writeDouble(message.getIscL2C(),  Unit.SECOND);
         writer.writeDouble(message.getIscL5I5(), Unit.SECOND);

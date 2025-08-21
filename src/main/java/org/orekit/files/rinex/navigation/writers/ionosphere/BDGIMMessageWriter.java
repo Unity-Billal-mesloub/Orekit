@@ -42,7 +42,7 @@ public class BDGIMMessageWriter
         writeTypeSvMsg(RecordType.ION, message.getIdentifier(), message, header, writer);
 
         // ION MESSAGE LINE - 0
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDate(message.getTransmitTime(), message.getSystem());
         writer.writeDouble(message.getAlpha()[0], RinexNavigationParser.TEC);
         writer.writeDouble(message.getAlpha()[1], RinexNavigationParser.TEC);
@@ -50,7 +50,7 @@ public class BDGIMMessageWriter
         writer.finishLine();
 
         // ION MESSAGE LINE - 1
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getAlpha()[3], RinexNavigationParser.TEC);
         writer.writeDouble(message.getAlpha()[4], RinexNavigationParser.TEC);
         writer.writeDouble(message.getAlpha()[5], RinexNavigationParser.TEC);
@@ -58,7 +58,7 @@ public class BDGIMMessageWriter
         writer.finishLine();
 
         // ION MESSAGE LINE - 2
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getAlpha()[7], RinexNavigationParser.TEC);
         writer.writeDouble(message.getAlpha()[8], RinexNavigationParser.TEC);
         writer.finishLine();

@@ -42,7 +42,7 @@ public class SystemTimeOffsetMessageWriter
         writeTypeSvMsg(RecordType.STO, message.getIdentifier(), message, header, writer);
 
         // EPOCH / SYSTEM CORR TYPE / SBAS ID / UTC ID
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDate(message.getReferenceEpoch(), message.getSystem());
         writer.outputField(' ', 24);
         writer.outputField(message.getDefinedTimeSystem().getTwoLettersCode(), 26, true);
@@ -52,7 +52,7 @@ public class SystemTimeOffsetMessageWriter
         writer.finishLine();
 
         // STO MESSAGE LINE - 1
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
         writer.writeDouble(message.getA0(), Unit.SECOND);
         writer.writeDouble(message.getA1(), RinexNavigationParser.S_PER_S);

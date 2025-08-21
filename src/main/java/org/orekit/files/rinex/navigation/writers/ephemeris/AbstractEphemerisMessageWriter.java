@@ -49,7 +49,7 @@ public abstract class AbstractEphemerisMessageWriter<T extends AbstractEphemeris
         writeEphLine0(message, identifier, header, writer);
 
         // EPH MESSAGE LINE - 1
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getX(),       Unit.KILOMETRE);
         writer.writeDouble(message.getXDot(),    RinexNavigationParser.KM_PER_S);
         writer.writeDouble(message.getXDotDot(), RinexNavigationParser.KM_PER_S2);
@@ -57,7 +57,7 @@ public abstract class AbstractEphemerisMessageWriter<T extends AbstractEphemeris
         writer.finishLine();
 
         // EPH MESSAGE LINE - 2
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getY(),       Unit.KILOMETRE);
         writer.writeDouble(message.getYDot(),    RinexNavigationParser.KM_PER_S);
         writer.writeDouble(message.getYDotDot(), RinexNavigationParser.KM_PER_S2);
@@ -65,7 +65,7 @@ public abstract class AbstractEphemerisMessageWriter<T extends AbstractEphemeris
         writer.finishLine();
 
         // EPH MESSAGE LINE - 3
-        writer.indentLine();
+        writer.indentLine(header);
         writer.writeDouble(message.getZ(),       Unit.KILOMETRE);
         writer.writeDouble(message.getZDot(),    RinexNavigationParser.KM_PER_S);
         writer.writeDouble(message.getZDotDot(), RinexNavigationParser.KM_PER_S2);
