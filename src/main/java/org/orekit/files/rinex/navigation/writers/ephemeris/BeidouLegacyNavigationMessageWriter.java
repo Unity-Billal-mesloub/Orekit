@@ -33,7 +33,8 @@ public class BeidouLegacyNavigationMessageWriter
 
     /** {@inheritDoc} */
     @Override
-    protected void writeField1Line1(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
+    protected void writeField1Line1(final BeidouLegacyNavigationMessage message,
+                                    final RinexNavigationWriter writer)
         throws IOException {
         writer.writeDouble(message.getAODE(), Unit.SECOND);
     }

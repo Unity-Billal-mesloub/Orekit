@@ -691,11 +691,11 @@ public class ParseInfo {
      * @param neQuickAlpha the α ionospheric parameters to set
      */
     public void setNeQuickAlpha(final double[] neQuickAlpha) {
-            file.getHeader().addIonosphericCorrection(new NeQuickGIonosphericCorrection(ionosphericCorrectionType,
-                                                                                        timeMark,
-                                                                                        neQuickAlpha));
-            ionosphericCorrectionType = null;
-            timeMark                  = 0;
+        file.getHeader().addIonosphericCorrection(new NeQuickGIonosphericCorrection(ionosphericCorrectionType,
+                                                                                    timeMark,
+                                                                                    neQuickAlpha));
+        ionosphericCorrectionType = null;
+        timeMark                  = 0;
     }
 
 }

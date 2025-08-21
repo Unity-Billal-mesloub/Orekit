@@ -124,7 +124,9 @@ public class BeidouCivilianNavigationMessageWriter
     }
 
     /** Write the SISMAI/Health/integrity line.
-     *
+     * @param message navigation message to write
+     * @param writer global file writer
+     * @exception  IOException if an I/O error occurs.
      */
     private void writeSismaiHealthIntegrity(final BeidouCivilianNavigationMessage message,
                                             final RinexNavigationWriter writer) throws IOException {

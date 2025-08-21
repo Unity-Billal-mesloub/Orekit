@@ -42,16 +42,16 @@ public abstract class AbstractNavigationMessageWriter<T extends AbstractNavigati
     extends NavigationMessageWriter<T> {
 
     /** Format for one 2 digits integer field. */
-    protected static final FastLongFormatter TWO_DIGITS_INTEGER = new FastLongFormatter(2, false);
+    private static final FastLongFormatter TWO_DIGITS_INTEGER = new FastLongFormatter(2, false);
 
     /** Format for one 3 digits integer field. */
-    protected static final FastLongFormatter THREE_DIGITS_INTEGER = new FastLongFormatter(3, false);
+    private static final FastLongFormatter THREE_DIGITS_INTEGER = new FastLongFormatter(3, false);
 
     /** Format for one 5.1 float field. */
-    public static final FastDoubleFormatter FIVE_ONE_FLOAT = new FastDecimalFormatter(5, 1);
+    private static final FastDoubleFormatter FIVE_ONE_FLOAT = new FastDecimalFormatter(5, 1);
 
     /** Format for one 19 float field. */
-    public static final FastDoubleFormatter NINETEEN_FLOAT = new FastScientificFormatter(19);
+    private static final FastDoubleFormatter NINETEEN_FLOAT = new FastScientificFormatter(19);
 
     /** {@inheritDoc} */
     @Override
@@ -105,7 +105,7 @@ public abstract class AbstractNavigationMessageWriter<T extends AbstractNavigati
             final TimeScale ts = message.getSystem() == SatelliteSystem.GLONASS ?
                                  writer.getTimeScales().getGLONASS() :
                                  writer.getTimeScales().getGPS();
-            DateTimeComponents dtc = message.getEpochToc().getComponents(ts);
+            final DateTimeComponents dtc = message.getEpochToc().getComponents(ts);
             writer.outputField(TWO_DIGITS_INTEGER, message.getPRN(),                2);
             writer.outputField(THREE_DIGITS_INTEGER, dtc.getDate().getYear() % 100, 5);
             writer.outputField(THREE_DIGITS_INTEGER, dtc.getDate().getMonth(),      8);
@@ -158,7 +158,7 @@ public abstract class AbstractNavigationMessageWriter<T extends AbstractNavigati
      * @param writer global file writer
      * @throws IOException if an I/O error occurs.
      */
-    protected void writeEphLine2(T message,
+    protected void writeEphLine2(final T message,
                                  final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
         writer.indentLine(header);
@@ -175,7 +175,7 @@ public abstract class AbstractNavigationMessageWriter<T extends AbstractNavigati
      * @param writer global file writer
      * @throws IOException if an I/O error occurs.
      */
-    protected void writeEphLine3(T message,
+    protected void writeEphLine3(final T message,
                                  final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
         writer.indentLine(header);

@@ -32,11 +32,16 @@ public enum RegionCode {
     /** Japan area (for QZSS only). */
     JAPAN(1, "JAPN");
 
-    /** Parsing maps.
+    /** Parsing map.
      * @since 14.0
      */
     private static final Map<Integer, RegionCode> INTEGERS_MAP = new HashMap<>();
+
+    /** Parsing map.
+     * @since 14.0
+     */
     private static final Map<String, RegionCode> STRINGS_MAP   = new HashMap<>();
+
     static {
         for (final RegionCode regionCode : values()) {
             INTEGERS_MAP.put(regionCode.getIntegerId(), regionCode);

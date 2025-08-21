@@ -70,16 +70,16 @@ import java.util.function.BiFunction;
 public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader> {
 
     /** Format for one 9 digits integer field. */
-    protected static final FastLongFormatter NINE_DIGITS_INTEGER = new FastLongFormatter(9, false);
+    private static final FastLongFormatter NINE_DIGITS_INTEGER = new FastLongFormatter(9, false);
 
     /** Format for one 12 digits float field. */
-    public static final FastDoubleFormatter TWELVE_DIGITS_SCIENTIFIC = new FastScientificFormatter(12);
+    private static final FastDoubleFormatter TWELVE_DIGITS_SCIENTIFIC = new FastScientificFormatter(12);
 
     /** Format for one 16 digits float field. */
-    public static final FastDoubleFormatter SIXTEEN_DIGITS_SCIENTIFIC = new FastScientificFormatter(16);
+    private static final FastDoubleFormatter SIXTEEN_DIGITS_SCIENTIFIC = new FastScientificFormatter(16);
 
     /** Format for one 17 digits float field. */
-    public static final FastDoubleFormatter SEVENTEEN_DIGITS_SCIENTIFIC = new FastScientificFormatter(17);
+    private static final FastDoubleFormatter SEVENTEEN_DIGITS_SCIENTIFIC = new FastScientificFormatter(17);
 
     /** Identifier for system time offset messages.
      * <p>

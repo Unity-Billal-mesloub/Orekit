@@ -107,7 +107,9 @@ public abstract class BaseRinexWriter<T extends RinexBaseHeader> implements Auto
                 ((AutoCloseable) output).close();
             }
             closed = true;
+        // CHECKSTYLE: stop IllegalCatch check
         } catch (Exception ex) {
+        // CHECKSTYLE: resume IllegalCatch check
             throw new IOException(ex);
         }
     }
