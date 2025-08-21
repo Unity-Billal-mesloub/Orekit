@@ -16,10 +16,11 @@
  */
 package org.orekit.files.rinex.navigation.writers.ephemeris;
 
-import org.orekit.files.rinex.navigation.RinexNavigationHeader;
+import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
-import org.orekit.files.rinex.navigation.writers.NavigationMessageWriter;
+import org.orekit.files.rinex.navigation.parsers.ephemeris.NavICLnavParser;
 import org.orekit.propagation.analytical.gnss.data.NavICL1NvNavigationMessage;
+import org.orekit.utils.units.Unit;
 
 import java.io.IOException;
 
@@ -28,14 +29,52 @@ import java.io.IOException;
  * @since 14.0
  */
 public class NavICL1NVNavigationMessageWriter
-    extends NavigationMessageWriter<NavICL1NvNavigationMessage> {
+    extends CivilianNavigationMessageWriter<NavICL1NvNavigationMessage> {
 
     /** {@inheritDoc} */
     @Override
-    public void writeMessage(final String identifier, final NavICL1NvNavigationMessage message,
-                             final RinexNavigationHeader header, final RinexNavigationWriter writer)
+    protected void writeEphLine5(NavICL1NvNavigationMessage message, final RinexNavigationWriter writer)
         throws IOException {
-        // TODO
+        writer.startLine();
+        writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
+        writer.writeDouble(message.getDeltaN0Dot(), RinexNavigationParser.RAD_PER_S2);
+        writer.writeEmpty();
+        writer.writeInt(message.getReferenceSignalFlag());
+        writer.finishLine();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void writeEphLine6(NavICL1NvNavigationMessage message, final RinexNavigationWriter writer)
+        throws IOException {
+        writer.startLine();
+
+        // convert accuracy to index
+        int index = 0;
+        while (index < NavICLnavParser.NAVIC_URA.length - 1) {
+            if (message.getSvAccuracy() <= NavICLnavParser.NAVIC_URA[index]) {
+                break;
+            }
+            ++index;
+        }
+        writer.writeInt(index);
+
+        writer.writeInt(message.getSvHealth());
+        writer.writeDouble(message.getTGD(),    Unit.SECOND);
+        writer.writeDouble(message.getTGDSL5(), Unit.SECOND);
+        writer.finishLine();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void writeEphLine7(NavICL1NvNavigationMessage message, final RinexNavigationWriter writer)
+        throws IOException {
+        writer.startLine();
+        writer.writeDouble(message.getIscSL1P(),   Unit.SECOND);
+        writer.writeDouble(message.getIscL1DL1P(), Unit.SECOND);
+        writer.writeDouble(message.getIscL1PS(),   Unit.SECOND);
+        writer.writeDouble(message.getIscL1DS(),   Unit.SECOND);
+        writer.finishLine();
     }
 
 }

@@ -27,7 +27,7 @@ import org.orekit.time.TimeStamped;
  * @see GLONASSFdmaNavigationMessage
  * @see SBASNavigationMessage
  */
-public abstract class AbstractEphemerisMessage implements TimeStamped {
+public abstract class AbstractEphemerisMessage implements TimeStamped, NavigationMessage {
 
     /** Ephemeris reference epoch. */
     private AbsoluteDate date;

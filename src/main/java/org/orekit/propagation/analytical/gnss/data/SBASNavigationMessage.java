@@ -29,9 +29,7 @@ import org.orekit.propagation.analytical.gnss.SBASPropagatorBuilder;
  * @author Bryan Cazabonne
  * @since 11.0
  */
-public class SBASNavigationMessage
-    extends AbstractEphemerisMessage
-    implements SBASOrbitalElements, NavigationMessage {
+public class SBASNavigationMessage extends AbstractEphemerisMessage implements SBASOrbitalElements {
 
     /** Message type.
      * @since 14.0

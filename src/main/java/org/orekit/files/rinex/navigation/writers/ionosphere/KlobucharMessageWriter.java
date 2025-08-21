@@ -66,7 +66,7 @@ public class KlobucharMessageWriter extends NavigationMessageWriter<IonosphereKl
         // ION MESSAGE LINE - 2
         writer.startLine();
         writer.writeDouble(message.getBeta()[3], IonosphereKlobucharMessage.S_PER_SC_N3);
-        if (header.getFormatVersion() <= 4.01) {
+        if (header.getFormatVersion() < 4.015) {
             writer.writeInt(message.getRegionCode().getIntegerId());
         }
         writer.finishLine();

@@ -78,6 +78,11 @@ public abstract class FieldCivilianNavigationMessage<T extends CalculusFieldElem
     /** Term 2 of Non-Elevation-Dependent User Range Accuracy. */
     private int uraiNed2;
 
+    /** Flags.
+     * @since 14.0
+     */
+    private int flags;
+
     /** Constructor from non-field instance.
      * @param field    field to which elements belong
      * @param original regular non-field instance
@@ -99,6 +104,7 @@ public abstract class FieldCivilianNavigationMessage<T extends CalculusFieldElem
         setUraiNed0(original.getUraiNed0());
         setUraiNed1(original.getUraiNed1());
         setUraiNed2(original.getUraiNed2());
+        setFlags(original.getFlags());
     }
 
     /** Constructor from different field instance.
@@ -124,6 +130,7 @@ public abstract class FieldCivilianNavigationMessage<T extends CalculusFieldElem
         setUraiNed0(original.getUraiNed0());
         setUraiNed1(original.getUraiNed1());
         setUraiNed2(original.getUraiNed2());
+        setFlags(original.getFlags());
     }
 
     /** Check it message is a CNV2 message.
@@ -351,6 +358,22 @@ public abstract class FieldCivilianNavigationMessage<T extends CalculusFieldElem
      */
     public void setUraiNed2(final int uraiNed2) {
         this.uraiNed2 = uraiNed2;
+    }
+
+    /** Get the flags.
+     * @return flags
+     * @since 14.0
+     */
+    public int getFlags() {
+        return flags;
+    }
+
+    /** Set the flags.
+     * @param flags flags
+     * @since 14.0
+     */
+    public void setFlags(final int flags) {
+        this.flags = flags;
     }
 
 }

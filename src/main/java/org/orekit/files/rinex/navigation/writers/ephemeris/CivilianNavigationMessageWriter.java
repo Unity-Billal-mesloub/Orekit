@@ -18,66 +18,60 @@ package org.orekit.files.rinex.navigation.writers.ephemeris;
 
 import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
-import org.orekit.propagation.analytical.gnss.data.LegacyNavigationMessage;
+import org.orekit.propagation.analytical.gnss.data.CivilianNavigationMessage;
 import org.orekit.utils.units.Unit;
 
 import java.io.IOException;
 
-/** Writer for legacy messages.
+/** Base writer for civilian messages.
+ * @param <T> type of the navigation messages this writer handles
  * @author Luc Maisonobe
  * @since 14.0
  */
-public abstract class LegacyNavigationMessageWriter<O extends LegacyNavigationMessage<O>>
-    extends AbstractNavigationMessageWriter<O> {
+public abstract class CivilianNavigationMessageWriter<T extends CivilianNavigationMessage<T>>
+    extends AbstractNavigationMessageWriter<T> {
 
     /** {@inheritDoc} */
     @Override
-    protected void writeField1Line1(O message, final RinexNavigationWriter writer)
+    protected void writeField1Line1(T message, final RinexNavigationWriter writer)
         throws IOException {
-        writer.writeDouble(message.getIODE(), Unit.SECOND);
+        writer.writeDouble(message.getADot(), RinexNavigationParser.M_PER_S);
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine5(O message, final RinexNavigationWriter writer)
+    protected void writeEphLine5(T message, final RinexNavigationWriter writer)
         throws IOException {
         writer.startLine();
         writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
-        writer.writeInt(message.getL2Codes());
-        writer.writeInt(message.getWeek());
-        writer.writeInt(message.getL2PFlags());
+        writer.writeDouble(message.getDeltaN0Dot(), RinexNavigationParser.RAD_PER_S2);
+        writer.writeInt(message.getUraiNed0());
+        writer.writeInt(message.getUraiNed1());
         writer.finishLine();
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine6(O message, final RinexNavigationWriter writer)
+    protected void writeEphLine6(T message, final RinexNavigationWriter writer)
         throws IOException {
         writer.startLine();
-        writeURA(message, writer);
+        writer.writeInt(message.getUraiEd());
         writer.writeInt(message.getSvHealth());
         writer.writeDouble(message.getTGD(), Unit.SECOND);
-        writer.writeInt(message.getIODC());
+        writer.writeInt(message.getUraiNed2());
         writer.finishLine();
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void writeEphLine7(O message, final RinexNavigationWriter writer)
+    protected void writeEphLine7(T message, final RinexNavigationWriter writer)
         throws IOException {
         writer.startLine();
-        writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
-        writer.writeInt(message.getFitInterval());
+        writer.writeDouble(message.getIscL1CA(), Unit.SECOND);
+        writer.writeDouble(message.getIscL2C(),  Unit.SECOND);
+        writer.writeDouble(message.getIscL5I5(), Unit.SECOND);
+        writer.writeDouble(message.getIscL5Q5(), Unit.SECOND);
         writer.finishLine();
-
     }
-
-    /** Write a navigation message.
-     * @param message navigation message to write
-     * @param writer global file writer
-     * @throws IOException if an I/O error occurs.
-     */
-    protected abstract void writeURA(O message, RinexNavigationWriter writer)
-        throws IOException;
 
 }

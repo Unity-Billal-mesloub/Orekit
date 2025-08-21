@@ -16,10 +16,10 @@
  */
 package org.orekit.files.rinex.navigation.writers.ephemeris;
 
-import org.orekit.files.rinex.navigation.RinexNavigationHeader;
+import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
-import org.orekit.files.rinex.navigation.writers.NavigationMessageWriter;
 import org.orekit.propagation.analytical.gnss.data.BeidouLegacyNavigationMessage;
+import org.orekit.utils.units.Unit;
 
 import java.io.IOException;
 
@@ -28,14 +28,47 @@ import java.io.IOException;
  * @since 14.0
  */
 public class BeidouLegacyNavigationMessageWriter
-    extends NavigationMessageWriter<BeidouLegacyNavigationMessage> {
+    extends AbstractNavigationMessageWriter<BeidouLegacyNavigationMessage> {
 
     /** {@inheritDoc} */
     @Override
-    public void writeMessage(final String identifier, final BeidouLegacyNavigationMessage message,
-                             final RinexNavigationHeader header, final RinexNavigationWriter writer)
+    protected void writeField1Line1(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
         throws IOException {
-        // TODO
+        writer.writeDouble(message.getAODE(), Unit.SECOND);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void writeEphLine5(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
+        throws IOException {
+        writer.startLine();
+        writer.writeDouble(message.getIDot(), RinexNavigationParser.RAD_PER_S);
+        writer.writeEmpty();
+        writer.writeInt(message.getWeek());
+        writer.writeEmpty();
+        writer.finishLine();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void writeEphLine6(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
+        throws IOException {
+        writer.startLine();
+        writer.writeDouble(message.getSvAccuracy(), Unit.METRE);
+        writer.writeInt(message.getSatH1());
+        writer.writeDouble(message.getTGD1(), Unit.SECOND);
+        writer.writeDouble(message.getTGD2(), Unit.SECOND);
+        writer.finishLine();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void writeEphLine7(BeidouLegacyNavigationMessage message, final RinexNavigationWriter writer)
+        throws IOException {
+        writer.startLine();
+        writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
+        writer.writeDouble(message.getAODC(),             Unit.SECOND);
+        writer.finishLine();
     }
 
 }

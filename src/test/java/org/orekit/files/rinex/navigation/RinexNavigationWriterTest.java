@@ -475,8 +475,7 @@ public class RinexNavigationWriterTest {
         // check data inherited from base class
         checkCivilian(first, second);
 
-        // check data specific to this message type
-        Assertions.assertEquals(first.getFlags(), second.getFlags());
+        // there are no specific data to check at GPSCivilianNavigationMessage level
 
     }
 
@@ -658,6 +657,8 @@ public class RinexNavigationWriterTest {
         Assertions.assertEquals(first.getUraiNed0(), second.getUraiNed0());
         Assertions.assertEquals(first.getUraiNed1(), second.getUraiNed1());
         Assertions.assertEquals(first.getUraiNed2(), second.getUraiNed2());
+        Assertions.assertEquals(first.getFlags(), second.getFlags());
+
 
     }
 

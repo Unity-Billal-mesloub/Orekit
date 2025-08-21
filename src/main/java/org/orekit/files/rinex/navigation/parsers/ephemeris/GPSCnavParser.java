@@ -37,19 +37,6 @@ public class GPSCnavParser extends CivilianNavigationParser<GPSCivilianNavigatio
 
     /** {@inheritDoc} */
     @Override
-    public void parseLine09() {
-        parseTransmissionTimeLine();
-    }
-
-    /** Parse transmission time line.
-     */
-    protected void parseTransmissionTimeLine() {
-        getMessage().setFlags(getParseInfo().parseInt3());
-        super.parseTransmissionTimeLine();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void closeRecord(final RinexNavigation file) {
         file.addGPSCivilianNavigationMessage(getMessage());
     }

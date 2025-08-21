@@ -18,8 +18,8 @@ package org.orekit.files.rinex.navigation.writers.ephemeris;
 
 import org.orekit.files.rinex.navigation.RinexNavigationHeader;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
-import org.orekit.files.rinex.navigation.writers.NavigationMessageWriter;
 import org.orekit.propagation.analytical.gnss.data.QZSSCivilianNavigationMessage;
+import org.orekit.utils.units.Unit;
 
 import java.io.IOException;
 
@@ -28,14 +28,30 @@ import java.io.IOException;
  * @since 14.0
  */
 public class QZSSCivilianNavigationMessageWriter
-    extends NavigationMessageWriter<QZSSCivilianNavigationMessage> {
+    extends CivilianNavigationMessageWriter<QZSSCivilianNavigationMessage> {
 
     /** {@inheritDoc} */
     @Override
     public void writeMessage(final String identifier, final QZSSCivilianNavigationMessage message,
                              final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
-        // TODO
+
+        // TYPE / SV / MSG, and lines 0 to 7
+        super.writeMessage(identifier, message, header, writer);
+
+        // EPH MESSAGE LINE - 8/9
+        if (message.isCnv2()) {
+            writer.startLine();
+            writer.writeDouble(message.getIscL1CD(), Unit.SECOND);
+            writer.writeDouble(message.getIscL1CP(), Unit.SECOND);
+            writer.finishLine();
+        }
+        writer.startLine();
+        writer.writeDouble(message.getTransmissionTime(), Unit.SECOND);
+        writer.writeInt(message.getWeek());
+        writer.writeInt(message.getFlags());
+        writer.finishLine();
+
     }
 
 }

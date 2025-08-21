@@ -16,11 +16,8 @@
  */
 package org.orekit.files.rinex.navigation.writers.ephemeris;
 
-import org.orekit.files.rinex.navigation.RecordType;
 import org.orekit.files.rinex.navigation.RinexNavigationHeader;
-import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
-import org.orekit.files.rinex.navigation.writers.NavigationMessageWriter;
 import org.orekit.files.rinex.utils.BaseRinexWriter;
 import org.orekit.gnss.SatelliteSystem;
 import org.orekit.propagation.analytical.gnss.data.GLONASSFdmaNavigationMessage;
@@ -36,21 +33,19 @@ import java.io.IOException;
  * @since 14.0
  */
 public class GlonassFdmaNavigationMessageWriter
-    extends NavigationMessageWriter<GLONASSFdmaNavigationMessage> {
+    extends AbstractEphemerisMessageWriter<GLONASSFdmaNavigationMessage> {
 
     /** Format for one 5.1 digits float field. */
     public static final FastDoubleFormatter FIVE_ONE_DIGITS_FLOAT = new FastDecimalFormatter(5, 1);
 
     /** {@inheritDoc} */
     @Override
-    public void writeMessage(final String identifier, final GLONASSFdmaNavigationMessage message,
-                             final RinexNavigationHeader header, final RinexNavigationWriter writer)
+    protected void writeEphLine0(final GLONASSFdmaNavigationMessage message,
+                                 final RinexNavigationHeader header, final RinexNavigationWriter writer)
         throws IOException {
 
-        // TYPE / SV / MSG
-        writeTypeSvMsg(RecordType.EPH, identifier, message, header, writer);
+        writer.startLine();
 
-        // EPH MESSAGE LINE - 0
         final DateTimeComponents dtc = message.getEpochToc().getComponents(writer.getTimeScales().getUTC());
         if (header.getFormatVersion() < 3.0) {
 
@@ -69,7 +64,6 @@ public class GlonassFdmaNavigationMessageWriter
             writer.outputField(' ', 22);
             writer.writeDouble(-message.getTN(),    Unit.SECOND);
             writer.writeDouble(message.getGammaN(), Unit.NONE);
-            writer.finishLine();
 
         } else {
             writer.outputField(SatelliteSystem.GLONASS.getKey(), 1);
@@ -79,31 +73,40 @@ public class GlonassFdmaNavigationMessageWriter
             writer.writeDouble(-message.getTN(),    Unit.SECOND);
             writer.writeDouble(message.getGammaN(), Unit.NONE);
             writer.writeDouble(message.getTime(),   Unit.NONE);
-            writer.finishLine();
         }
 
-        // EPH MESSAGE LINE - 1
-        writer.startLine();
-        writer.writeDouble(message.getX(),       Unit.KILOMETRE);
-        writer.writeDouble(message.getXDot(),    RinexNavigationParser.KM_PER_S);
-        writer.writeDouble(message.getXDotDot(), RinexNavigationParser.KM_PER_S2);
+        writer.finishLine();
+
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void writeField4Line1(final GLONASSFdmaNavigationMessage message, final RinexNavigationWriter writer)
+        throws IOException {
         writer.writeDouble(message.getHealth(),  Unit.NONE);
-        writer.finishLine();
+    }
 
-        // EPH MESSAGE LINE - 2
-        writer.startLine();
-        writer.writeDouble(message.getY(),               Unit.KILOMETRE);
-        writer.writeDouble(message.getYDot(),            RinexNavigationParser.KM_PER_S);
-        writer.writeDouble(message.getYDotDot(),         RinexNavigationParser.KM_PER_S2);
+    /** {@inheritDoc} */
+    @Override
+    protected void writeField4Line2(final GLONASSFdmaNavigationMessage message, final RinexNavigationWriter writer)
+        throws IOException {
         writer.writeDouble(message.getFrequencyNumber(), Unit.NONE);
-        writer.finishLine();
+    }
 
-        // EPH MESSAGE LINE - 3
-        writer.startLine();
-        writer.writeDouble(message.getZ(),               Unit.KILOMETRE);
-        writer.writeDouble(message.getZDot(),            RinexNavigationParser.KM_PER_S);
-        writer.writeDouble(message.getZDotDot(),         RinexNavigationParser.KM_PER_S2);
-        writer.finishLine();
+    /** {@inheritDoc} */
+    @Override
+    protected void writeField4Line3(final GLONASSFdmaNavigationMessage message, final RinexNavigationWriter writer) {
+        // nothing to do
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void writeMessage(final String identifier, final GLONASSFdmaNavigationMessage message,
+                             final RinexNavigationHeader header, final RinexNavigationWriter writer)
+        throws IOException {
+
+        // TYPE / SV / MSG, and lines 0 to 3
+        super.writeMessage(identifier, message, header, writer);
 
         if (header.getFormatVersion() > 3.045) {
             // EPH MESSAGE LINE - 4

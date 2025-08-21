@@ -30,8 +30,7 @@ import org.orekit.propagation.numerical.GLONASSNumericalPropagatorBuilder;
  * @author Bryan Cazabonne
  * @since 11.0
  */
-public class GLONASSFdmaNavigationMessage
-    extends AbstractEphemerisMessage implements GLONASSOrbitalElements, NavigationMessage {
+public class GLONASSFdmaNavigationMessage extends AbstractEphemerisMessage implements GLONASSOrbitalElements {
 
     /** Message type.
      * @since 14.0

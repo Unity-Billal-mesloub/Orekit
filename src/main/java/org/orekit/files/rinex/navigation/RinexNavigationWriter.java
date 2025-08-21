@@ -50,7 +50,6 @@ import org.orekit.time.DateTimeComponents;
 import org.orekit.time.GNSSDate;
 import org.orekit.time.TimeScale;
 import org.orekit.time.TimeScales;
-import org.orekit.utils.formatting.FastDecimalFormatter;
 import org.orekit.utils.formatting.FastDoubleFormatter;
 import org.orekit.utils.formatting.FastLongFormatter;
 import org.orekit.utils.formatting.FastScientificFormatter;
@@ -72,13 +71,13 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
     /** Format for one 9 digits integer field. */
     protected static final FastLongFormatter NINE_DIGITS_INTEGER = new FastLongFormatter(9, false);
 
-    /** Format for one 12.4 digits float field. */
-    public static final FastDoubleFormatter TWELVE_FOUR_DIGITS_FLOAT = new FastDecimalFormatter(12, 4);
+    /** Format for one 12digits float field. */
+    public static final FastDoubleFormatter TWELVE_DIGITS_SCIENTIFIC = new FastScientificFormatter(12);
 
-    /** Format for one 16.9 digits float field. */
+    /** Format for one 16 digits float field. */
     public static final FastDoubleFormatter SIXTEEN_DIGITS_SCIENTIFIC = new FastScientificFormatter(16);
 
-    /** Format for one 17.10 digits float field. */
+    /** Format for one 17 digits float field. */
     public static final FastDoubleFormatter SEVENTEEN_DIGITS_SCIENTIFIC = new FastScientificFormatter(17);
 
     /** Identifier for system time offset messages.
@@ -229,26 +228,26 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
                                       new SBASNavigationMessageWriter()));
 
         // STO messages
-        pending.add(new PendingMessages<>(STO_IDENTIFIER, new SystemTimeOffsetMessageWriter(),
-                                          rinexNavigation.getSystemTimeOffsets()));
+        addHandler(pending, STO_IDENTIFIER,
+                   rinexNavigation.getSystemTimeOffsets(), new SystemTimeOffsetMessageWriter());
 
         // EOP messages
-        pending.add(new PendingMessages<>(EOP_IDENTIFIER, new EarthOrientationParametersMessageWriter(),
-                                          rinexNavigation.getEarthOrientationParameters()));
+        addHandler(pending, EOP_IDENTIFIER,
+                   rinexNavigation.getEarthOrientationParameters(), new EarthOrientationParametersMessageWriter());
 
         // ION messages
-        pending.add(new PendingMessages<>(KLOBUCHAR_IDENTIFIER, new KlobucharMessageWriter(),
-                                          rinexNavigation.getKlobucharMessages()));
-        pending.add(new PendingMessages<>(NEQUICK_IDENTIFIER, new NequickGMessageWriter(),
-                                          rinexNavigation.getNequickGMessages()));
-        pending.add(new PendingMessages<>(BDGIM_IDENTIFIER, new BDGIMMessageWriter(),
-                                          rinexNavigation.getBDGIMMessages()));
-        pending.add(new PendingMessages<>(NAVIC_KLOBUCHAR_IDENTIFIER, new NavICKlobucharMessageWriter(),
-                                          rinexNavigation.getNavICKlobucharMessages()));
-        pending.add(new PendingMessages<>(NAVIC_NEQUICK_N_IDENTIFIER, new NavICNeQuickNMessageWriter(),
-                                          rinexNavigation.getNavICNeQuickNMessages()));
-        pending.add(new PendingMessages<>(GLONASS_CDMS_IDENTIFIER, new GlonassCDMSMessageWriter(),
-                                          rinexNavigation.getGlonassCDMSMessages()));
+        addHandler(pending, KLOBUCHAR_IDENTIFIER,
+                   rinexNavigation.getKlobucharMessages(), new KlobucharMessageWriter());
+        addHandler(pending, NEQUICK_IDENTIFIER,
+                   rinexNavigation.getNequickGMessages(), new NequickGMessageWriter());
+        addHandler(pending, BDGIM_IDENTIFIER,
+                   rinexNavigation.getBDGIMMessages(), new BDGIMMessageWriter());
+        addHandler(pending, NAVIC_KLOBUCHAR_IDENTIFIER,
+                   rinexNavigation.getNavICKlobucharMessages(), new NavICKlobucharMessageWriter());
+        addHandler(pending, NAVIC_NEQUICK_N_IDENTIFIER,
+                   rinexNavigation.getNavICNeQuickNMessages(), new NavICNeQuickNMessageWriter());
+        addHandler(pending, GLONASS_CDMS_IDENTIFIER,
+                   rinexNavigation.getGlonassCDMSMessages(), new GlonassCDMSMessageWriter());
 
         pending.sort(Comparator.comparing(pl -> pl.identifier));
 
@@ -268,13 +267,28 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
      * @param messageWriter writer for the current message type
      * @return list of handlers for one message type
      */
-    private <T extends NavigationMessage> List<PendingMessages<T>> createHandlers(final Map<String, List<T>> map,
+    private <T extends NavigationMessage> List<PendingMessages<?>> createHandlers(final Map<String, List<T>> map,
                                                                                   final NavigationMessageWriter<T> messageWriter) {
-        final List<PendingMessages<T>> handlers = new ArrayList<>();
+        final List<PendingMessages<?>> handlers = new ArrayList<>();
         for (final Map.Entry<String, List<T>> entry : map.entrySet()) {
-            handlers.add(new PendingMessages<>(entry.getKey(), messageWriter, entry.getValue()));
+            addHandler(handlers, entry.getKey(), entry.getValue(), messageWriter);
         }
         return handlers;
+    }
+
+    /** Add message handler for one message type.
+     * @param <T> type of the navigation message
+     * @param pending list to complete
+     * @param identifier identifier
+     * @param list messages list
+     * @param messageWriter writer for the current message type
+     */
+    private <T extends NavigationMessage> void addHandler(final List<PendingMessages<?>> pending,
+                                                          final String identifier, final List<T> list,
+                                                          final NavigationMessageWriter<T> messageWriter) {
+        if (!list.isEmpty()) {
+            pending.add(new PendingMessages<>(identifier, messageWriter, list));
+        }
     }
 
     /** Find the earliest pending date.
@@ -313,16 +327,16 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
         // PGM / RUN BY / DATE
         writeProgramRunByDate(header);
 
-        if (header.getFormatVersion() < 4) {
+        if (header.getFormatVersion() < 4.0) {
             // IONOSPHERIC CORR
             for (final IonosphericCorrection correction : header.getIonosphericCorrections()) {
                 if (correction.getType() == IonosphericCorrectionType.GAL) {
                     final NeQuickGIonosphericCorrection nequick = (NeQuickGIonosphericCorrection) correction;
                     final double[] alpha = nequick.getNeQuickAlpha();
                     outputField(nequick.getType().toString(), 5, true);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, alpha[0], 17);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, alpha[1], 29);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, alpha[2], 41);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[0], 17);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[1], 29);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[2], 41);
                     outputField("", 53, true);
                     outputField(nequick.getTimeMark(), 54);
                     finishHeaderLine(NavigationLabel.IONOSPHERIC_CORR);
@@ -331,19 +345,19 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
                     final double[] alpha = klobuchar.getKlobucharAlpha();
                     final double[] beta  = klobuchar.getKlobucharBeta();
                     outputField(klobuchar.getType().toString(), 3, true);
-                    outputField('A', 5);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, alpha[0], 17);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, alpha[1], 29);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, alpha[2], 41);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, alpha[3], 53);
+                    outputField("A ", 5, true);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[0], 17);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[1], 29);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[2], 41);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, alpha[3], 53);
                     outputField(klobuchar.getTimeMark(), 54);
                     finishHeaderLine(NavigationLabel.IONOSPHERIC_CORR);
                     outputField(klobuchar.getType().toString(), 3, true);
-                    outputField('B', 5);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, beta[0], 17);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, beta[1], 29);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, beta[2], 41);
-                    outputField(TWELVE_FOUR_DIGITS_FLOAT, beta[3], 53);
+                    outputField("B ", 5, true);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, beta[0], 17);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, beta[1], 29);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, beta[2], 41);
+                    outputField(TWELVE_DIGITS_SCIENTIFIC, beta[3], 53);
                     outputField(klobuchar.getTimeMark(), 54);
                     finishHeaderLine(NavigationLabel.IONOSPHERIC_CORR);
                 }
@@ -354,39 +368,44 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
                 final GNSSDate date = new GNSSDate(correction.getReferenceDate(), header.getSatelliteSystem());
                 outputField(correction.getTimeSystemCorrectionType(), 5, true);
                 outputField(SEVENTEEN_DIGITS_SCIENTIFIC, correction.getTimeSystemCorrectionA0(), 22);
-                outputField(SIXTEEN_DIGITS_SCIENTIFIC,   correction.getTimeSystemCorrectionA1(), 39);
-                outputField(SIX_DIGITS_INTEGER, (int) FastMath.rint(date.getSecondsInWeek()), 46);
-                outputField(FOUR_DIGITS_INTEGER, date.getWeekNumber(), 51);
+                outputField(SIXTEEN_DIGITS_SCIENTIFIC,   correction.getTimeSystemCorrectionA1(), 38);
+                outputField(' ', 39);
+                outputField(SIX_DIGITS_INTEGER, (int) FastMath.rint(date.getSecondsInWeek()), 45);
+                outputField(' ', 46);
+                outputField(FOUR_DIGITS_INTEGER, date.getWeekNumber(), 50);
+                outputField(' ', 51);
                 outputField(correction.getSatId(), 56, false);
-                outputField("", 57, true);
+                outputField(' ', 57);
                 outputField(TWO_DIGITS_INTEGER, correction.getUtcId(), 59);
                 finishHeaderLine(NavigationLabel.TIME_SYSTEM_CORR);
             }
 
+        } else {
+
+            // REC # / TYPE / VERS
+            if (header.getReceiverNumber() != null) {
+                outputField(header.getReceiverNumber(), 20, true);
+                outputField(header.getReceiverType(), 40, true);
+                outputField(header.getReceiverVersion(), 60, true);
+                finishHeaderLine(ObservationLabel.REC_NB_TYPE_VERS);
+            }
+
+            // MERGED FILE
+            if (header.getMergedFiles() > 0) {
+                outputField(NINE_DIGITS_INTEGER, header.getMergedFiles(), 9);
+                finishHeaderLine(NavigationLabel.MERGED_FILE);
+            }
+
+            // DOI
+            writeHeaderLine(header.getDoi(), CommonLabel.DOI);
+
+            // LICENSE OF USE
+            writeHeaderLine(header.getLicense(), CommonLabel.LICENSE);
+
+            // STATION INFORMATION
+            writeHeaderLine(header.getStationInformation(), CommonLabel.STATION_INFORMATION);
+
         }
-
-        // REC # / TYPE / VERS
-        if (header.getReceiverNumber() != null) {
-            outputField(header.getReceiverNumber(), 20, true);
-            outputField(header.getReceiverType(), 40, true);
-            outputField(header.getReceiverVersion(), 60, true);
-            finishHeaderLine(ObservationLabel.REC_NB_TYPE_VERS);
-        }
-
-        // MERGED FILE
-        if (header.getMergedFiles() > 0) {
-            outputField(NINE_DIGITS_INTEGER, header.getMergedFiles(), 9);
-            finishHeaderLine(NavigationLabel.MERGED_FILE);
-        }
-
-        // DOI
-        writeHeaderLine(header.getDoi(), CommonLabel.DOI);
-
-        // LICENSE OF USE
-        writeHeaderLine(header.getLicense(), CommonLabel.LICENSE);
-
-        // STATION INFORMATION
-        writeHeaderLine(header.getStationInformation(), CommonLabel.STATION_INFORMATION);
 
         // LEAP SECONDS
         if (header.getLeapSecondsGNSS() > 0) {
@@ -460,6 +479,16 @@ public class RinexNavigationWriter extends BaseRinexWriter<RinexNavigationHeader
      */
     public void writeInt(final int value) throws IOException {
         outputField(BaseRinexWriter.NINETEEN_SCIENTIFIC_FLOAT, value, getColumn() + 19);
+    }
+
+    /** Write an empty field.
+     * <p>
+     * The field will span over 19 characters.
+     * </p>
+     * @exception IOException if an I/O error occurs.
+     */
+    public void writeEmpty() throws IOException {
+        outputField("", getColumn() + 19, true);
     }
 
     /** Start (indent) a new line.

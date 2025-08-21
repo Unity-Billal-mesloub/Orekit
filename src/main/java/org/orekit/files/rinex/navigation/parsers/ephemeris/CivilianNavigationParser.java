@@ -151,6 +151,7 @@ public abstract class CivilianNavigationParser<T extends CivilianNavigationMessa
     protected void parseTransmissionTimeLine() {
         message.setTransmissionTime(parseInfo.parseDouble1(Unit.SECOND));
         message.setWeek(parseInfo.parseInt2());
+        message.setFlags(getParseInfo().parseInt3());
         parseInfo.closePendingRecord();
     }
 

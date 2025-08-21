@@ -63,23 +63,12 @@ public class BeidouCnv123Parser extends AbstractNavigationParser<BeidouCivilianN
         final BeidouCivilianNavigationMessage message = getMessage();
         message.setIDot(parseInfo.parseDouble1(RinexNavigationParser.RAD_PER_S));
         message.setDeltaN0Dot(parseInfo.parseDouble2(RinexNavigationParser.RAD_PER_S2));
-        switch (parseInfo.parseInt3()) {
-            case 0:
-                message.setSatelliteType(BeidouSatelliteType.RESERVED);
-                break;
-            case 1:
-                message.setSatelliteType(BeidouSatelliteType.GEO);
-                break;
-            case 2:
-                message.setSatelliteType(BeidouSatelliteType.IGSO);
-                break;
-            case 3:
-                message.setSatelliteType(BeidouSatelliteType.MEO);
-                break;
-            default:
-                throw new OrekitException(OrekitMessages.UNABLE_TO_PARSE_LINE_IN_FILE,
-                                          parseInfo.getLineNumber(), parseInfo.getName(),
-                                          parseInfo.getLine());
+        try {
+            message.setSatelliteType(BeidouSatelliteType.parseSatelliteType(parseInfo.parseInt3()));
+        } catch (IllegalArgumentException iae) {
+            throw new OrekitException(OrekitMessages.UNABLE_TO_PARSE_LINE_IN_FILE,
+                                      parseInfo.getLineNumber(), parseInfo.getName(),
+                                      parseInfo.getLine());
         }
         message.setTime(parseInfo.parseDouble4(Unit.SECOND));
     }

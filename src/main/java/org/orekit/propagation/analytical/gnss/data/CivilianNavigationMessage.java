@@ -73,6 +73,11 @@ public abstract class CivilianNavigationMessage<O extends CivilianNavigationMess
     /** Term 2 of Non-Elevation-Dependent User Range Accuracy. */
     private int uraiNed2;
 
+    /** Flags.
+     * @since 14.0
+     */
+    private int flags;
+
     /**
      * Constructor.
      * @param cnv2            indicator for CNV2 messages
@@ -116,6 +121,7 @@ public abstract class CivilianNavigationMessage<O extends CivilianNavigationMess
         setUraiNed0(original.getUraiNed0());
         setUraiNed1(original.getUraiNed1());
         setUraiNed2(original.getUraiNed2());
+        setFlags(original.getFlags());
     }
 
     /** Check it message is a CNV2 message.
@@ -343,6 +349,22 @@ public abstract class CivilianNavigationMessage<O extends CivilianNavigationMess
      */
     public void setUraiNed2(final int uraiNed2) {
         this.uraiNed2 = uraiNed2;
+    }
+
+    /** Get the flags.
+     * @return flags
+     * @since 14.0
+     */
+    public int getFlags() {
+        return flags;
+    }
+
+    /** Set the flags.
+     * @param flags flags
+     * @since 14.0
+     */
+    public void setFlags(final int flags) {
+        this.flags = flags;
     }
 
 }
