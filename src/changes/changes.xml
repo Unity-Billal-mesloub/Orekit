@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
+        <action dev="serrof" type="add" issue="1796">
+            Added TleExtendedPositionProvider.
+        </action>
         <action dev="serrof" type="add" issue="1791">
             Added (Field)SingleDateDetector.
         </action>

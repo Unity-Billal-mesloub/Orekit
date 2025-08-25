@@ -192,6 +192,15 @@ public class FieldTLE<T extends CalculusFieldElement<T>> implements FieldTimeSta
         this(field, line1, line2, DataContext.getDefault().getTimeScales().getUTC());
     }
 
+    /** Constructor from non-Field object.
+     * @param field field utilized by default
+     * @param tle Two-Line Element
+     * @since 14.0
+     */
+    public FieldTLE(final Field<T> field, final TLE tle) {
+        this(field, tle.getLine1(), tle.getLine2(), tle.getUtc());
+    }
+
     /** Simple constructor from unparsed two lines using the given time scale as UTC.
      *
      *<p>This method uses the {@link DataContext#getDefault() default data context}.
