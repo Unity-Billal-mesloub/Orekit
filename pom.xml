@@ -712,7 +712,7 @@
             <option>-extdirs</option>
             <option>${tools.jar.dir}</option>
           </additionalOptions>
-          <bottom>Copyright &amp;copy; ${project.inceptionYear}-{currentYear} &lt;a href="https://www.csgroup.eu"&gt;CS GROUP&lt;/a&gt;. All rights reserved.</bottom>
+          <bottom>Copyright &amp;copy; ${project.inceptionYear}-{currentYear} &lt;a href="https://www.cs-soprasteria.com/en/"&gt;CS GROUP&lt;/a&gt;. All rights reserved.</bottom>
           <links>
             <link>https://docs.oracle.com/javase/8/docs/api/</link>
             <link>https://www.hipparchus.org/apidocs/</link>
@@ -957,7 +957,7 @@
         <version>${orekit.maven-jxr-plugin.version}</version>
         <configuration>
           <linkJavadoc>false</linkJavadoc>
-          <bottom>Copyright &amp;copy; ${project.inceptionYear}-{currentYear} &lt;a href="https://www.csgroup.eu"&gt;CS GROUP&lt;/a&gt;. All rights reserved.</bottom>
+          <bottom>Copyright &amp;copy; ${project.inceptionYear}-{currentYear} &lt;a href="https://www.cs-soprasteria.com/en/"&gt;CS GROUP&lt;/a&gt;. All rights reserved.</bottom>
         </configuration>
       </plugin>
       <plugin>
@@ -973,7 +973,7 @@
             <option>-extdirs</option>
             <option>${tools.jar.dir}</option>
           </additionalOptions>
-          <bottom>Copyright &amp;copy; ${project.inceptionYear}-{currentYear} &lt;a href="https://www.csgroup.eu"&gt;CS GROUP&lt;/a&gt;. All rights reserved.</bottom>
+          <bottom>Copyright &amp;copy; ${project.inceptionYear}-{currentYear} &lt;a href="https://www.cs-soprasteria.com/en/"&gt;CS GROUP&lt;/a&gt;. All rights reserved.</bottom>
           <links>
             <link>https://docs.oracle.com/javase/8/docs/api/</link>
             <link>https://www.hipparchus.org/apidocs/</link>
