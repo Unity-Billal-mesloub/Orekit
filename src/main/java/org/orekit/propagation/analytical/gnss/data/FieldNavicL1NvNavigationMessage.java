@@ -27,7 +27,7 @@ import java.util.function.Function;
  * @author Luc Maisonobe
  * @since 13.0
  */
-public class FieldNavicL1NVNavigationMessage<T extends CalculusFieldElement<T>>
+public class FieldNavicL1NvNavigationMessage<T extends CalculusFieldElement<T>>
     extends FieldCivilianNavigationMessage<T, NavICL1NvNavigationMessage> {
 
     /** Reference signal flag. */
@@ -52,7 +52,7 @@ public class FieldNavicL1NVNavigationMessage<T extends CalculusFieldElement<T>>
      * @param field    field to which elements belong
      * @param original regular non-field instance
      */
-    public FieldNavicL1NVNavigationMessage(final Field<T> field, final NavICL1NvNavigationMessage original) {
+    public FieldNavicL1NvNavigationMessage(final Field<T> field, final NavICL1NvNavigationMessage original) {
         super(field, original);
         setReferenceSignalFlag(original.getReferenceSignalFlag());
         setTGDSL5(field.getZero().newInstance(original.getTGDSL5()));
@@ -67,8 +67,8 @@ public class FieldNavicL1NVNavigationMessage<T extends CalculusFieldElement<T>>
      * @param original regular non-field instance
      * @param converter for field elements
      */
-    public <V extends CalculusFieldElement<V>> FieldNavicL1NVNavigationMessage(final Function<V, T> converter,
-                                                                               final FieldNavicL1NVNavigationMessage<V> original) {
+    public <V extends CalculusFieldElement<V>> FieldNavicL1NvNavigationMessage(final Function<V, T> converter,
+                                                                               final FieldNavicL1NvNavigationMessage<V> original) {
         super(converter, original);
         setReferenceSignalFlag(original.getReferenceSignalFlag());
         setTGDSL5(converter.apply(original.getTGDSL5()));
@@ -89,7 +89,7 @@ public class FieldNavicL1NVNavigationMessage<T extends CalculusFieldElement<T>>
     @Override
     public <U extends CalculusFieldElement<U>, G extends FieldGnssOrbitalElements<U, NavICL1NvNavigationMessage>>
         G changeField(final Function<T, U> converter) {
-        return (G) new FieldNavicL1NVNavigationMessage<>(converter, this);
+        return (G) new FieldNavicL1NvNavigationMessage<>(converter, this);
     }
 
     /** Set reference signal flag.

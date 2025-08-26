@@ -69,7 +69,7 @@ public class NavICL1NvNavigationMessage
      * @param <T> type of the field elements
      * @param original regular field instance
      */
-    public <T extends CalculusFieldElement<T>> NavICL1NvNavigationMessage(final FieldNavicL1NVNavigationMessage<T> original) {
+    public <T extends CalculusFieldElement<T>> NavICL1NvNavigationMessage(final FieldNavicL1NvNavigationMessage<T> original) {
         super(original);
         setReferenceSignalFlag(original.getReferenceSignalFlag());
         setTGDSL5(original.getTGDSL5().getReal());
@@ -84,7 +84,7 @@ public class NavICL1NvNavigationMessage
     @Override
     public <T extends CalculusFieldElement<T>, F extends FieldGnssOrbitalElements<T, NavICL1NvNavigationMessage>>
         F toField(final Field<T> field) {
-        return (F) new FieldNavicL1NVNavigationMessage<>(field, this);
+        return (F) new FieldNavicL1NvNavigationMessage<>(field, this);
     }
 
     /** Set reference signal flag.
