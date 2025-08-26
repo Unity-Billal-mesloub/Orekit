@@ -88,8 +88,7 @@ The source code control management system used is [Git](http://git-scm.com/). Th
 main Orekit repository is located at [https://gitlab.orekit.org/orekit/orekit.git](https://gitlab.orekit.org/orekit/orekit.git).
 
 Starting after version 9.0, the branch management workflow is adapted from
-both [git flow](http://nvie.com/posts/a-successful-git-branching-model/)
-and from the [Orfeo ToolBox Workflow](https://wiki.orfeo-toolbox.org/index.php/Git#Workflow).
+[git flow](http://nvie.com/posts/a-successful-git-branching-model/).
 
 ![Orekit git workflow](./images/orekit-git-flow.png)
 
