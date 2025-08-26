@@ -37,6 +37,7 @@
  * handle a set of laws, only one of which being active at any time. The
  * active law changes as switch events are triggered.
  * </p>
+ * <img src="doc-files/attitude-class-diagram.png" alt="class diagram">
  *
  * @author Fabien Maussion
  * @author Luc Maisonobe

@@ -19,6 +19,9 @@
  * This independent package provides classes to handle epochs, time scales,
  * and to compare instants together.
  *
+ * <img src="doc-files/time-class-diagram.png" alt="class diagram">
+ *
+ *
  * <p>
  * The principal class is {@link org.orekit.time.AbsoluteDate}
  * which represents a unique instant in time, with no ambiguity. For that
