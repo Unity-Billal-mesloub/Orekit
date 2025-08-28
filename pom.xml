@@ -28,7 +28,7 @@
     <orekit.checkstyle.version>9.3</orekit.checkstyle.version>
     <orekit.maven-clean-plugin.version>3.4.1</orekit.maven-clean-plugin.version>
     <orekit.maven-compiler-plugin.version>3.14.0</orekit.maven-compiler-plugin.version>
-    <orekit.maven-javadoc-plugin.version>3.11.2</orekit.maven-javadoc-plugin.version>
+    <orekit.maven-javadoc-plugin.version>3.11.3</orekit.maven-javadoc-plugin.version>
     <orekit.maven-jar-plugin.version>3.4.2</orekit.maven-jar-plugin.version>
     <orekit.maven-jxr-plugin.version>3.6.0</orekit.maven-jxr-plugin.version>
     <orekit.plantuml-maven-plugin.version>0.2.14</orekit.plantuml-maven-plugin.version>
