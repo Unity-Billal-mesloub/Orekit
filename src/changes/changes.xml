@@ -5963,7 +5963,7 @@
       </action>
       <action dev="pascal" type="update">
         Orekit supports the two different naming patterns for bulletins B provided by IERS
-        on http://www.iers.org/ and http://hpiers.obspm.fr/eop-pc/.
+        on https://www.iers.org/ and https://hpiers.obspm.fr/eop-pc/.
       </action>
       <action dev="luc" type="update">
         the predefined times scales (TAI, UTC ...) are now built using a factory. The various

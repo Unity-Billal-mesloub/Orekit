@@ -29,10 +29,10 @@ This product includes software translated from original work developed by
 Mickaël Gastineau (CNRS - Observatoire de Paris - IMCCE)
 
 This product includes software translated from original work developed by
-The Apache Software Foundation (http://www.apache.org/)
+The Apache Software Foundation (https://www.apache.org/)
 
 This product depends on software developed by
-The Apache Software Foundation (http://www.apache.org/)
+The Apache Software Foundation (https://www.apache.org/)
 
 This product depends on software developed by
 The Hipparchus project (https://hipparchus.org/)
