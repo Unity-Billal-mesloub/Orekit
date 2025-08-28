@@ -16,11 +16,11 @@
 
 <h2>Development Library version</h2>
 
-The development version of the Orekit library is always available to
-download from our version control system. We use [ Git](http://git-scm.com/)
-as our SCM. The anonymous read access to our Git repository  allows users who
-need the latest features and the latest bug fixes to get them even before an
-official release.
+The development version of the Orekit library is always available to download
+from our version control system. We use [Git](https://git-scm.com) as our SCM.
+The anonymous read access to our Git repository allows users who need the
+latest features and the latest bug fixes to get them even before an official
+release.
 
 The Git repository can be cloned using the following command, which can
 be easily adapted if you are using one of the numerous Git graphical
@@ -36,7 +36,7 @@ the one that better suits your needs. Source packages are the most complete
 ones since the other packages (binary jars, javadoc jars and even the bulk
 of this site) are created from these sources.
 
-Orekit source code can be also downloaded from our 
+Orekit source code can be also downloaded from our
 [version control system](https://gitlab.orekit.org/orekit/orekit/-/releases)
 in .zip, .tar.gz, .tar.bz2, and .tar extensions.
 
@@ -96,7 +96,7 @@ needed for their computation.
   * JPL DE 440 planetary ephemerides from 1990 to 2069,
 
   * Eigen 06S gravity field,
- 
+
   * CSSI space weather file,
 
   * FES 2004 ocean tides model.

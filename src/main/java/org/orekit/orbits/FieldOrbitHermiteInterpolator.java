@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  * </ul>
  * <p>
  * In any case, it should be used only with small number of interpolation points (about 10-20 points) in order to avoid
- * <a href="http://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge's phenomenon</a> and numerical problems
+ * <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge's phenomenon</a> and numerical problems
  * (including NaN appearing).
  *
  * @param <KK> type of the field element
@@ -77,7 +77,7 @@ public class FieldOrbitHermiteInterpolator<KK extends CalculusFieldElement<KK>> 
      *     <li>Use of position and two time derivatives during interpolation</li>
      * </ul>
      * As this implementation of interpolation is polynomial, it should be used only with small number of interpolation
-     * points (about 10-20 points) in order to avoid <a href="http://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge's
+     * points (about 10-20 points) in order to avoid <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge's
      * phenomenon</a> and numerical problems (including NaN appearing).
      *
      * @param outputInertialFrame output inertial frame
@@ -93,7 +93,7 @@ public class FieldOrbitHermiteInterpolator<KK extends CalculusFieldElement<KK>> 
      *     <li>Use of position and two time derivatives during interpolation</li>
      * </ul>
      * As this implementation of interpolation is polynomial, it should be used only with small number of interpolation
-     * points (about 10-20 points) in order to avoid <a href="http://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge's
+     * points (about 10-20 points) in order to avoid <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge's
      * phenomenon</a> and numerical problems (including NaN appearing).
      *
      * @param interpolationPoints number of interpolation points
@@ -107,7 +107,7 @@ public class FieldOrbitHermiteInterpolator<KK extends CalculusFieldElement<KK>> 
      * Constructor with default extrapolation threshold value ({@code DEFAULT_EXTRAPOLATION_THRESHOLD_SEC} s).
      * <p>
      * As this implementation of interpolation is polynomial, it should be used only with small number of interpolation
-     * points (about 10-20 points) in order to avoid <a href="http://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge's
+     * points (about 10-20 points) in order to avoid <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge's
      * phenomenon</a> and numerical problems (including NaN appearing).
      *
      * @param interpolationPoints number of interpolation points
@@ -123,7 +123,7 @@ public class FieldOrbitHermiteInterpolator<KK extends CalculusFieldElement<KK>> 
      * Constructor.
      * <p>
      * As this implementation of interpolation is polynomial, it should be used only with small number of interpolation
-     * points (about 10-20 points) in order to avoid <a href="http://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge's
+     * points (about 10-20 points) in order to avoid <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon">Runge's
      * phenomenon</a> and numerical problems (including NaN appearing).
      *
      * @param interpolationPoints number of interpolation points
