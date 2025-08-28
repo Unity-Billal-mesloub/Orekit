@@ -28,6 +28,8 @@
  * org.orekit.orbits.CartesianOrbit Cartesian} representations are supported.
  * </p>
  *
+ * <img src="doc-files/orbits-class-diagram.png" alt="class diagram">
+ *
  * <h2>Design History</h2>
  * <p>
  * Early designs for the orbit package were much more complex than the current design.

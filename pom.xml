@@ -28,11 +28,10 @@
     <orekit.checkstyle.version>9.3</orekit.checkstyle.version>
     <orekit.maven-clean-plugin.version>3.4.1</orekit.maven-clean-plugin.version>
     <orekit.maven-compiler-plugin.version>3.14.0</orekit.maven-compiler-plugin.version>
-    <orekit.maven-javadoc-plugin.version>3.11.2</orekit.maven-javadoc-plugin.version>
+    <orekit.maven-javadoc-plugin.version>3.11.3</orekit.maven-javadoc-plugin.version>
     <orekit.maven-jar-plugin.version>3.4.2</orekit.maven-jar-plugin.version>
     <orekit.maven-jxr-plugin.version>3.6.0</orekit.maven-jxr-plugin.version>
-    <orekit.plantuml-maven-plugin.version>1.2</orekit.plantuml-maven-plugin.version>
-    <orekit.plantuml.version>1.2025.2</orekit.plantuml.version>
+    <orekit.plantuml-maven-plugin.version>0.2.14</orekit.plantuml-maven-plugin.version>
     <orekit.maven-resources-plugin.version>3.3.1</orekit.maven-resources-plugin.version>
     <orekit.maven-site-plugin.version>3.21.0</orekit.maven-site-plugin.version>
     <orekit.maven-project-info-reports-plugin.version>3.9.0</orekit.maven-project-info-reports-plugin.version>
@@ -729,6 +728,7 @@
             <option>-extdirs</option>
             <option>${tools.jar.dir}</option>
           </additionalOptions>
+          <javadocDirectory>${project.build.directory}/generated-sources/plantuml</javadocDirectory>
           <bottom>Copyright &amp;copy; ${project.inceptionYear}-{currentYear} &lt;a href="https://www.cs-soprasteria.com/en/"&gt;CS GROUP&lt;/a&gt;. All rights reserved.</bottom>
           <links>
             <link>https://docs.oracle.com/javase/8/docs/api/</link>
@@ -818,35 +818,48 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.github.jeluard</groupId>
+        <groupId>com.github.davidmoten</groupId>
         <artifactId>plantuml-maven-plugin</artifactId>
         <version>${orekit.plantuml-maven-plugin.version}</version>
-        <configuration>
-          <sourceFiles>
-            <directory>${basedir}/src/design</directory>
-            <includes>
-              <include>
-                *.puml
-              </include>
-            </includes>
-          </sourceFiles>
-          <outputDirectory>
-            ${project.build.directory}/site/images/design
-          </outputDirectory>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>net.sourceforge.plantuml</groupId>
-            <artifactId>plantuml</artifactId>
-            <version>${orekit.plantuml.version}</version>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
+            <id>javadoc-diagrams</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <directory>${basedir}/src/main/plantuml</directory>
+                  <includes>
+                    <include>**/*.puml</include>
+                  </includes>
+              </sources>
+              <outputDirectory>${project.build.directory}/generated-sources/plantuml</outputDirectory>
+                <formats>
+                  <format>png</format>
+                </formats>
+                <preserveDirectoryStructure>true</preserveDirectoryStructure>
+                <generateMarkdownIndex>false</generateMarkdownIndex>
+            </configuration>
+          </execution>
+          <execution>
+            <id>site-images</id>
             <phase>pre-site</phase>
             <goals>
               <goal>generate</goal>
             </goals>
+            <configuration>
+              <sources>
+                <directory>${basedir}/src/design</directory>
+                <includes>
+                  <include>**/*.puml</include>
+                </includes>
+              </sources>
+              <outputDirectory>
+                ${project.build.directory}/site/images/design
+              </outputDirectory>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -990,6 +1003,7 @@
             <option>-extdirs</option>
             <option>${tools.jar.dir}</option>
           </additionalOptions>
+          <javadocDirectory>${project.build.directory}/generated-sources/plantuml</javadocDirectory>
           <bottom>Copyright &amp;copy; ${project.inceptionYear}-{currentYear} &lt;a href="https://www.cs-soprasteria.com/en/"&gt;CS GROUP&lt;/a&gt;. All rights reserved.</bottom>
           <links>
             <link>https://docs.oracle.com/javase/8/docs/api/</link>
