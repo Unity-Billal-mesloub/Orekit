@@ -31,8 +31,28 @@ public class ClocksDifferenceTest {
     @Test
     public void testDouble() {
         final AbsoluteDate t0 = AbsoluteDate.ARBITRARY_EPOCH;
-        final ClockModel clockModel = new ClocksDifference(new ConstantClockModel(1.5),
-                                                           new QuadraticClockModel(t0, 0.0, -1.0, -0.25));
+        final ClockModel clockModel = new ClocksDifference(new ConstantClockModel(1.5) {
+            @Override
+            public AbsoluteDate getValidityStart() {
+                return t0.shiftedBy(-1000);
+            }
+            @Override
+            public AbsoluteDate getValidityEnd() {
+                return t0.shiftedBy(1000);
+            }
+        },
+                                                           new QuadraticClockModel(t0, 0.0, -1.0, -0.25) {
+            @Override
+            public AbsoluteDate getValidityStart() {
+                return t0.shiftedBy(-100);
+            }
+            @Override
+            public AbsoluteDate getValidityEnd() {
+                return t0.shiftedBy(100000);
+            }
+        });
+        Assertions.assertEquals(-100.0, clockModel.getValidityStart().durationFrom(t0), 1.0e-15);
+        Assertions.assertEquals(1000.0, clockModel.getValidityEnd().durationFrom(t0), 1.0e-15);
         for (double dt = 0.02; dt < 0.98; dt += 0.02) {
             final ClockOffset co = clockModel.getOffset(t0.shiftedBy(dt));
             Assertions.assertEquals(dt, co.getDate().durationFrom(t0), 1.0e-15);
