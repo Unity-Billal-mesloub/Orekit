@@ -30,8 +30,8 @@ import org.orekit.errors.OrekitMessages;
 import org.orekit.files.rinex.RinexFile;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.ChronologicalComparator;
-import org.orekit.time.ClockOffset;
-import org.orekit.time.SampledClockModel;
+import org.orekit.time.clocks.ClockOffset;
+import org.orekit.time.clocks.SampledClockModel;
 import org.orekit.utils.TimeSpanMap;
 
 /** Represents a parsed clock file from the IGS.

@@ -21,7 +21,7 @@ import java.util.Collections;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.orekit.estimation.measurements.ObservableSatellite;
 import org.orekit.estimation.measurements.ObservedMeasurement;
-import org.orekit.estimation.measurements.QuadraticClockModel;
+import org.orekit.time.clocks.QuadraticClockModel;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.FieldPVCoordinatesProvider;

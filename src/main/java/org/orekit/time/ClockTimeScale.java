@@ -17,6 +17,7 @@
 package org.orekit.time;
 
 import org.hipparchus.CalculusFieldElement;
+import org.orekit.time.clocks.ClockModel;
 
 /** Time scale with clock offset from another time scale.
  * @author Luc Maisonobe

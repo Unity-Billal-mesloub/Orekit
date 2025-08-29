@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.estimation.measurements;
+package org.orekit.time.clocks;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.differentiation.Gradient;
@@ -22,10 +22,7 @@ import org.hipparchus.util.FastMath;
 import org.orekit.errors.OrekitException;
 import org.orekit.errors.OrekitMessages;
 import org.orekit.time.AbsoluteDate;
-import org.orekit.time.ClockModel;
-import org.orekit.time.ClockOffset;
 import org.orekit.time.FieldAbsoluteDate;
-import org.orekit.time.FieldClockOffset;
 import org.orekit.utils.ParameterDriver;
 
 import java.util.Map;

@@ -22,7 +22,7 @@ import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.orekit.errors.OrekitException;
 import org.orekit.estimation.measurements.MeasurementCreator;
 import org.orekit.estimation.measurements.ObservableSatellite;
-import org.orekit.estimation.measurements.QuadraticClockModel;
+import org.orekit.time.clocks.QuadraticClockModel;
 import org.orekit.gnss.RadioWave;
 import org.orekit.propagation.BoundedPropagator;
 import org.orekit.propagation.SpacecraftState;

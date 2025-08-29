@@ -14,37 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.time;
+package org.orekit.time.clocks;
 
-import org.hipparchus.CalculusFieldElement;
-
-/** Offset clock model.
+/** Clock model for perfect clock with constant zero offset.
  * @author Luc Maisonobe
  * @since 12.1
  */
-public interface ClockModel {
+public class PerfectClockModel extends ConstantClockModel {
 
-    /** Get validity start.
-     * @return model validity start
+    /** Simple constructor.
      */
-    AbsoluteDate getValidityStart();
-
-    /** Get validity end.
-     * @return model validity end
-     */
-    AbsoluteDate getValidityEnd();
-
-    /** Get the clock offset at date.
-     * @param date date at which offset is requested
-     * @return clock offset at specified date
-     */
-    ClockOffset getOffset(AbsoluteDate date);
-
-    /** Get the clock offset at date.
-     * @param <T> type of the field elements
-     * @param date date at which offset is requested
-     * @return clock offset at specified date
-     */
-    <T extends CalculusFieldElement<T>> FieldClockOffset<T> getOffset(FieldAbsoluteDate<T> date);
+    public PerfectClockModel() {
+        super(0.0);
+    }
 
 }

@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package org.orekit.time;
+package org.orekit.time.clocks;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.hipparchus.util.Binary64Field;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.orekit.time.FieldAbsoluteDate;
 
 import java.util.Arrays;
 

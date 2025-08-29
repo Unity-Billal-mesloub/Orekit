@@ -23,8 +23,8 @@ import java.util.List;
 import org.orekit.files.general.EphemerisFile;
 import org.orekit.frames.Frame;
 import org.orekit.time.AbsoluteDate;
-import org.orekit.time.AggregatedClockModel;
-import org.orekit.time.ClockModel;
+import org.orekit.time.clocks.AggregatedClockModel;
+import org.orekit.time.clocks.ClockModel;
 import org.orekit.utils.CartesianDerivativesFilter;
 import org.orekit.utils.TimeSpanMap;
 

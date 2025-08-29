@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.time;
+package org.orekit.time.clocks;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
@@ -23,12 +23,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.orekit.Utils;
+import org.orekit.time.AbsoluteDate;
+import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.time.TimeScalesFactory;
 
 public class PerfectClockModelTest {
 
     @Test
     public void testZero() {
-        final AbsoluteDate       t0      = new AbsoluteDate(2020, 4, 1, TimeScalesFactory.getUTC());
+        final AbsoluteDate t0      = new AbsoluteDate(2020, 4, 1, TimeScalesFactory.getUTC());
         final PerfectClockModel clockModel = new PerfectClockModel();
         for (double dt = 0.02; dt < 0.98; dt += 0.02) {
             final ClockOffset co = clockModel.getOffset(t0.shiftedBy(dt));

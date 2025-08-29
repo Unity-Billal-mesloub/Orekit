@@ -14,19 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.time;
+package org.orekit.time.clocks;
 
+import org.hipparchus.CalculusFieldElement;
+import org.hipparchus.analysis.interpolation.FieldHermiteInterpolator;
 import org.hipparchus.analysis.interpolation.HermiteInterpolator;
+import org.hipparchus.util.MathArrays;
+import org.orekit.time.AbstractFieldTimeInterpolator;
+import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.time.TimeInterpolator;
 
 import java.util.List;
 
 /**bHermite interpolator of time stamped clock offsets.
+ * @param <T> type of the field elements
  * @author Luc Maisonobe
  * @see HermiteInterpolator
  * @see TimeInterpolator
  * @since 12.1
  */
-public class ClockOffsetHermiteInterpolator extends AbstractTimeInterpolator<ClockOffset> {
+public class FieldClockOffsetHermiteInterpolator<T extends CalculusFieldElement<T>>
+    extends AbstractFieldTimeInterpolator<FieldClockOffset<T>, T> {
 
     /**
      * Constructor with default extrapolation threshold value ({@code DEFAULT_EXTRAPOLATION_THRESHOLD_SEC} s).
@@ -42,7 +50,7 @@ public class ClockOffsetHermiteInterpolator extends AbstractTimeInterpolator<Clo
      * </p>
      * @param interpolationPoints number of interpolation points
      */
-    public ClockOffsetHermiteInterpolator(final int interpolationPoints) {
+    public FieldClockOffsetHermiteInterpolator(final int interpolationPoints) {
         this(interpolationPoints, DEFAULT_EXTRAPOLATION_THRESHOLD_SEC);
     }
 
@@ -61,40 +69,43 @@ public class ClockOffsetHermiteInterpolator extends AbstractTimeInterpolator<Clo
      * @param interpolationPoints number of interpolation points
      * @param extrapolationThreshold extrapolation threshold beyond which the propagation will fail
      */
-    public ClockOffsetHermiteInterpolator(final int interpolationPoints, final double extrapolationThreshold) {
+    public FieldClockOffsetHermiteInterpolator(final int interpolationPoints, final double extrapolationThreshold) {
         super(interpolationPoints, extrapolationThreshold);
     }
 
     /** {@inheritDoc} */
     @Override
-    protected ClockOffset interpolate(final InterpolationData interpolationData) {
-        final HermiteInterpolator interpolator = new HermiteInterpolator();
+    protected FieldClockOffset<T> interpolate(final InterpolationData interpolationData) {
+        final FieldHermiteInterpolator<T> interpolator = new FieldHermiteInterpolator<>();
 
         // Fill interpolator with sample
-        final AbsoluteDate                         interpolationDate = interpolationData.getInterpolationDate();
-        final List<ClockOffset> neighborList      = interpolationData.getNeighborList();
-        for (ClockOffset value : neighborList) {
-            final double deltaT = value.getDate().durationFrom(interpolationDate);
-            final double[] offset = new double[] { value.getOffset() };
-            if (Double.isNaN(value.getRate())) {
+        final FieldAbsoluteDate<T> interpolationDate = interpolationData.getInterpolationDate();
+        final List<FieldClockOffset<T>> neighborList      = interpolationData.getNeighborList();
+        for (FieldClockOffset<T> value : neighborList) {
+            final T   deltaT = value.getDate().durationFrom(interpolationDate);
+            final T[] offset = MathArrays.buildArray(interpolationDate.getField(), 1);
+            offset[0] = value.getOffset();
+            if (value.getRate() == null || value.getRate().isNaN()) {
                 // no clock rate for this entry
                 interpolator.addSamplePoint(deltaT, offset);
             } else {
                 // clock rate is available
-                final double[] rate = new double[] { value.getRate() };
-                if (Double.isNaN(value.getAcceleration())) {
+                final T[] rate = MathArrays.buildArray(interpolationDate.getField(), 1);
+                rate[0] = value.getRate();
+                if (value.getAcceleration() == null || value.getAcceleration().isNaN()) {
                     // no clock acceleration for this entry
                     interpolator.addSamplePoint(deltaT, offset, rate);
                 } else {
                     // clock acceleration is available
-                    final double[] acceleration = new double[] { value.getAcceleration() };
+                    final T[] acceleration = MathArrays.buildArray(interpolationDate.getField(), 1);
+                    acceleration[0] = value.getAcceleration();
                     interpolator.addSamplePoint(deltaT, offset, rate, acceleration);
                 }
             }
         }
 
-        final double[][] y = interpolator.derivatives(0, 2);
-        return new ClockOffset(interpolationDate, y[0][0], y[1][0], y[2][0]);
+        final T[][] y = interpolator.derivatives(interpolationDate.getField().getZero(), 2);
+        return new FieldClockOffset<>(interpolationDate, y[0][0], y[1][0], y[2][0]);
 
     }
 

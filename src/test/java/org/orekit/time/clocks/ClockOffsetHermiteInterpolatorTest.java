@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package org.orekit.time;
+package org.orekit.time.clocks;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.orekit.time.AbsoluteDate;
 
 import java.util.Arrays;
 

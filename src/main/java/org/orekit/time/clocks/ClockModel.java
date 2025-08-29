@@ -14,39 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.time;
+package org.orekit.time.clocks;
 
 import org.hipparchus.CalculusFieldElement;
+import org.orekit.time.AbsoluteDate;
+import org.orekit.time.FieldAbsoluteDate;
 
-/** Clock model for perfect clock with constant zero offset.
+/** Offset clock model.
  * @author Luc Maisonobe
  * @since 12.1
  */
-public class PerfectClockModel implements ClockModel {
+public interface ClockModel {
 
-    /** {@inheritDoc} */
-    @Override
-    public AbsoluteDate getValidityStart() {
-        return AbsoluteDate.PAST_INFINITY;
-    }
+    /** Get validity start.
+     * @return model validity start
+     */
+    AbsoluteDate getValidityStart();
 
-    /** {@inheritDoc} */
-    @Override
-    public AbsoluteDate getValidityEnd() {
-        return AbsoluteDate.FUTURE_INFINITY;
-    }
+    /** Get validity end.
+     * @return model validity end
+     */
+    AbsoluteDate getValidityEnd();
 
-    /** {@inheritDoc} */
-    @Override
-    public ClockOffset getOffset(final AbsoluteDate date) {
-        return new ClockOffset(date, 0, 0, 0);
-    }
+    /** Get the clock offset at date.
+     * @param date date at which offset is requested
+     * @return clock offset at specified date
+     */
+    ClockOffset getOffset(AbsoluteDate date);
 
-    /** {@inheritDoc} */
-    @Override
-    public <T extends CalculusFieldElement<T>> FieldClockOffset<T> getOffset(final FieldAbsoluteDate<T> date) {
-        final T zero = date.getField().getZero();
-        return new FieldClockOffset<>(date, zero, zero, zero);
-    }
+    /** Get the clock offset at date.
+     * @param <T> type of the field elements
+     * @param date date at which offset is requested
+     * @return clock offset at specified date
+     */
+    <T extends CalculusFieldElement<T>> FieldClockOffset<T> getOffset(FieldAbsoluteDate<T> date);
 
 }

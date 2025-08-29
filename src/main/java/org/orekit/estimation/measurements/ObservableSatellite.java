@@ -17,6 +17,7 @@
 package org.orekit.estimation.measurements;
 
 import org.hipparchus.util.FastMath;
+import org.orekit.time.clocks.QuadraticClockModel;
 import org.orekit.utils.ParameterDriver;
 
 /** Class modeling a satellite that can be observed.

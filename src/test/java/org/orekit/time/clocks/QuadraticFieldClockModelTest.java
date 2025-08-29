@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.estimation.measurements;
+package org.orekit.time.clocks;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
-
 
 public class QuadraticFieldClockModelTest {
 

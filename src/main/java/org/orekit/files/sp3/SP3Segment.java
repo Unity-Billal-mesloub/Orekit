@@ -25,9 +25,9 @@ import org.orekit.frames.Frame;
 import org.orekit.propagation.BoundedPropagator;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
-import org.orekit.time.ClockModel;
-import org.orekit.time.ClockOffset;
-import org.orekit.time.SampledClockModel;
+import org.orekit.time.clocks.ClockModel;
+import org.orekit.time.clocks.ClockOffset;
+import org.orekit.time.clocks.SampledClockModel;
 import org.orekit.utils.CartesianDerivativesFilter;
 import org.orekit.utils.SortedListTrimmer;
 

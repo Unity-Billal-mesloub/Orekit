@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.orekit.Utils;
-import org.orekit.estimation.measurements.QuadraticClockModel;
+import org.orekit.time.clocks.QuadraticClockModel;
 import org.orekit.gnss.PredefinedTimeSystem;
 
 public class ClockTimeScaleTest {

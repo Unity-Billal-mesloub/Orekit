@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.time;
+package org.orekit.time.clocks;
 
 import org.hipparchus.CalculusFieldElement;
+import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.time.FieldTimeStamped;
 
 /** Container for time stamped clock offset.
  * @param <T> type of the field elements

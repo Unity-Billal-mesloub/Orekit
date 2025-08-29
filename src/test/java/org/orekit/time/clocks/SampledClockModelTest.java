@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.time;
+package org.orekit.time.clocks;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
@@ -25,6 +25,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.orekit.Utils;
+import org.orekit.time.AbsoluteDate;
+import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.time.TimeScalesFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +42,7 @@ public class SampledClockModelTest {
                                                                   FastMath.scalb(1.0, -9));
         final PolynomialFunction cDot    = c.polynomialDerivative();
         final PolynomialFunction cDotDot = cDot.polynomialDerivative();
-        final AbsoluteDate       t0      = new AbsoluteDate(2020, 4, 1, TimeScalesFactory.getUTC());
+        final AbsoluteDate t0      = new AbsoluteDate(2020, 4, 1, TimeScalesFactory.getUTC());
         final List<ClockOffset> sample = new ArrayList<>();
         for (double dt = 0; dt < 10; dt += FastMath.scalb(1, -4)) {
             sample.add(new ClockOffset(t0.shiftedBy(dt), c.value(dt), Double.NaN, Double.NaN));

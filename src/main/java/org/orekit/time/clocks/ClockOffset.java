@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.time;
+package org.orekit.time.clocks;
+
+import org.orekit.time.AbsoluteDate;
+import org.orekit.time.TimeStamped;
 
 /** Container for time stamped clock offset.
  * <p>
