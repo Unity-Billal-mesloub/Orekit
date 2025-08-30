@@ -174,18 +174,6 @@ class DetectorModifierTest {
 
         Assertions.assertEquals(100.0*dt, finalState.getDate().durationFrom(iniDate), threshold);
     }
-
-    @Deprecated
-    @Test
-    void testAdapterDetector() {
-        // GIVEN
-        final DateDetector detector = new DateDetector();
-        // WHEN
-        final AdapterDetector adapterDetector = new AdapterDetector(detector);
-        // THEN
-        final TestDetectorModifier detectorModifier = new TestDetectorModifier(detector);
-        Assertions.assertEquals(detectorModifier.getDetector(), adapterDetector.getDetector());
-    }
     
     private static class TestDetectorModifier implements DetectorModifier {
 
