@@ -20,8 +20,8 @@ import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathUtils;
+import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.FieldGeodeticPoint;
-import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.events.handlers.FieldContinueOnEvent;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
@@ -37,12 +37,7 @@ import org.orekit.time.FieldAbsoluteDate;
  * @param <T> type of the field elements
  */
 public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
-    extends FieldAbstractDetector<FieldLongitudeCrossingDetector<T>, T> {
-
-    /**
-    * Body on which the longitude is defined.
-    */
-    private final OneAxisEllipsoid body;
+    extends FieldAbstractGeographicalDetector<FieldLongitudeCrossingDetector<T>, T> {
 
     /**
     * Fixed longitude to be crossed.
@@ -64,7 +59,7 @@ public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
     * @param body      body on which the longitude is defined
     * @param longitude longitude to be crossed
     */
-    public FieldLongitudeCrossingDetector(final Field<T> field, final OneAxisEllipsoid body, final double longitude) {
+    public FieldLongitudeCrossingDetector(final Field<T> field, final BodyShape body, final double longitude) {
         this(new FieldEventDetectionSettings<>(field, EventDetectionSettings.getDefaultEventDetectionSettings()),
                 new FieldStopOnIncreasing<>(), body, longitude);
     }
@@ -79,7 +74,7 @@ public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
     */
     public FieldLongitudeCrossingDetector(final T maxCheck,
                                           final T threshold,
-                                          final OneAxisEllipsoid body,
+                                          final BodyShape body,
                                           final double longitude) {
         this(new FieldEventDetectionSettings<>(FieldAdaptableInterval.of(maxCheck.getReal()), threshold, DEFAULT_MAX_ITER),
                 new FieldStopOnIncreasing<>(), body, longitude);
@@ -101,12 +96,10 @@ public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
     protected FieldLongitudeCrossingDetector(
         final FieldEventDetectionSettings<T> detectionSettings,
         final FieldEventHandler<T> handler,
-        final OneAxisEllipsoid body,
+        final BodyShape body,
         final double longitude) {
 
-        super(detectionSettings, handler);
-
-        this.body = body;
+        super(detectionSettings, handler, body);
         this.longitude = longitude;
 
         // we filter out spurious longitude crossings occurring at the antimeridian
@@ -124,16 +117,7 @@ public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
     @Override
     protected FieldLongitudeCrossingDetector<T> create(
         final FieldEventDetectionSettings<T> detectionSettings, final FieldEventHandler<T> newHandler) {
-        return new FieldLongitudeCrossingDetector<>(detectionSettings, newHandler, body, longitude);
-    }
-
-    /**
-    * Get the body on which the geographic zone is defined.
-    *
-    * @return body on which the geographic zone is defined
-    */
-    public OneAxisEllipsoid getBody() {
-        return body;
+        return new FieldLongitudeCrossingDetector<>(detectionSettings, newHandler, getBodyShape(), longitude);
     }
 
     /**
@@ -176,8 +160,8 @@ public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
         return filtering.g(s);
     }
 
-    private class FieldRawLongitudeCrossingDetector <TT extends CalculusFieldElement<TT>>
-        extends FieldAbstractDetector<FieldRawLongitudeCrossingDetector<TT>, TT> {
+    private class FieldRawLongitudeCrossingDetector <S extends CalculusFieldElement<S>>
+        extends FieldAbstractDetector<FieldRawLongitudeCrossingDetector<S>, S> {
 
         /**
         * Protected constructor with full parameters.
@@ -191,8 +175,8 @@ public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
         * @param handler   event handler to call at event occurrences
         */
         protected FieldRawLongitudeCrossingDetector(
-            final FieldEventDetectionSettings<TT> detectionSettings,
-            final FieldEventHandler<TT> handler) {
+            final FieldEventDetectionSettings<S> detectionSettings,
+            final FieldEventHandler<S> handler) {
             super(detectionSettings, handler);
         }
 
@@ -200,9 +184,9 @@ public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
         * {@inheritDoc}
         */
         @Override
-        protected FieldRawLongitudeCrossingDetector<TT> create(
-            final FieldEventDetectionSettings<TT> detectionSettings,
-            final FieldEventHandler<TT> newHandler) {
+        protected FieldRawLongitudeCrossingDetector<S> create(
+            final FieldEventDetectionSettings<S> detectionSettings,
+            final FieldEventHandler<S> newHandler) {
             return new FieldRawLongitudeCrossingDetector<>(detectionSettings, newHandler);
         }
 
@@ -220,14 +204,14 @@ public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
         * @return longitude difference between the spacecraft and the fixed
         * longitude
         */
-        public TT g(final FieldSpacecraftState<TT> s) {
+        public S g(final FieldSpacecraftState<S> s) {
 
             // convert state to geodetic coordinates
-            final FieldGeodeticPoint<TT> gp = body.transform(s.getPosition(),
+            final FieldGeodeticPoint<S> gp = getBodyShape().transform(s.getPosition(),
                 s.getFrame(), s.getDate());
 
             // longitude difference
-            final TT zero = gp.getLongitude().getField().getZero();
+            final S zero = gp.getLongitude().getField().getZero();
             return MathUtils.normalizeAngle(gp.getLongitude().subtract(longitude), zero);
 
         }

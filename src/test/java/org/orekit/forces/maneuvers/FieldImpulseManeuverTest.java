@@ -353,7 +353,7 @@ class FieldImpulseManeuverTest {
             fieldDetector = new FieldDateDetector<>(field, new FieldAbsoluteDate<>(field, ((DateDetector) detector).getDate()));
         } else if (detector instanceof LatitudeCrossingDetector) {
             fieldDetector = new FieldLatitudeCrossingDetector<>(field,
-                                                                ((LatitudeCrossingDetector) detector).getBody(),
+                                                                ((LatitudeCrossingDetector) detector).getBodyShape(),
                                                                 ((LatitudeCrossingDetector) detector).getLatitude());
         } else if (detector instanceof EclipseDetector) {
             fieldDetector = new FieldEclipseDetector<>(field,

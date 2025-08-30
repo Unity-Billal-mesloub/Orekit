@@ -392,7 +392,7 @@ class FieldEventSlopeFilterTest {
                     }
 
                 });
-        Assertions.assertSame(earth, detector.getBody());
+        Assertions.assertSame(earth, detector.getBodyShape());
         propagator.addEventDetector(new FieldEventSlopeFilter<>(detector, filter));
         FieldAbsoluteDate<Binary64> target = propagator.getInitialState().getDate().shiftedBy(dt);
         FieldSpacecraftState<Binary64> finalState = propagator.propagate(target);

@@ -37,13 +37,10 @@ import org.orekit.propagation.events.handlers.FieldStopOnDecreasing;
  * @since 9.0
  * @param <T> type of the field elements
  */
-public class FieldAltitudeDetector<T extends CalculusFieldElement<T>> extends FieldAbstractDetector<FieldAltitudeDetector<T>, T> {
+public class FieldAltitudeDetector<T extends CalculusFieldElement<T>> extends FieldAbstractGeographicalDetector<FieldAltitudeDetector<T>, T> {
 
     /** Threshold altitude value (m). */
     private final T altitude;
-
-    /** Body shape with respect to which altitude should be evaluated. */
-    private final BodyShape bodyShape;
 
     /** Build a new altitude detector.
      * <p>This simple constructor takes default values for maximal checking
@@ -108,16 +105,15 @@ public class FieldAltitudeDetector<T extends CalculusFieldElement<T>> extends Fi
      */
     protected FieldAltitudeDetector(final FieldEventDetectionSettings<T> detectionSettings,
                                     final FieldEventHandler<T> handler, final T altitude, final BodyShape bodyShape) {
-        super(detectionSettings, handler);
+        super(detectionSettings, handler, bodyShape);
         this.altitude  = altitude;
-        this.bodyShape = bodyShape;
     }
 
     /** {@inheritDoc} */
     @Override
     protected FieldAltitudeDetector<T> create(final FieldEventDetectionSettings<T> detectionSettings,
                                               final FieldEventHandler<T> newHandler) {
-        return new FieldAltitudeDetector<>(detectionSettings, newHandler, altitude, bodyShape);
+        return new FieldAltitudeDetector<>(detectionSettings, newHandler, altitude, getBodyShape());
     }
 
     /** Get the threshold altitude value.
@@ -127,13 +123,6 @@ public class FieldAltitudeDetector<T extends CalculusFieldElement<T>> extends Fi
         return altitude;
     }
 
-    /** Get the body shape.
-     * @return the body shape
-     */
-    public BodyShape getBodyShape() {
-        return bodyShape;
-    }
-
     /** Compute the value of the switching function.
      * This function measures the difference between the current altitude
      * and the threshold altitude.
@@ -141,8 +130,8 @@ public class FieldAltitudeDetector<T extends CalculusFieldElement<T>> extends Fi
      * @return value of the switching function
      */
     public T g(final FieldSpacecraftState<T> s) {
-        final Frame bodyFrame              = bodyShape.getBodyFrame();
-        final FieldGeodeticPoint<T> point  = bodyShape.transform(s.getPosition(bodyFrame),
+        final Frame bodyFrame              = getBodyShape().getBodyFrame();
+        final FieldGeodeticPoint<T> point  = getBodyShape().transform(s.getPosition(bodyFrame),
                                                                  bodyFrame, s.getDate());
         return point.getAltitude().subtract(altitude);
     }

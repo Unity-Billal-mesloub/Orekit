@@ -16,7 +16,7 @@
  */
 package org.orekit.propagation.events;
 
-import org.orekit.bodies.OneAxisEllipsoid;
+import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.GeodeticPoint;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.handlers.EventHandler;
@@ -28,10 +28,7 @@ import org.orekit.propagation.events.handlers.StopOnIncreasing;
  * @author Luc Maisonobe
  * @since 7.1
  */
-public class LatitudeCrossingDetector extends AbstractDetector<LatitudeCrossingDetector> {
-
-    /** Body on which the latitude is defined. */
-    private final OneAxisEllipsoid body;
+public class LatitudeCrossingDetector extends AbstractGeographicalDetector<LatitudeCrossingDetector> {
 
     /** Fixed latitude to be crossed. */
     private final double latitude;
@@ -43,7 +40,7 @@ public class LatitudeCrossingDetector extends AbstractDetector<LatitudeCrossingD
      * @param body body on which the latitude is defined
      * @param latitude latitude to be crossed
      */
-    public LatitudeCrossingDetector(final OneAxisEllipsoid body, final double latitude) {
+    public LatitudeCrossingDetector(final BodyShape body, final double latitude) {
         this(DEFAULT_MAX_CHECK, DEFAULT_THRESHOLD, body, latitude);
     }
 
@@ -54,7 +51,7 @@ public class LatitudeCrossingDetector extends AbstractDetector<LatitudeCrossingD
      * @param latitude latitude to be crossed
      */
     public LatitudeCrossingDetector(final double maxCheck, final double threshold,
-                                    final OneAxisEllipsoid body, final double latitude) {
+                                    final BodyShape body, final double latitude) {
         this(new EventDetectionSettings(maxCheck, threshold, DEFAULT_MAX_ITER), new StopOnIncreasing(),
              body, latitude);
     }
@@ -72,9 +69,8 @@ public class LatitudeCrossingDetector extends AbstractDetector<LatitudeCrossingD
      * @since 13.0
      */
     protected LatitudeCrossingDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
-                                       final OneAxisEllipsoid body, final double latitude) {
-        super(detectionSettings, handler);
-        this.body     = body;
+                                       final BodyShape body, final double latitude) {
+        super(detectionSettings, handler, body);
         this.latitude = latitude;
     }
 
@@ -82,14 +78,7 @@ public class LatitudeCrossingDetector extends AbstractDetector<LatitudeCrossingD
     @Override
     protected LatitudeCrossingDetector create(final EventDetectionSettings detectionSettings,
                                               final EventHandler newHandler) {
-        return new LatitudeCrossingDetector(detectionSettings, newHandler, body, latitude);
-    }
-
-    /** Get the body on which the geographic zone is defined.
-     * @return body on which the geographic zone is defined
-     */
-    public OneAxisEllipsoid getBody() {
-        return body;
+        return new LatitudeCrossingDetector(detectionSettings, newHandler, getBodyShape(), latitude);
     }
 
     /** Get the fixed latitude to be crossed (radians).
@@ -111,7 +100,7 @@ public class LatitudeCrossingDetector extends AbstractDetector<LatitudeCrossingD
     public double g(final SpacecraftState s) {
 
         // convert state to geodetic coordinates
-        final GeodeticPoint gp = body.transform(s.getPosition(),
+        final GeodeticPoint gp = getBodyShape().transform(s.getPosition(),
                                                 s.getFrame(), s.getDate());
 
         // latitude difference

@@ -17,12 +17,14 @@
 package org.orekit.propagation.events;
 
 import org.hipparchus.analysis.differentiation.UnivariateDerivative2;
+import org.hipparchus.analysis.differentiation.UnivariateDerivative2Field;
 import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.FieldGeodeticPoint;
-import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnIncreasing;
+import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.utils.FieldPVCoordinates;
 
 /** Detector for geographic latitude extremum.
  * <p>This detector identifies when a spacecraft reaches its
@@ -30,10 +32,7 @@ import org.orekit.propagation.events.handlers.StopOnIncreasing;
  * @author Luc Maisonobe
  * @since 7.1
  */
-public class LatitudeExtremumDetector extends AbstractDetector<LatitudeExtremumDetector> {
-
-    /** Body on which the latitude is defined. */
-    private OneAxisEllipsoid body;
+public class LatitudeExtremumDetector extends AbstractGeographicalDetector<LatitudeExtremumDetector> {
 
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
@@ -41,7 +40,7 @@ public class LatitudeExtremumDetector extends AbstractDetector<LatitudeExtremumD
      * #DEFAULT_THRESHOLD}).</p>
      * @param body body on which the latitude is defined
      */
-    public LatitudeExtremumDetector(final OneAxisEllipsoid body) {
+    public LatitudeExtremumDetector(final BodyShape body) {
         this(DEFAULT_MAX_CHECK, DEFAULT_THRESHOLD, body);
     }
 
@@ -51,7 +50,7 @@ public class LatitudeExtremumDetector extends AbstractDetector<LatitudeExtremumD
      * @param body body on which the latitude is defined
      */
     public LatitudeExtremumDetector(final double maxCheck, final double threshold,
-                                    final OneAxisEllipsoid body) {
+                                    final BodyShape body) {
         this(new EventDetectionSettings(maxCheck, threshold, DEFAULT_MAX_ITER), new StopOnIncreasing(), body);
     }
 
@@ -66,23 +65,15 @@ public class LatitudeExtremumDetector extends AbstractDetector<LatitudeExtremumD
      * @param body body on which the latitude is defined
      */
     protected LatitudeExtremumDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
-                                       final OneAxisEllipsoid body) {
-        super(detectionSettings, handler);
-        this.body = body;
+                                       final BodyShape body) {
+        super(detectionSettings, handler, body);
     }
 
     /** {@inheritDoc} */
     @Override
     protected LatitudeExtremumDetector create(final EventDetectionSettings detectionSettings,
                                               final EventHandler newHandler) {
-        return new LatitudeExtremumDetector(detectionSettings, newHandler, body);
-    }
-
-    /** Get the body on which the geographic zone is defined.
-     * @return body on which the geographic zone is defined
-     */
-    public BodyShape getBody() {
-        return body;
+        return new LatitudeExtremumDetector(detectionSettings, newHandler, getBodyShape());
     }
 
     /** Compute the value of the detection function.
@@ -95,8 +86,11 @@ public class LatitudeExtremumDetector extends AbstractDetector<LatitudeExtremumD
     public double g(final SpacecraftState s) {
 
         // convert state to geodetic coordinates
-        final FieldGeodeticPoint<UnivariateDerivative2> gp =
-                        body.transform(s.getPVCoordinates(), s.getFrame(), s.getDate());
+        final FieldPVCoordinates<UnivariateDerivative2> pv = s.getPVCoordinates().toUnivariateDerivative2PV();
+        final UnivariateDerivative2Field field = UnivariateDerivative2Field.getInstance();
+        final UnivariateDerivative2 dt = new UnivariateDerivative2(0, 1, 0);
+        final FieldAbsoluteDate<UnivariateDerivative2> fieldDate = new FieldAbsoluteDate<>(field, s.getDate()).shiftedBy(dt);
+        final FieldGeodeticPoint<UnivariateDerivative2> gp = getBodyShape().transform(pv.getPosition(), s.getFrame(), fieldDate);
 
         // latitude time derivative
         return gp.getLatitude().getFirstDerivative();

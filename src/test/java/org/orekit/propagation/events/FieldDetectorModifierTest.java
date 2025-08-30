@@ -132,18 +132,6 @@ class FieldDetectorModifierTest {
         Mockito.verify(detector).finish(mockedState);
     }
 
-    @Deprecated
-    @Test
-    void testAdapterDetector() {
-        // GIVEN
-        final FieldDateDetector<Binary64> detector = new FieldDateDetector<>(Binary64Field.getInstance());
-        // WHEN
-        final FieldAdapterDetector<Binary64> adapterDetector = new FieldAdapterDetector<>(detector);
-        // THEN
-        final TestFieldDetector<Binary64> detectorModifier = new TestFieldDetector<>(detector);
-        Assertions.assertEquals(detectorModifier.getDetector(), adapterDetector.getDetector());
-    }
-
     private static class TestFieldDetector<T extends CalculusFieldElement<T>> implements FieldDetectorModifier<T> {
 
         private final FieldEventDetector<T> detector;
