@@ -147,15 +147,6 @@ public class EventSlopeFilter<T extends EventDetector> implements EventDetector 
 
     /** Get filter type.
      * @return filter type
-     * @deprecated since 13.0 (use getFilterType)
-     */
-    @Deprecated
-    public FilterType getFilter() {
-        return getFilterType();
-    }
-
-    /** Get filter type.
-     * @return filter type
      * @since 13.0
      */
     public FilterType getFilterType() {

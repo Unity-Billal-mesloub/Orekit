@@ -132,27 +132,8 @@ class FieldImpulseManeuverTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         Utils.setDataRoot("regular-data");
-    }
-
-    @Deprecated
-    @Test
-    void testDeprecatedConstructors() {
-        // Given
-        final Complex zero = complexField.getZero();
-        final Complex complexIsp = zero.add(200.);
-        final FieldVector3D<Complex> deltaVSat = new FieldVector3D<>(complexField, Vector3D.PLUS_I);
-        final FieldAbsoluteDate<Complex> fieldAbsoluteDate = new FieldAbsoluteDate<>(complexField,
-                AbsoluteDate.ARBITRARY_EPOCH);
-        final FieldDateDetector<Complex> dateDetector = new FieldDateDetector<>(complexField, fieldAbsoluteDate);
-
-        // When
-        final FieldImpulseManeuver<Complex> fieldImpulseManeuver = new FieldImpulseManeuver<>(dateDetector, null, deltaVSat, complexIsp,
-                Control3DVectorCostType.TWO_NORM);
-
-        // Then
-        Assertions.assertEquals(complexIsp, fieldImpulseManeuver.getIsp());
     }
 
     @Test

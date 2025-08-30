@@ -474,18 +474,6 @@ class ImpulseManeuverTest {
         Assertions.assertEquals(initialMass * FastMath.exp(deltaV.getNormInf() * factorExponential), finalMassWithNormInf);
     }
 
-    @Deprecated
-    @Test
-    void testDeprecatedConstructor() {
-        // GIVEN
-        final double expectedIsp = 10;
-        // WHEN
-        final ImpulseManeuver maneuver = new ImpulseManeuver(new DateDetector(), null, Vector3D.ZERO,
-                expectedIsp, Control3DVectorCostType.NONE);
-        // THEN
-        Assertions.assertEquals(expectedIsp, maneuver.getIsp());
-    }
-
     @Test
     void testInit() {
         // GIVEN
