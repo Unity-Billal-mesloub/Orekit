@@ -18,8 +18,8 @@ package org.orekit.propagation.events;
 
 import org.hipparchus.Field;
 import org.hipparchus.CalculusFieldElement;
+import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.FieldGeodeticPoint;
-import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnIncreasing;
@@ -34,10 +34,7 @@ import org.orekit.propagation.events.intervals.FieldAdaptableInterval;
  * @param <T> type of the field elements
  */
 public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
-        extends FieldAbstractDetector<FieldLatitudeCrossingDetector<T>, T> {
-
-    /** Body on which the latitude is defined. */
-    private final OneAxisEllipsoid body;
+        extends FieldAbstractGeographicalDetector<FieldLatitudeCrossingDetector<T>, T> {
 
     /** Fixed latitude to be crossed. */
     private final double latitude;
@@ -51,7 +48,7 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
      * @param latitude latitude to be crossed
      */
     public FieldLatitudeCrossingDetector(final Field<T> field,
-                                         final OneAxisEllipsoid body,
+                                         final BodyShape body,
                                          final double latitude) {
         this(new FieldEventDetectionSettings<>(field, EventDetectionSettings.getDefaultEventDetectionSettings()),
                 new FieldStopOnIncreasing<>(), body, latitude);
@@ -65,7 +62,7 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
      */
     public FieldLatitudeCrossingDetector(final T maxCheck,
                                          final T threshold,
-                                         final OneAxisEllipsoid body,
+                                         final BodyShape body,
                                          final double latitude) {
         this(new FieldEventDetectionSettings<>(FieldAdaptableInterval.of(maxCheck.getReal()), threshold, DEFAULT_MAX_ITER),
                 new FieldStopOnIncreasing<>(), body, latitude);
@@ -86,10 +83,9 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
     protected FieldLatitudeCrossingDetector(
             final FieldEventDetectionSettings<T> detectionSettings,
             final FieldEventHandler<T> handler,
-            final OneAxisEllipsoid body,
+            final BodyShape body,
             final double latitude) {
-        super(detectionSettings, handler);
-        this.body     = body;
+        super(detectionSettings, handler, body);
         this.latitude = latitude;
     }
 
@@ -98,14 +94,7 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
     protected FieldLatitudeCrossingDetector<T> create(
             final FieldEventDetectionSettings<T> detectionSettings,
             final FieldEventHandler<T> newHandler) {
-        return new FieldLatitudeCrossingDetector<>(detectionSettings, newHandler, body, latitude);
-    }
-
-    /** Get the body on which the geographic zone is defined.
-     * @return body on which the geographic zone is defined
-     */
-    public OneAxisEllipsoid getBody() {
-        return body;
+        return new FieldLatitudeCrossingDetector<>(detectionSettings, newHandler, getBodyShape(), latitude);
     }
 
     /** Get the fixed latitude to be crossed (radians).
@@ -127,7 +116,7 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
     public T g(final FieldSpacecraftState<T> s) {
 
         // convert state to geodetic coordinates
-        final FieldGeodeticPoint<T> gp = body.transform(
+        final FieldGeodeticPoint<T> gp = getBodyShape().transform(
                 s.getPosition(),
                 s.getFrame(),
                 s.getDate());

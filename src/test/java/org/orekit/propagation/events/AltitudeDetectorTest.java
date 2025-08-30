@@ -34,10 +34,10 @@ import org.orekit.propagation.events.handlers.StopOnEvent;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
 
-public class AltitudeDetectorTest {
+class AltitudeDetectorTest {
 
     @Test
-    public void testBackAndForth() {
+    void testBackAndForth() {
 
         final Frame EME2000 = FramesFactory.getEME2000();
         final AbsoluteDate initialDate = new AbsoluteDate(2009, 1, 1, TimeScalesFactory.getUTC());

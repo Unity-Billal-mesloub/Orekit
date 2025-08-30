@@ -34,13 +34,10 @@ import org.orekit.propagation.events.handlers.StopOnDecreasing;
  * @see org.orekit.propagation.Propagator#addEventDetector(EventDetector)
  * @author Luc Maisonobe
  */
-public class AltitudeDetector extends AbstractDetector<AltitudeDetector> {
+public class AltitudeDetector extends AbstractGeographicalDetector<AltitudeDetector> {
 
     /** Threshold altitude value (m). */
     private final double altitude;
-
-    /** Body shape with respect to which altitude should be evaluated. */
-    private final BodyShape bodyShape;
 
     /** Build a new altitude detector.
      * <p>This simple constructor takes default values for maximal checking
@@ -100,15 +97,14 @@ public class AltitudeDetector extends AbstractDetector<AltitudeDetector> {
     protected AltitudeDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                final double altitude,
                                final BodyShape bodyShape) {
-        super(detectionSettings, handler);
+        super(detectionSettings, handler, bodyShape);
         this.altitude  = altitude;
-        this.bodyShape = bodyShape;
     }
 
     /** {@inheritDoc} */
     @Override
     protected AltitudeDetector create(final EventDetectionSettings detectionSettings, final EventHandler newHandler) {
-        return new AltitudeDetector(detectionSettings, newHandler, altitude, bodyShape);
+        return new AltitudeDetector(detectionSettings, newHandler, altitude, getBodyShape());
     }
 
     /** Get the threshold altitude value.
@@ -118,13 +114,6 @@ public class AltitudeDetector extends AbstractDetector<AltitudeDetector> {
         return altitude;
     }
 
-    /** Get the body shape.
-     * @return the body shape
-     */
-    public BodyShape getBodyShape() {
-        return bodyShape;
-    }
-
     /** Compute the value of the switching function.
      * This function measures the difference between the current altitude
      * and the threshold altitude.
@@ -132,8 +121,8 @@ public class AltitudeDetector extends AbstractDetector<AltitudeDetector> {
      * @return value of the switching function
      */
     public double g(final SpacecraftState s) {
-        final Frame bodyFrame      = bodyShape.getBodyFrame();
-        final GeodeticPoint point  = bodyShape.transform(s.getPosition(bodyFrame), bodyFrame, s.getDate());
+        final Frame bodyFrame      = getBodyShape().getBodyFrame();
+        final GeodeticPoint point  = getBodyShape().transform(s.getPosition(bodyFrame), bodyFrame, s.getDate());
         return point.getAltitude() - altitude;
     }
 

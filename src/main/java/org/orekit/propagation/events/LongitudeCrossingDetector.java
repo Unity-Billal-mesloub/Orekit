@@ -18,8 +18,8 @@ package org.orekit.propagation.events;
 
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathUtils;
+import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.GeodeticPoint;
-import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.handlers.ContinueOnEvent;
 import org.orekit.propagation.events.handlers.EventHandler;
@@ -32,10 +32,7 @@ import org.orekit.time.AbsoluteDate;
  * @author Luc Maisonobe
  * @since 7.1
  */
-public class LongitudeCrossingDetector extends AbstractDetector<LongitudeCrossingDetector> {
-
-    /** Body on which the longitude is defined. */
-    private OneAxisEllipsoid body;
+public class LongitudeCrossingDetector extends AbstractGeographicalDetector<LongitudeCrossingDetector> {
 
     /** Fixed longitude to be crossed. */
     private final double longitude;
@@ -50,7 +47,7 @@ public class LongitudeCrossingDetector extends AbstractDetector<LongitudeCrossin
      * @param body body on which the longitude is defined
      * @param longitude longitude to be crossed
      */
-    public LongitudeCrossingDetector(final OneAxisEllipsoid body, final double longitude) {
+    public LongitudeCrossingDetector(final BodyShape body, final double longitude) {
         this(DEFAULT_MAX_CHECK, DEFAULT_THRESHOLD, body, longitude);
     }
 
@@ -61,7 +58,7 @@ public class LongitudeCrossingDetector extends AbstractDetector<LongitudeCrossin
      * @param longitude longitude to be crossed
      */
     public LongitudeCrossingDetector(final double maxCheck, final double threshold,
-                                    final OneAxisEllipsoid body, final double longitude) {
+                                     final BodyShape body, final double longitude) {
         this(new EventDetectionSettings(maxCheck, threshold, DEFAULT_MAX_ITER), new StopOnIncreasing(),
              body, longitude);
     }
@@ -79,11 +76,10 @@ public class LongitudeCrossingDetector extends AbstractDetector<LongitudeCrossin
      * @since 13.0
      */
     protected LongitudeCrossingDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
-                                        final OneAxisEllipsoid body, final double longitude) {
+                                        final BodyShape body, final double longitude) {
 
-        super(detectionSettings, handler);
+        super(detectionSettings, handler, body);
 
-        this.body      = body;
         this.longitude = longitude;
 
         // we filter out spurious longitude crossings occurring at the antimeridian
@@ -98,14 +94,7 @@ public class LongitudeCrossingDetector extends AbstractDetector<LongitudeCrossin
     @Override
     protected LongitudeCrossingDetector create(final EventDetectionSettings detectionSettings,
                                                final EventHandler newHandler) {
-        return new LongitudeCrossingDetector(detectionSettings, newHandler, body, longitude);
-    }
-
-    /** Get the body on which the geographic zone is defined.
-     * @return body on which the geographic zone is defined
-     */
-    public OneAxisEllipsoid getBody() {
-        return body;
+        return new LongitudeCrossingDetector(detectionSettings, newHandler, getBodyShape(), longitude);
     }
 
     /** Get the fixed longitude to be crossed (radians).
@@ -180,7 +169,7 @@ public class LongitudeCrossingDetector extends AbstractDetector<LongitudeCrossin
         public double g(final SpacecraftState s) {
 
             // convert state to geodetic coordinates
-            final GeodeticPoint gp = body.transform(s.getPosition(),
+            final GeodeticPoint gp = getBodyShape().transform(s.getPosition(),
                                                     s.getFrame(), s.getDate());
 
             // longitude difference

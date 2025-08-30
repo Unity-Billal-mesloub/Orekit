@@ -67,7 +67,7 @@ public class LongitudeCrossingDetectorTest {
         Assertions.assertEquals(1.0e-6, d.getThreshold(), 1.0e-15);
         Assertions.assertEquals(10.0, FastMath.toDegrees(d.getLongitude()), 1.0e-14);
         Assertions.assertEquals(AbstractDetector.DEFAULT_MAX_ITER, d.getMaxIterationCount());
-        Assertions.assertSame(earth, d.getBody());
+        Assertions.assertSame(earth, d.getBodyShape());
 
         final TimeScale utc = TimeScalesFactory.getUTC();
         final Vector3D position = new Vector3D(-6142438.668, 3492467.56, -25767.257);

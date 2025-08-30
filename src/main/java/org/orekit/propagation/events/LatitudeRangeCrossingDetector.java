@@ -17,8 +17,8 @@
 package org.orekit.propagation.events;
 
 import org.hipparchus.util.FastMath;
+import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.GeodeticPoint;
-import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnDecreasing;
@@ -30,10 +30,7 @@ import org.orekit.propagation.events.handlers.StopOnDecreasing;
  * @author Alberto Ferrero
  * @since 12.0
  */
-public class LatitudeRangeCrossingDetector extends AbstractDetector<LatitudeRangeCrossingDetector> {
-
-    /** Body on which the latitude is defined. */
-    private final OneAxisEllipsoid body;
+public class LatitudeRangeCrossingDetector extends AbstractGeographicalDetector<LatitudeRangeCrossingDetector> {
 
     /** Fixed latitude to be crossed, lower boundary in radians. */
     private final double fromLatitude;
@@ -54,7 +51,7 @@ public class LatitudeRangeCrossingDetector extends AbstractDetector<LatitudeRang
      * @param fromLatitude latitude to be crossed, lower range boundary
      * @param toLatitude latitude to be crossed, upper range boundary
      */
-    public LatitudeRangeCrossingDetector(final OneAxisEllipsoid body, final double fromLatitude, final double toLatitude) {
+    public LatitudeRangeCrossingDetector(final BodyShape body, final double fromLatitude, final double toLatitude) {
         this(DEFAULT_MAX_CHECK, DEFAULT_THRESHOLD, body, fromLatitude, toLatitude);
     }
 
@@ -66,7 +63,7 @@ public class LatitudeRangeCrossingDetector extends AbstractDetector<LatitudeRang
      * @param toLatitude latitude to be crossed, upper range boundary
      */
     public LatitudeRangeCrossingDetector(final double maxCheck, final double threshold,
-                                         final OneAxisEllipsoid body, final double fromLatitude, final double toLatitude) {
+                                         final BodyShape body, final double fromLatitude, final double toLatitude) {
         this(new EventDetectionSettings(maxCheck, threshold, DEFAULT_MAX_ITER), new StopOnDecreasing(),
              body, fromLatitude, toLatitude);
     }
@@ -86,9 +83,8 @@ public class LatitudeRangeCrossingDetector extends AbstractDetector<LatitudeRang
      */
     protected LatitudeRangeCrossingDetector(final EventDetectionSettings detectionSettings,
                                             final EventHandler handler,
-                                            final OneAxisEllipsoid body, final double fromLatitude, final double toLatitude) {
-        super(detectionSettings, handler);
-        this.body     = body;
+                                            final BodyShape body, final double fromLatitude, final double toLatitude) {
+        super(detectionSettings, handler, body);
         this.fromLatitude = fromLatitude;
         this.toLatitude = toLatitude;
         this.sign = FastMath.signum(toLatitude - fromLatitude);
@@ -98,14 +94,7 @@ public class LatitudeRangeCrossingDetector extends AbstractDetector<LatitudeRang
     @Override
     protected LatitudeRangeCrossingDetector create(final EventDetectionSettings detectionSettings,
                                                    final EventHandler newHandler) {
-        return new LatitudeRangeCrossingDetector(detectionSettings, newHandler, body, fromLatitude, toLatitude);
-    }
-
-    /** Get the body on which the geographic zone is defined.
-     * @return body on which the geographic zone is defined
-     */
-    public OneAxisEllipsoid getBody() {
-        return body;
+        return new LatitudeRangeCrossingDetector(detectionSettings, newHandler, getBodyShape(), fromLatitude, toLatitude);
     }
 
     /** Get the fixed latitude range to be crossed (radians), lower boundary.
@@ -134,7 +123,7 @@ public class LatitudeRangeCrossingDetector extends AbstractDetector<LatitudeRang
     public double g(final SpacecraftState s) {
 
         // convert state to geodetic coordinates
-        final GeodeticPoint gp = body.transform(s.getPVCoordinates().getPosition(),
+        final GeodeticPoint gp = getBodyShape().transform(s.getPVCoordinates().getPosition(),
             s.getFrame(), s.getDate());
 
         // point latitude

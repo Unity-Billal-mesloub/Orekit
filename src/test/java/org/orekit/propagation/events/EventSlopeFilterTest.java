@@ -440,7 +440,7 @@ class EventSlopeFilterTest {
                     }
 
                 });
-        Assertions.assertSame(earth, detector.getBody());
+        Assertions.assertSame(earth, detector.getBodyShape());
         propagator.addEventDetector(new EventSlopeFilter<EventDetector>(detector, filter));
         AbsoluteDate target = propagator.getInitialState().getDate().shiftedBy(dt);
         SpacecraftState finalState = propagator.propagate(target);
