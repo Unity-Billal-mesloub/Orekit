@@ -120,22 +120,6 @@ public class FieldImpulseManeuver<T extends CalculusFieldElement<T>> extends Abs
     /** Build a new instance.
      * @param trigger triggering event
      * @param attitudeOverride the attitude provider to use for the maneuver
-     * @param deltaVSat velocity increment in satellite frame
-     * @param isp engine specific impulse (s)
-     * @param control3DVectorCostType increment's norm for mass consumption
-     * @deprecated since 13.0
-     */
-    @Deprecated
-    public FieldImpulseManeuver(final FieldEventDetector<T> trigger, final AttitudeProvider attitudeOverride,
-                                final FieldVector3D<T> deltaVSat, final T isp,
-                                final Control3DVectorCostType control3DVectorCostType) {
-        this(trigger, trigger.getDetectionSettings(), attitudeOverride,
-                FieldImpulseProvider.of(deltaVSat), isp, control3DVectorCostType);
-    }
-
-    /** Build a new instance.
-     * @param trigger triggering event
-     * @param attitudeOverride the attitude provider to use for the maneuver
      * @param fieldImpulseProvider impulse provider
      * @param isp engine specific impulse (s)
      * @param control3DVectorCostType increment's norm for mass consumption

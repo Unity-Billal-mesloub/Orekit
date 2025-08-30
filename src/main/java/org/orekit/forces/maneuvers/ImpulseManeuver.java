@@ -113,20 +113,6 @@ public class ImpulseManeuver extends AbstractImpulseManeuver implements Detector
     /** Build a new instance.
      * @param trigger triggering event
      * @param attitudeOverride the attitude provider to use for the maneuver
-     * @param deltaVSat velocity increment in satellite frame
-     * @param isp engine specific impulse (s)
-     * @param control3DVectorCostType increment's norm for mass consumption
-     * @deprecated since 13.0
-     */
-    @Deprecated
-    public ImpulseManeuver(final EventDetector trigger, final AttitudeProvider attitudeOverride,
-                           final Vector3D deltaVSat, final double isp, final Control3DVectorCostType control3DVectorCostType) {
-        this(trigger, trigger.getDetectionSettings(), attitudeOverride, ImpulseProvider.of(deltaVSat), isp, control3DVectorCostType);
-    }
-
-    /** Build a new instance.
-     * @param trigger triggering event
-     * @param attitudeOverride the attitude provider to use for the maneuver
      * @param impulseProvider impulse provider
      * @param isp engine specific impulse (s)
      * @param control3DVectorCostType increment's norm for mass consumption
