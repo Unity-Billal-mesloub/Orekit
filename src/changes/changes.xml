@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
+        <action dev="serrof" type="add" issue="1808">
+            Added mass rate in state.
+        </action>
         <action dev="luc" type="add" issue="1803">
             Added TimeUtils.earliest() and TimeUtils.latest().
         </action>

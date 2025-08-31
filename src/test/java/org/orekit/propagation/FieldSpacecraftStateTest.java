@@ -37,10 +37,14 @@ import org.hipparchus.util.MathArrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.orekit.TestUtils;
 import org.orekit.Utils;
+import org.orekit.attitudes.Attitude;
 import org.orekit.attitudes.BodyCenterPointing;
 import org.orekit.attitudes.FieldAttitude;
+import org.orekit.attitudes.FrameAlignedProvider;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
 import org.orekit.errors.OrekitIllegalArgumentException;
@@ -65,6 +69,7 @@ import org.orekit.time.AbsoluteDate;
 import org.orekit.time.DateComponents;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.TimeComponents;
+import org.orekit.time.TimeOffset;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.Constants;
@@ -82,7 +87,7 @@ import org.orekit.utils.TimeStampedFieldAngularCoordinates;
 class FieldSpacecraftStateTest {
 
     @Test
-    public void testToFieldSpacecraftStateWithStringAdditionalData() {
+    void testToFieldSpacecraftStateWithStringAdditionalData() {
         final Binary64Field field = Binary64Field.getInstance();
         final SpacecraftState state = new SpacecraftState(TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH)).addAdditionalData("test-string", "hello");
         final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(field, state);
@@ -122,6 +127,22 @@ class FieldSpacecraftStateTest {
     }
 
     @Test
+    void testWithMassRateAndOrbit() {
+        // GIVEN
+        final SpacecraftState state = new SpacecraftState(TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH));
+        final Binary64Field field = Binary64Field.getInstance();
+        final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(field, state);
+        final Binary64 expectedMassRate = new Binary64(123);
+        // WHEN
+        final FieldSpacecraftState<Binary64> fieldStateWithMassRate = fieldState.withMassRate(expectedMassRate);
+        // THEN
+        Assertions.assertEquals(expectedMassRate, fieldStateWithMassRate.getMassRate());
+        Assertions.assertEquals(fieldState.getMass(), fieldStateWithMassRate.getMass());
+        Assertions.assertEquals(fieldState.getAttitude(), fieldStateWithMassRate.getAttitude());
+        Assertions.assertEquals(fieldState.getOrbit(), fieldStateWithMassRate.getOrbit());
+    }
+
+    @Test
     void testWithAttitudeAndAbsolutePV() {
         // GIVEN
         final AbsolutePVCoordinates absolutePVCoordinates = new AbsolutePVCoordinates(FramesFactory.getEME2000(),
@@ -154,6 +175,88 @@ class FieldSpacecraftStateTest {
         Assertions.assertEquals(expectedMass, fieldStateWithMass.getMass());
         Assertions.assertEquals(fieldState.getAttitude(), fieldStateWithMass.getAttitude());
         Assertions.assertEquals(fieldState.getAbsPVA(), fieldStateWithMass.getAbsPVA());
+    }
+
+    @Test
+    void testWithMassRateAndAbsolutePV() {
+        // GIVEN
+        final AbsolutePVCoordinates absolutePVCoordinates = new AbsolutePVCoordinates(FramesFactory.getEME2000(),
+                AbsoluteDate.ARBITRARY_EPOCH, new PVCoordinates());
+        final SpacecraftState state = new SpacecraftState(absolutePVCoordinates);
+        final Binary64Field field = Binary64Field.getInstance();
+        final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(field, state);
+        final Binary64 expectedMassRate = new Binary64(123);
+        // WHEN
+        final FieldSpacecraftState<Binary64> fieldStateWithMassRate = fieldState.withMassRate(expectedMassRate);
+        // THEN
+        Assertions.assertEquals(expectedMassRate, fieldStateWithMassRate.getMassRate());
+        Assertions.assertEquals(fieldState.getMass(), fieldStateWithMassRate.getMass());
+        Assertions.assertEquals(fieldState.getAttitude(), fieldStateWithMassRate.getAttitude());
+        Assertions.assertEquals(fieldState.getAbsPVA().getPosition(), fieldStateWithMassRate.getAbsPVA().getPosition());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testShiftedByOrbit(final boolean useTimeOffset) {
+        // GIVEN
+        final FieldOrbit<Binary64> fieldOrbit = new FieldCartesianOrbit<>(Binary64Field.getInstance(), rOrbit);
+        final FieldAttitude<Binary64> attitude = new FrameAlignedProvider(fieldOrbit.getFrame()).getAttitude(fieldOrbit, fieldOrbit.getDate(), fieldOrbit.getFrame());
+        final Binary64 massRate = new Binary64(1e-3);
+        final FieldSpacecraftState<Binary64> state = new FieldSpacecraftState<>(fieldOrbit, attitude).withMassRate(massRate);
+        final Binary64 dt = Binary64.ONE;
+        // WHEN
+        final FieldSpacecraftState<Binary64> shiftedState;
+        if (useTimeOffset) {
+            shiftedState = state.shiftedBy(new TimeOffset(dt.getReal()));
+        } else {
+            shiftedState = state.shiftedBy(dt);
+        }
+        // THEN
+        Assertions.assertEquals(state.getDate().shiftedBy(dt), shiftedState.getDate());
+        Assertions.assertEquals(state.getOrbit().shiftedBy(dt).getPosition(), shiftedState.getOrbit().getPosition());
+        Assertions.assertEquals(state.getAttitude().shiftedBy(dt).getSpin(), shiftedState.getAttitude().getSpin());
+        Assertions.assertEquals(state.getMass().add(dt.multiply(state.getMassRate())), shiftedState.getMass());
+        Assertions.assertEquals(state.getMassRate(), shiftedState.getMassRate());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testShiftedByAbsolutePV(final boolean useTimeOffset) {
+        // GIVEN
+        final Attitude attitude = new FrameAlignedProvider(rOrbit.getFrame()).getAttitude(rOrbit, rOrbit.getDate(), rOrbit.getFrame());
+        final AbsolutePVCoordinates absolutePVCoordinates = new AbsolutePVCoordinates(FramesFactory.getEME2000(),
+                rDate, rOrbit.getPVCoordinates());
+        final SpacecraftState nonFieldState = new SpacecraftState(absolutePVCoordinates, attitude);
+        final Binary64 massRate = new Binary64(1e-3);
+        final FieldSpacecraftState<Binary64> state = new FieldSpacecraftState<>(Binary64Field.getInstance(), nonFieldState).withMassRate(massRate);
+        final Binary64 dt = Binary64.ONE;
+        // WHEN
+        final FieldSpacecraftState<Binary64> shiftedState;
+        if (useTimeOffset) {
+            shiftedState = state.shiftedBy(new TimeOffset(dt.getReal()));
+        } else {
+            shiftedState = state.shiftedBy(dt);
+        }
+        // THEN
+        Assertions.assertEquals(state.getDate().shiftedBy(dt), shiftedState.getDate());
+        Assertions.assertEquals(state.getAbsPVA().shiftedBy(dt).getPosition(), shiftedState.getAbsPVA().getPosition());
+        Assertions.assertEquals(state.getAttitude().shiftedBy(dt).getSpin(), shiftedState.getAttitude().getSpin());
+        Assertions.assertEquals(state.getMass().add(dt.multiply(state.getMassRate())), shiftedState.getMass());
+        Assertions.assertEquals(state.getMassRate(), shiftedState.getMassRate());
+    }
+
+    @Test
+    void testToString() {
+        // GIVEN
+        final FieldSpacecraftState<Binary64> state = new FieldSpacecraftState<>(Binary64Field.getInstance(), new SpacecraftState(rOrbit));
+        // WHEN
+        final String string = state.toString();
+        // THEN
+        Assertions.assertTrue(string.contains("orbit"));
+        Assertions.assertTrue(string.contains("mass"));
+        Assertions.assertTrue(string.contains("massRate"));
+        Assertions.assertTrue(string.contains("attitude"));
+        Assertions.assertTrue(string.contains("additional"));
     }
 
     @Test
@@ -300,7 +403,7 @@ class FieldSpacecraftStateTest {
     }
 
     @Test
-    public void testIssue1557() {
+    void testIssue1557() {
         // GIVEN
         // Define orbit state
         final FieldOrbit<Binary64>           mockOrbit  = TestUtils.getFakeFieldOrbit();

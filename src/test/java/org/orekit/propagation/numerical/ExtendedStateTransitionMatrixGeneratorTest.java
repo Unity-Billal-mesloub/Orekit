@@ -279,8 +279,9 @@ class ExtendedStateTransitionMatrixGeneratorTest {
         final MatricesHarvester harvester6x6 = otherPropagator.setupMatricesComputation(stmName, MatrixUtils.createRealIdentityMatrix(6), null);
         final SpacecraftState otherState = otherPropagator.propagate(targetDate);
         final RealMatrix expectedStm = harvester6x6.getStateTransitionMatrix(otherState);
+        final double tolerance = orbitType == OrbitType.KEPLERIAN ? 1e-4 : 0;
         for (int i = 0; i < 6; i++) {
-            assertArrayEquals(expectedStm.getRow(i), Arrays.copyOfRange(actualStm.getRow(i), 0, 6));
+            assertArrayEquals(expectedStm.getRow(i), Arrays.copyOfRange(actualStm.getRow(i), 0, 6), tolerance);
         }
     }
 

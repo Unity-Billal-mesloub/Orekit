@@ -435,6 +435,7 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
             // the parameter type is ignored for the Numerical Propagator
 
             final T mass = y[6];
+            final T massRate = yDot == null ? mass.getField().getZero() : yDot[6];
             if (mass.getReal() <= 0.0) {
                 throw new OrekitException(OrekitMessages.NOT_POSITIVE_SPACECRAFT_MASS, mass);
             }
@@ -453,12 +454,12 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
                 }
 
                 final FieldAttitude<T> attitude = getAttitudeProvider().getAttitude(absPva, date, getFrame());
-                return new FieldSpacecraftState<>(absPva, attitude).withMass(mass);
+                return new FieldSpacecraftState<>(absPva, attitude, mass, massRate, null, null);
             } else {
                 // propagation uses regular orbits
                 final FieldOrbit<T> orbit       = superGetOrbitType().mapArrayToOrbit(y, yDot, super.getPositionAngleType(), date, getMu(), getFrame());
                 final FieldAttitude<T> attitude = getAttitudeProvider().getAttitude(orbit, date, getFrame());
-                return new FieldSpacecraftState<>(orbit, attitude).withMass(mass);
+                return new FieldSpacecraftState<>(orbit, attitude, mass, massRate, null, null);
             }
         }
 

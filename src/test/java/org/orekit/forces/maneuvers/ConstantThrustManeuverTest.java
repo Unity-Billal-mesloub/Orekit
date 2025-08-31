@@ -791,7 +791,7 @@ class ConstantThrustManeuverTest extends AbstractLegacyForceModelTest {
                             1.0e-9);
         Assertions.assertTrue(maneuver.isFiring(middleState.shiftedBy(3 * duration)));
         Assertions.assertEquals(0.186340263,
-                            maneuver.acceleration(middleState.shiftedBy(3 * duration), maneuver.getParameters()).getNorm(),
+                            maneuver.acceleration(middleState.withMassRate(0).shiftedBy(3 * duration), maneuver.getParameters()).getNorm(),
                             1.0e-9);
 
 

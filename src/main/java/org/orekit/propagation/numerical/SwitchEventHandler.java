@@ -205,7 +205,7 @@ class SwitchEventHandler implements EventHandler {
         for (int i = 3; i < 7; i++) {
             deltaDerivatives[i] = derivativesAfter[i] - derivativesBefore[i];
         }
-        final Gradient g = evaluateG(buildCartesianState(state, state.getPVCoordinates()), derivativesBefore[6]);
+        final Gradient g = evaluateG(buildCartesianState(state, state.getPVCoordinates()));
         final double gLastDerivative = g.getPartialDerivative(7);
         final double gDot = isForward ? gLastDerivative : -gLastDerivative;
         final double[] gGradientState = Arrays.copyOfRange(g.getGradient(), 0, 7);
@@ -257,21 +257,17 @@ class SwitchEventHandler implements EventHandler {
     /**
      * Evaluate event function in Taylor algebra.
      * @param state state
-     * @param massRate mass rate
      * @return g in Taylor algebra
      */
-    private Gradient evaluateG(final SpacecraftState state, final double massRate) {
+    private Gradient evaluateG(final SpacecraftState state) {
         Gradient time = Gradient.variable(8, 7, 0);
         if (!isForward) {
             time = time.negate();
         }
         final GradientField field = time.getField();
-        FieldSpacecraftState<Gradient> fieldState = DerivativeStateUtils.buildSpacecraftStateGradient(field,
+        final FieldSpacecraftState<Gradient> fieldState = DerivativeStateUtils.buildSpacecraftStateGradient(field,
                 state, attitudeProvider);
-        fieldState = fieldState.shiftedBy(time);
-        final Gradient shiftedMass = time.multiply(massRate).add(state.getMass());
-        fieldState = fieldState.withMass(shiftedMass);  // necessary because shiftedBy does not consider mass
-        return switchFieldDetector.g(fieldState);
+        return switchFieldDetector.g(fieldState.shiftedBy(time));
     }
 
 }

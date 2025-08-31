@@ -99,6 +99,9 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
     /** Current mass (kg). */
     private final T mass;
 
+    /** Current mass rate (kg/s). */
+    private final T massRate;
+
     /** Additional data, can be any object (String, T[], etc.). */
     private final FieldDataDictionary<T> additional;
 
@@ -133,6 +136,31 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
      * @param orbit the orbit
      * @param attitude attitude
      * @param mass the mass (kg)
+     * @param massRate mass rate (kg/s)
+     * @param additional additional states (may be null if no additional states are available)
+     * @param additionalDot additional states derivatives(may be null if no additional states derivatives are available)
+     * @exception IllegalArgumentException if orbit and attitude dates
+     * or frames are not equal
+     * @since 14.0
+     */
+    public FieldSpacecraftState(final FieldOrbit<T> orbit, final FieldAttitude<T> attitude, final T mass, final T massRate,
+                                final FieldDataDictionary<T> additional,
+                                final FieldArrayDictionary<T> additionalDot)
+            throws IllegalArgumentException {
+        checkConsistency(orbit, attitude);
+        this.orbit      = orbit;
+        this.attitude   = attitude;
+        this.mass       = mass;
+        this.massRate  = massRate;
+        this.absPva     = null;
+        this.additional = additional == null ? new FieldDataDictionary<>(orbit.getDate().getField()) : new FieldDataDictionary<>(additional);
+        this.additionalDot = additionalDot == null ? new FieldArrayDictionary<>(orbit.getDate().getField()) : new FieldArrayDictionary<>(additionalDot);
+    }
+
+    /** Build a spacecraft state from orbit, attitude, mass, additional states and derivatives.
+     * @param orbit the orbit
+     * @param attitude attitude
+     * @param mass the mass (kg)
      * @param additional additional states (may be null if no additional states are available)
      * @param additionalDot additional states derivatives(may be null if no additional states derivative sare available)
      * @exception IllegalArgumentException if orbit and attitude dates
@@ -143,14 +171,7 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
                                 final FieldDataDictionary<T> additional,
                                 final FieldArrayDictionary<T> additionalDot)
         throws IllegalArgumentException {
-        checkConsistency(orbit, attitude);
-        this.orbit      = orbit;
-        this.attitude   = attitude;
-        this.mass       = mass;
-        this.absPva     = null;
-        this.additional = additional == null ? new FieldDataDictionary<>(orbit.getDate().getField()) : new FieldDataDictionary<>(additional);
-        this.additionalDot = additionalDot == null ? new FieldArrayDictionary<>(orbit.getDate().getField()) : new FieldArrayDictionary<>(additionalDot);
-
+        this(orbit, attitude, mass, mass.getField().getZero(), additional, additionalDot);
     }
 
     /** Convert a {@link FieldSpacecraftState}.
@@ -178,6 +199,7 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
 
         this.attitude = new FieldAttitude<>(field, state.getAttitude());
         this.mass     = field.getZero().newInstance(state.getMass());
+        this.massRate = this.mass.newInstance(state.getMassRate());
 
         final DataDictionary additionalD = state.getAdditionalDataValues();
         if (additionalD.size() == 0) {
@@ -245,11 +267,30 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
     public FieldSpacecraftState(final FieldAbsolutePVCoordinates<T> absPva, final FieldAttitude<T> attitude, final T mass,
                                 final FieldDataDictionary<T> additional, final FieldArrayDictionary<T> additionalDot)
         throws IllegalArgumentException {
+        this(absPva, attitude, mass, mass.getField().getZero(), additional, additionalDot);
+    }
+
+    /** Build a spacecraft state from orbit, attitude and mass.
+     * @param absPva position-velocity-acceleration
+     * @param attitude attitude
+     * @param mass the mass (kg)
+     * @param massRate mass rate (kg/s)
+     * @param additional additional states (may be null if no additional states are available)
+     * @param additionalDot additional states derivatives(may be null if no additional states derivatives are available)
+     * @exception IllegalArgumentException if orbit and attitude dates
+     * or frames are not equal
+     * @since 14.0
+     */
+    public FieldSpacecraftState(final FieldAbsolutePVCoordinates<T> absPva, final FieldAttitude<T> attitude,
+                                final T mass, final T massRate,
+                                final FieldDataDictionary<T> additional, final FieldArrayDictionary<T> additionalDot)
+            throws IllegalArgumentException {
         checkConsistency(absPva, attitude);
         this.orbit      = null;
         this.absPva     = absPva;
         this.attitude   = attitude;
         this.mass       = mass;
+        this.massRate  = massRate;
         this.additional = additional == null ? new FieldDataDictionary<>(absPva.getDate().getField()) : new FieldDataDictionary<>(additional);
         this.additionalDot = additionalDot == null ? new FieldArrayDictionary<>(absPva.getDate().getField()) : new FieldArrayDictionary<>(additionalDot);
     }
@@ -265,6 +306,20 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
             return new FieldSpacecraftState<>(orbit, attitude, newMass, additional, additionalDot);
         } else {
             return new FieldSpacecraftState<>(absPva, attitude, newMass, additional, additionalDot);
+        }
+    }
+
+    /**
+     * Create a new instance with input mass.
+     * @param newMassRate mass rate
+     * @return new state
+     * @since 14.0
+     */
+    public FieldSpacecraftState<T> withMassRate(final T newMassRate) {
+        if (isOrbitDefined()) {
+            return new FieldSpacecraftState<>(orbit, attitude, mass, newMassRate, additional, additionalDot);
+        } else {
+            return new FieldSpacecraftState<>(absPva, attitude, mass, newMassRate, additional, additionalDot);
         }
     }
 
@@ -429,9 +484,10 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
     /** Get a time-shifted state.
      * <p>
      * The state can be slightly shifted to close dates. This shift is based on
-     * a simple Keplerian model for orbit, a linear extrapolation for attitude
-     * taking the spin rate into account and neither mass nor additional states
-     * changes. It is <em>not</em> intended as a replacement for proper orbit
+     * a simple Keplerian model for orbit and Taylor series for absolute position-velocity.
+     * A linear extrapolation for attitude is used, taking the spin rate into account.
+     * The mass is changed linearly, as well as additional states
+     * if their derivatives are available. It is <em>not</em> intended as a replacement for proper orbit
      * and attitude propagation but should be sufficient for small time shifts
      * or coarse accuracy.
      * </p>
@@ -455,25 +511,25 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
      * </table>
      * @param dt time shift in seconds
      * @return a new state, shifted with respect to the instance (which is immutable)
-     * except for the mass which stay unchanged
      */
     @Override
     public FieldSpacecraftState<T> shiftedBy(final double dt) {
         if (isOrbitDefined()) {
-            return new FieldSpacecraftState<>(orbit.shiftedBy(dt), attitude.shiftedBy(dt),
-                                              mass, shiftAdditional(dt), additionalDot);
+            return new FieldSpacecraftState<>(orbit.shiftedBy(dt), attitude.shiftedBy(dt), mass.add(massRate.multiply(dt)),
+                                              massRate, shiftAdditional(dt), additionalDot);
         } else {
-            return new FieldSpacecraftState<>(absPva.shiftedBy(dt), attitude.shiftedBy(dt),
-                                              mass, shiftAdditional(dt), additionalDot);
+            return new FieldSpacecraftState<>(absPva.shiftedBy(dt), attitude.shiftedBy(dt), mass.add(massRate.multiply(dt)),
+                                              massRate, shiftAdditional(dt), additionalDot);
         }
     }
 
     /** Get a time-shifted state.
      * <p>
      * The state can be slightly shifted to close dates. This shift is based on
-     * a simple Keplerian model for orbit, a linear extrapolation for attitude
-     * taking the spin rate into account and neither mass nor additional states
-     * changes. It is <em>not</em> intended as a replacement for proper orbit
+     * a simple Keplerian model for orbit and Taylor series for absolute position-velocity.
+     * A linear extrapolation for attitude is used, taking the spin rate into account.
+     * The mass is changed linearly, as well as additional states
+     * if their derivatives are available. It is <em>not</em> intended as a replacement for proper orbit
      * and attitude propagation but should be sufficient for small time shifts
      * or coarse accuracy.
      * </p>
@@ -497,16 +553,15 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
      * </table>
      * @param dt time shift in seconds
      * @return a new state, shifted with respect to the instance (which is immutable)
-     * except for the mass which stay unchanged
      */
     @Override
     public FieldSpacecraftState<T> shiftedBy(final T dt) {
         if (isOrbitDefined()) {
-            return new FieldSpacecraftState<>(orbit.shiftedBy(dt), attitude.shiftedBy(dt),
-                                              mass, shiftAdditional(dt), additionalDot);
+            return new FieldSpacecraftState<>(orbit.shiftedBy(dt), attitude.shiftedBy(dt), mass.add(massRate.multiply(dt)),
+                                              massRate, shiftAdditional(dt), additionalDot);
         } else {
-            return new FieldSpacecraftState<>(absPva.shiftedBy(dt), attitude.shiftedBy(dt),
-                                              mass, shiftAdditional(dt), additionalDot);
+            return new FieldSpacecraftState<>(absPva.shiftedBy(dt), attitude.shiftedBy(dt), mass.add(massRate.multiply(dt)),
+                                              massRate, shiftAdditional(dt), additionalDot);
         }
     }
 
@@ -868,6 +923,14 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
         return mass;
     }
 
+    /** Gets the current mass rate.
+     * @return the mass (kg/S)
+     * @since 14.0
+     */
+    public T getMassRate() {
+        return massRate;
+    }
+
     /**To convert a FieldSpacecraftState instance into a SpacecraftState instance.
      *
      * @return SpacecraftState instance with the same properties
@@ -919,8 +982,10 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
     public String toString() {
         return "FieldSpacecraftState{" +
                 "orbit=" + orbit +
+                ", absPva=" + absPva +
                 ", attitude=" + attitude +
                 ", mass=" + mass +
+                ", massRate=" + massRate +
                 ", additional=" + additional +
                 ", additionalDot=" + additionalDot +
                 '}';

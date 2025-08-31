@@ -929,11 +929,12 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
             // the parameter type is ignored for the Numerical Propagator
 
             final double mass = y[6];
+            final double massRate = yDot == null ? 0. : yDot[6];
             if (mass <= 0.0) {
                 throw new OrekitException(OrekitMessages.NOT_POSITIVE_SPACECRAFT_MASS, mass);
             }
 
-            if (getOrbitType() == null) {
+            if (super.getOrbitType() == null) {
                 // propagation uses absolute position-velocity-acceleration
                 final Vector3D p = new Vector3D(y[0],    y[1],    y[2]);
                 final Vector3D v = new Vector3D(y[3],    y[4],    y[5]);
@@ -947,20 +948,20 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
                 }
 
                 final Attitude attitude = getAttitudeProvider().getAttitude(absPva, date, getFrame());
-                return new SpacecraftState(absPva, attitude).withMass(mass);
+                return new SpacecraftState(absPva, attitude, mass, massRate, null, null);
             } else {
                 // propagation uses regular orbits
-                final Orbit orbit       = getOrbitType().mapArrayToOrbit(y, yDot, getPositionAngleType(), date, getMu(), getFrame());
+                final Orbit orbit       = super.getOrbitType().mapArrayToOrbit(y, yDot, super.getPositionAngleType(), date, getMu(), getFrame());
                 final Attitude attitude = getAttitudeProvider().getAttitude(orbit, date, getFrame());
 
-                return new SpacecraftState(orbit, attitude).withMass(mass);
+                return new SpacecraftState(orbit, attitude, mass, massRate, null, null);
             }
 
         }
 
         /** {@inheritDoc} */
         public void mapStateToArray(final SpacecraftState state, final double[] y, final double[] yDot) {
-            if (getOrbitType() == null) {
+            if (super.getOrbitType() == null) {
                 // propagation uses absolute position-velocity-acceleration
                 final Vector3D p = state.getAbsPVA().getPosition();
                 final Vector3D v = state.getAbsPVA().getVelocity();
@@ -973,7 +974,7 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
                 y[6] = state.getMass();
             }
             else {
-                getOrbitType().mapOrbitToArray(state.getOrbit(), getPositionAngleType(), y, yDot);
+                super.getOrbitType().mapOrbitToArray(state.getOrbit(), super.getPositionAngleType(), y, yDot);
                 y[6] = state.getMass();
             }
         }
