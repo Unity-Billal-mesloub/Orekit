@@ -41,6 +41,9 @@
         <action dev="luc" type="fix" issue="1811">
           Fixed observables ordering error when writing Rinex observation header.
         </action>
+        <action dev="bryan" type="fix" issue="1808">
+            Fixed inconsistency between Abstract{Field}ODEStateInterpolator and {Field}DetectorBasedEventState for event time handling.
+        </action>
         <action dev="sdinot" type="fix" issue="1790">
             Fixed duplicated 13.1 version in faq.md.
         </action>
