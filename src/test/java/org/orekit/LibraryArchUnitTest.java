@@ -27,6 +27,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 class LibraryArchUnitTest {
 
+    // packages
     private static final String SSA_NAME = "..ssa..";
     private static final String FILES_NAME = "..files..";
     private static final String ESTIMATION_NAME = "..estimation..";
@@ -43,6 +44,9 @@ class LibraryArchUnitTest {
     private static final String ERRORS_NAME = "..errors..";
     private static final String MODELS_NAME = "..models..";
     private static final String GNSS_NAME = "..gnss..";
+
+    // sub-packages
+    private static final String CR3BP_NAME = "..cr3bp..";
 
     // GIVEN
     private static final JavaClasses IMPORTED_CLASSES = new ClassFileImporter()
@@ -136,10 +140,21 @@ class LibraryArchUnitTest {
     }
 
     @Test
-    void testNoClassesOrbitsPackageAccess() {
+    void testNoClassesOrbitsExceptCr3bpPackageAccess() {
         // WHEN
         final ArchRule myRule = noClasses()
-                .that().resideInAPackage(ORBITS_NAME)
+                .that().resideInAPackage(ORBITS_NAME).and().resideOutsideOfPackage(CR3BP_NAME)
+                .should().dependOnClassesThat().resideInAnyPackage(SSA_NAME, ESTIMATION_NAME, CONTROL_NAME,
+                        FORCES_NAME, PROPAGATION_NAME, CR3BP_NAME);
+        // THEN
+        myRule.check(IMPORTED_CLASSES);
+    }
+
+    @Test
+    void testNoClassesOrbitsCr3bpPackageAccess() {
+        // WHEN
+        final ArchRule myRule = noClasses()
+                .that().resideInAPackage(ORBITS_NAME).and().resideInAPackage(CR3BP_NAME)
                 .should().dependOnClassesThat().resideInAnyPackage(SSA_NAME, ESTIMATION_NAME, CONTROL_NAME,
                         FORCES_NAME);
         // THEN

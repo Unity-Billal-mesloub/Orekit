@@ -31,11 +31,11 @@ import org.orekit.bodies.CR3BPFactory;
 import org.orekit.bodies.CR3BPSystem;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
-import org.orekit.orbits.CR3BPDifferentialCorrection;
-import org.orekit.orbits.HaloOrbit;
-import org.orekit.orbits.LibrationOrbitFamily;
-import org.orekit.orbits.LibrationOrbitType;
-import org.orekit.orbits.RichardsonExpansion;
+import org.orekit.orbits.cr3bp.CR3BPDifferentialCorrection;
+import org.orekit.orbits.cr3bp.HaloOrbit;
+import org.orekit.orbits.cr3bp.LibrationOrbitFamily;
+import org.orekit.orbits.cr3bp.LibrationOrbitType;
+import org.orekit.orbits.cr3bp.RichardsonExpansion;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.numerical.NumericalPropagator;
 import org.orekit.time.AbsoluteDate;
@@ -44,10 +44,10 @@ import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.LagrangianPoints;
 import org.orekit.utils.PVCoordinates;
 
-public class CR3BPMultipleShooterTest {
+class CR3BPMultipleShooterTest {
 
     @Test
-    public void testCannotSetEpochFreedom() {
+    void testCannotSetEpochFreedom() {
         Assertions.assertThrows(OrekitException.class, () -> {
             final CR3BPSystem syst = CR3BPFactory.getEarthMoonCR3BP();
             final AbsoluteDate date = AbsoluteDate.J2000_EPOCH;
@@ -66,7 +66,7 @@ public class CR3BPMultipleShooterTest {
     }
 
     @Test
-    public void testCannotSetScaleLength() {
+    void testCannotSetScaleLength() {
         Assertions.assertThrows(OrekitException.class, () -> {
             final CR3BPSystem syst = CR3BPFactory.getEarthMoonCR3BP();
             final AbsoluteDate date = AbsoluteDate.J2000_EPOCH;
@@ -85,7 +85,7 @@ public class CR3BPMultipleShooterTest {
     }
 
     @Test
-    public void testCannotSetScaleTime() {
+    void testCannotSetScaleTime() {
         Assertions.assertThrows(OrekitException.class, () -> {
             final CR3BPSystem syst = CR3BPFactory.getEarthMoonCR3BP();
             final AbsoluteDate date = AbsoluteDate.J2000_EPOCH;
@@ -104,7 +104,7 @@ public class CR3BPMultipleShooterTest {
     }
 
     @Test
-    public void testHaloOrbit() {
+    void testHaloOrbit() {
 
         final CR3BPSystem syst = CR3BPFactory.getEarthMoonCR3BP();
         final AbsoluteDate date = AbsoluteDate.J2000_EPOCH;
@@ -194,7 +194,7 @@ public class CR3BPMultipleShooterTest {
     }
 
     @Test
-    public void testClosedOrbit() {
+    void testClosedOrbit() {
 
         // Earth-Moon system and L2 southern Halo
         final CR3BPSystem earthMoon = CR3BPFactory.getEarthMoonCR3BP();
@@ -261,7 +261,7 @@ public class CR3BPMultipleShooterTest {
 
     // Non regression test
     @Test
-    public void testWithConstraint() {
+    void testWithConstraint() {
 
         // Earth-Moon system and L2 southern Halo
         final CR3BPSystem earthMoon = CR3BPFactory.getEarthMoonCR3BP();
@@ -325,7 +325,7 @@ public class CR3BPMultipleShooterTest {
     }
 
     @Test
-    public void testLagrangianError() {
+    void testLagrangianError() {
         Assertions.assertThrows(OrekitException.class, () -> {
             CR3BPSystem syst = CR3BPFactory.getEarthMoonCR3BP();
             final HaloOrbit h = new HaloOrbit(new RichardsonExpansion(syst, LagrangianPoints.L3), 8E6, LibrationOrbitFamily.NORTHERN);
@@ -334,7 +334,7 @@ public class CR3BPMultipleShooterTest {
     }
 
     @Test
-    public void testDifferentialCorrectionError() {
+    void testDifferentialCorrectionError() {
         Assertions.assertThrows(OrekitException.class, () -> {
             CR3BPSystem syst = CR3BPFactory.getEarthMoonCR3BP();
 
@@ -349,7 +349,7 @@ public class CR3BPMultipleShooterTest {
     }
 
     @Test
-    public void testSTMError() {
+    void testSTMError() {
         Assertions.assertThrows(OrekitException.class, () -> {
             // Time settings
             final AbsoluteDate initialDate =
@@ -379,7 +379,7 @@ public class CR3BPMultipleShooterTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         Utils.setDataRoot("cr3bp:regular-data");
     }
 }

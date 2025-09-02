@@ -14,19 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.orbits;
-
 /**
- * Enumerate for {@link LibrationOrbit Libration Orbit} type.
+ *
+ * This package provides classes to compute orbits in the three-body problem.
+ *
+ *
+ * @author Vincent Mouraux
  * @author Bryan Cazabonne
- * @since 10.2
+ *
  */
-public enum LibrationOrbitType {
-
-    /** Halo orbit type. */
-    HALO,
-
-    /** Lyapunov orbit type. */
-    LYAPUNOV;
-
-}
+package org.orekit.orbits.cr3bp;

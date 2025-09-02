@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
+        <action dev="serrof" type="update" issue="1807">
+            Created cr3bp package inside orbit.
+        </action>
         <action dev="serrof" type="update" issue="1806">
             Moved (Field)OrbitBlender to propagation package.
         </action>

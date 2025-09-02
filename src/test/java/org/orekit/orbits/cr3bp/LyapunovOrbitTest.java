@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.orbits;
+package org.orekit.orbits.cr3bp;
 
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.ode.nonstiff.AdaptiveStepsizeIntegrator;
@@ -37,11 +37,11 @@ import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.LagrangianPoints;
 import org.orekit.utils.PVCoordinates;
 
-public class LyapunovOrbitTest {
+class LyapunovOrbitTest {
 
 
     @Test
-    public void testLyapunovOrbit() {
+    void testLyapunovOrbit() {
         CR3BPSystem syst = CR3BPFactory.getEarthMoonCR3BP();
 
         final PVCoordinates firstGuess = new PVCoordinates(new Vector3D(0.0, 1.0, 2.0), new Vector3D(3.0, 4.0, 5.0));
@@ -82,7 +82,7 @@ public class LyapunovOrbitTest {
     }
 
     @Test
-        public void testLagrangianError() {
+        void testLagrangianError() {
         Assertions.assertThrows(OrekitException.class, () -> {
             CR3BPSystem syst = CR3BPFactory.getEarthMoonCR3BP();
             final HaloOrbit h = new HaloOrbit(new RichardsonExpansion(syst, LagrangianPoints.L3), 8E6, LibrationOrbitFamily.NORTHERN);
@@ -91,7 +91,7 @@ public class LyapunovOrbitTest {
     }
 
     @Test
-    public void testManifolds() {
+    void testManifolds() {
 
         // Time settings
         final AbsoluteDate initialDate =
@@ -158,7 +158,7 @@ public class LyapunovOrbitTest {
     }
 
     @Test
-    public void testDifferentialCorrectionError() {
+    void testDifferentialCorrectionError() {
         Assertions.assertThrows(OrekitException.class, () -> {
             CR3BPSystem syst = CR3BPFactory.getEarthMoonCR3BP();
 
@@ -173,7 +173,7 @@ public class LyapunovOrbitTest {
     }
 
     @Test
-    public void testSTMError() {
+    void testSTMError() {
         Assertions.assertThrows(OrekitException.class, () -> {
             // Time settings
             final AbsoluteDate initialDate =
@@ -202,7 +202,7 @@ public class LyapunovOrbitTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         Utils.setDataRoot("cr3bp:regular-data");
     }
 }
