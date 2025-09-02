@@ -41,7 +41,7 @@ import org.orekit.frames.encounter.EncounterLOFType;
 import org.orekit.orbits.FieldOrbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
-import org.orekit.propagation.FieldStateCovariance;
+import org.orekit.propagation.covariance.FieldStateCovariance;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.FieldPVCoordinates;
 

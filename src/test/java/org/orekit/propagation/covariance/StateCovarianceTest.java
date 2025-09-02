@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.propagation;
+package org.orekit.propagation.covariance;
 
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.linear.BlockRealMatrix;
@@ -24,6 +24,7 @@ import org.hipparchus.ode.ODEIntegrator;
 import org.hipparchus.ode.nonstiff.DormandPrince853Integrator;
 import org.hipparchus.util.FastMath;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,6 +43,9 @@ import org.orekit.orbits.KeplerianOrbit;
 import org.orekit.orbits.Orbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
+import org.orekit.propagation.MatricesHarvester;
+import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.ToleranceProvider;
 import org.orekit.propagation.numerical.NumericalPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
@@ -54,8 +58,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StateCovarianceTest {
 
-    final private static double          DEFAULT_VALLADO_THRESHOLD = 1e-6;
-    private       SpacecraftState initialState;
+    private static final double          DEFAULT_VALLADO_THRESHOLD = 1e-6;
+    private SpacecraftState initialState;
     private       double[][]      initCov;
 
     /**
@@ -97,6 +101,7 @@ public class StateCovarianceTest {
     	assertEquals(initialDate, stateCovariance.getDate());
     }
 
+    @BeforeEach
     void setUp() {
         Utils.setDataRoot("orbit-determination/february-2016:potential/icgem-format");
         GravityFieldFactory.addPotentialCoefficientsReader(new ICGEMFormatReader("eigen-6s-truncated", true));
@@ -784,28 +789,6 @@ public class StateCovarianceTest {
 
         compareCovariance(expectedCovarianceMatrixInRTN, convertedCovarianceMatrixInRTN, DEFAULT_VALLADO_THRESHOLD);
 
-    }
-
-    @Test
-    @Deprecated
-    void testGetStm() {
-        // Given
-        final AbsoluteDate  initialDate      = new AbsoluteDate();
-        final Frame         inertialFrame    = FramesFactory.getGCRF();
-        final PVCoordinates pv               = getValladoInitialPV();
-        final double        mu               = Constants.IERS2010_EARTH_MU;
-        final Orbit initialOrbit = new CartesianOrbit(pv, inertialFrame, initialDate, mu);
-        final double dt = 100;
-
-        // When
-        final RealMatrix stm = StateCovariance.getStm(initialOrbit, dt);
-
-        // Then
-        final RealMatrix expectedStm          = MatrixUtils.createRealIdentityMatrix(6);
-        final double     sma          = initialOrbit.getA();
-        final double     contribution = -1.5 * dt * FastMath.sqrt(mu / FastMath.pow(sma, 5));
-        stm.setEntry(5, 0, contribution);
-        Assertions.assertEquals(0., expectedStm.subtract(stm).getNorm1(), 1e-7);
     }
 
     @ParameterizedTest

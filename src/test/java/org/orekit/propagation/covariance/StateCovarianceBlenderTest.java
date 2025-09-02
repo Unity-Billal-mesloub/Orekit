@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.propagation;
+package org.orekit.propagation.covariance;
 
 import java.util.Locale;
 import java.util.Map;
@@ -38,6 +38,9 @@ import org.orekit.frames.LOFType;
 import org.orekit.orbits.Orbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
+import org.orekit.propagation.OrbitBlender;
+import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.SpacecraftStateInterpolator;
 import org.orekit.propagation.analytical.AbstractAnalyticalPropagator;
 import org.orekit.propagation.analytical.BrouwerLyddanePropagator;
 import org.orekit.propagation.analytical.EcksteinHechlerPropagator;

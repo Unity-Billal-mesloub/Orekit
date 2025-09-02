@@ -22,7 +22,7 @@ import org.hipparchus.linear.RealMatrix;
 import org.orekit.frames.LOFType;
 import org.orekit.orbits.PositionAngleType;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.StateCovariance;
+import org.orekit.propagation.covariance.StateCovariance;
 
 /** Provider for a temporal evolution of the process noise matrix.
  * All parameters (orbital or propagation) are time dependent and provided as {@link UnivariateFunction}.

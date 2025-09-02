@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.propagation;
+package org.orekit.propagation.covariance;
 
 import org.hipparchus.analysis.polynomials.SmoothStepFactory;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
@@ -62,6 +62,11 @@ import org.orekit.orbits.CartesianOrbit;
 import org.orekit.orbits.Orbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
+import org.orekit.propagation.MatricesHarvester;
+import org.orekit.propagation.OrbitBlender;
+import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.SpacecraftStateInterpolator;
+import org.orekit.propagation.ToleranceProvider;
 import org.orekit.propagation.analytical.Ephemeris;
 import org.orekit.propagation.analytical.KeplerianPropagator;
 import org.orekit.propagation.numerical.NumericalPropagator;
@@ -88,7 +93,7 @@ public class StateCovarianceKeplerianHermiteInterpolatorTest {
     private final  double DEFAULT_SERGEI_TABULATED_TIMESTEP   = 2400;
 
     @BeforeAll
-    static void setUp() {
+    public static void setUp() {
         Utils.setDataRoot("regular-data:potential/egm-format:atmosphere:tides:regular-data/de405-ephemerides");
         GravityFieldFactory.addPotentialCoefficientsReader(new EGMFormatReader("EGM96-truncated-21x21", true));
         AstronomicalAmplitudeReader aaReader =

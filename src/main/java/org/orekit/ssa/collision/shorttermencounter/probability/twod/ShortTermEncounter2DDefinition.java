@@ -37,7 +37,7 @@ import org.orekit.frames.encounter.EncounterLOFType;
 import org.orekit.orbits.Orbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
-import org.orekit.propagation.StateCovariance;
+import org.orekit.propagation.covariance.StateCovariance;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.PVCoordinates;
 

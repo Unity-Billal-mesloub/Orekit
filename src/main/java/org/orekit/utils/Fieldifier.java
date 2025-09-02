@@ -21,8 +21,8 @@ import org.hipparchus.Field;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.MatrixUtils;
 import org.hipparchus.linear.RealMatrix;
-import org.orekit.propagation.FieldStateCovariance;
-import org.orekit.propagation.StateCovariance;
+import org.orekit.propagation.covariance.FieldStateCovariance;
+import org.orekit.propagation.covariance.StateCovariance;
 import org.orekit.time.FieldAbsoluteDate;
 
 /**

@@ -20,8 +20,8 @@ import org.hipparchus.CalculusFieldElement;
 import org.orekit.files.ccsds.ndm.cdm.Cdm;
 import org.orekit.orbits.FieldOrbit;
 import org.orekit.orbits.Orbit;
-import org.orekit.propagation.FieldStateCovariance;
-import org.orekit.propagation.StateCovariance;
+import org.orekit.propagation.covariance.FieldStateCovariance;
+import org.orekit.propagation.covariance.StateCovariance;
 import org.orekit.ssa.metrics.FieldProbabilityOfCollision;
 import org.orekit.ssa.metrics.ProbabilityOfCollision;
 

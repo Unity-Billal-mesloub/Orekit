@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.propagation;
+package org.orekit.propagation.covariance;
 
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.analysis.differentiation.GradientField;
@@ -721,30 +721,6 @@ public class StateCovariance implements TimeStamped {
      */
     private static RealMatrix getJacobian(final KinematicTransform transform) {
         return MatrixUtils.createRealMatrix(transform.getPVJacobian());
-    }
-
-    /**
-     * Get the state transition matrix considering Keplerian contribution only and assuming equinoctial elements with mean anomaly.
-     *
-     * @param initialOrbit orbit to which the initial covariance matrix should correspond
-     * @param dt time difference between the two orbits
-     * @return the state transition matrix used to shift the covariance matrix
-     * @deprecated since 13.1. If you must, do:
-     * final RealMatrix stm = MatrixUtils.createRealIdentityMatrix(STATE_DIMENSION);
-     * double contribution = initialOrbit.getMeanAnomalyDotWrtA() * dt;
-     * stm.setEntry(5, 0, contribution);
-     */
-    @Deprecated
-    public static RealMatrix getStm(final Orbit initialOrbit, final double dt) {
-        // initialize the STM
-        final RealMatrix stm = MatrixUtils.createRealIdentityMatrix(STATE_DIMENSION);
-
-        // State transition matrix using Keplerian contribution only
-        final double contribution = initialOrbit.getMeanAnomalyDotWrtA() * dt;
-        stm.setEntry(5, 0, contribution);
-
-        // Return
-        return stm;
     }
 
     /**

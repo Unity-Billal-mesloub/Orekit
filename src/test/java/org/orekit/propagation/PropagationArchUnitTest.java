@@ -28,6 +28,7 @@ class PropagationArchUnitTest {
 
     private static final String ANALYTICAL_NAME = "..analytical..";
     private static final String NUMERICAL_NAME = "..numerical..";
+    private static final String COVARIANCE_NAME = "..covariance..";
     private static final String INTEGRATION_NAME = "..integration..";
     private static final String EVENTS_NAME = "..events..";
     private static final String SAMPLING_NAME = "..sampling..";
@@ -44,7 +45,18 @@ class PropagationArchUnitTest {
         final ArchRule myRule = noClasses()
                 .that().resideInAPackage(SAMPLING_NAME)
                 .should().dependOnClassesThat().resideInAnyPackage(SEMI_ANALYTICAL_NAME, NUMERICAL_NAME,
-                        INTEGRATION_NAME, ANALYTICAL_NAME);
+                        INTEGRATION_NAME, ANALYTICAL_NAME, COVARIANCE_NAME);
+        // THEN
+        myRule.check(IMPORTED_CLASSES);
+    }
+
+    @Test
+    void testNoClassesCovariancePackageAccess() {
+        // WHEN
+        final ArchRule myRule = noClasses()
+                .that().resideInAPackage(COVARIANCE_NAME)
+                .should().dependOnClassesThat().resideInAnyPackage(EVENTS_NAME, INTEGRATION_NAME, SEMI_ANALYTICAL_NAME,
+                        ANALYTICAL_NAME, NUMERICAL_NAME);
         // THEN
         myRule.check(IMPORTED_CLASSES);
     }
@@ -55,7 +67,7 @@ class PropagationArchUnitTest {
         final ArchRule myRule = noClasses()
                 .that().resideInAPackage(EVENTS_NAME)
                 .should().dependOnClassesThat().resideInAnyPackage(SEMI_ANALYTICAL_NAME, NUMERICAL_NAME,
-                        ANALYTICAL_NAME, INTEGRATION_NAME);
+                        ANALYTICAL_NAME, INTEGRATION_NAME, COVARIANCE_NAME);
         // THEN
         myRule.check(IMPORTED_CLASSES);
     }
@@ -75,7 +87,7 @@ class PropagationArchUnitTest {
         // WHEN
         final ArchRule myRule = noClasses()
                 .that().resideInAPackage(INTEGRATION_NAME)
-                .should().dependOnClassesThat().resideInAnyPackage(SEMI_ANALYTICAL_NAME, NUMERICAL_NAME);
+                .should().dependOnClassesThat().resideInAnyPackage(SEMI_ANALYTICAL_NAME, NUMERICAL_NAME, COVARIANCE_NAME);
         // THEN
         myRule.check(IMPORTED_CLASSES);
     }
@@ -85,7 +97,7 @@ class PropagationArchUnitTest {
         // WHEN
         final ArchRule myRule = noClasses()
                 .that().resideInAPackage(SEMI_ANALYTICAL_NAME)
-                .should().dependOnClassesThat().resideInAnyPackage(NUMERICAL_NAME, ANALYTICAL_NAME);
+                .should().dependOnClassesThat().resideInAnyPackage(NUMERICAL_NAME, ANALYTICAL_NAME, COVARIANCE_NAME);
         // THEN
         myRule.check(IMPORTED_CLASSES);
     }
@@ -95,7 +107,7 @@ class PropagationArchUnitTest {
         // WHEN
         final ArchRule myRule = noClasses()
                 .that().resideInAPackage(NUMERICAL_NAME)
-                .should().dependOnClassesThat().resideInAnyPackage(SEMI_ANALYTICAL_NAME);
+                .should().dependOnClassesThat().resideInAnyPackage(SEMI_ANALYTICAL_NAME, COVARIANCE_NAME);
         // THEN
         myRule.check(IMPORTED_CLASSES);
     }

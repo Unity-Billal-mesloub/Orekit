@@ -44,6 +44,9 @@ import org.orekit.propagation.analytical.BrouwerLyddanePropagator;
 import org.orekit.propagation.analytical.EcksteinHechlerPropagator;
 import org.orekit.propagation.analytical.Ephemeris;
 import org.orekit.propagation.analytical.KeplerianPropagator;
+import org.orekit.propagation.covariance.StateCovariance;
+import org.orekit.propagation.covariance.StateCovarianceKeplerianHermiteInterpolatorTest;
+import org.orekit.propagation.covariance.StateCovarianceMatrixProvider;
 import org.orekit.propagation.numerical.NumericalPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.AbstractTimeInterpolator;
@@ -119,7 +122,7 @@ class OrbitBlenderTest {
 
         propagator.addAdditionalDataProvider(stateCovarianceMatrixProvider);
 
-        propagator.getMultiplexer().add(1, (currentState) -> {
+        propagator.getMultiplexer().add(1, currentState -> {
             referenceStates.add(currentState);
 
             // Save tabulated state and covariance
@@ -238,7 +241,6 @@ class OrbitBlenderTest {
                             1e-12, false);
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     @DisplayName("non regression test on Keplerian quadratic orbit blending on full force model test case from : "
             + "TANYGIN, Sergei. Efficient covariance interpolation using blending of approximate covariance propagations. "
@@ -362,7 +364,6 @@ class OrbitBlenderTest {
                             
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     @DisplayName("non regression test on Eckstein-Hechler quadratic orbit blending on full force model test case from : "
             + "TANYGIN, Sergei. Efficient covariance interpolation using blending of approximate covariance propagations. "

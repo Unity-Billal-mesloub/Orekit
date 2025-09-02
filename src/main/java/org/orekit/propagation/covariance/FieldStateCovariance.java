@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.propagation;
+package org.orekit.propagation.covariance;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;

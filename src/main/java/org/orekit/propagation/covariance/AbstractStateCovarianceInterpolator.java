@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.propagation;
+package org.orekit.propagation.covariance;
 
 import org.orekit.frames.Frame;
 import org.orekit.frames.LOFType;
@@ -77,9 +77,9 @@ public abstract class AbstractStateCovarianceInterpolator
      * @see OrbitType
      * @see PositionAngleType
      */
-    public AbstractStateCovarianceInterpolator(final int interpolationPoints, final double extrapolationThreshold,
-                                               final TimeInterpolator<Orbit> orbitInterpolator,
-                                               final LOFType outLOF) {
+    protected AbstractStateCovarianceInterpolator(final int interpolationPoints, final double extrapolationThreshold,
+                                                  final TimeInterpolator<Orbit> orbitInterpolator,
+                                                  final LOFType outLOF) {
         super(interpolationPoints, extrapolationThreshold);
         this.orbitInterpolator = orbitInterpolator;
         this.outLOF            = outLOF;
@@ -102,10 +102,9 @@ public abstract class AbstractStateCovarianceInterpolator
      * @see OrbitType
      * @see PositionAngleType
      */
-    public AbstractStateCovarianceInterpolator(final int interpolationPoints, final double extrapolationThreshold,
-                                               final TimeInterpolator<Orbit> orbitInterpolator,
-                                               final Frame outFrame,
-                                               final OrbitType outOrbitType,
+    protected AbstractStateCovarianceInterpolator(final int interpolationPoints, final double extrapolationThreshold,
+                                                  final TimeInterpolator<Orbit> orbitInterpolator,
+                                                  final Frame outFrame, final OrbitType outOrbitType,
                                                final PositionAngleType outPositionAngleType) {
         super(interpolationPoints, extrapolationThreshold);
         this.orbitInterpolator = orbitInterpolator;

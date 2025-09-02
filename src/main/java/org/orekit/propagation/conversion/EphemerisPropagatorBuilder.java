@@ -26,7 +26,7 @@ import org.orekit.orbits.Orbit;
 import org.orekit.orbits.PositionAngleType;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.SpacecraftStateInterpolator;
-import org.orekit.propagation.StateCovariance;
+import org.orekit.propagation.covariance.StateCovariance;
 import org.orekit.propagation.analytical.Ephemeris;
 import org.orekit.time.TimeInterpolator;
 import org.orekit.time.TimeStampedPair;

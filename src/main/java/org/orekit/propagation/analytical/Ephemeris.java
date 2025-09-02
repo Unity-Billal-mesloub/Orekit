@@ -32,7 +32,7 @@ import org.orekit.propagation.AbstractMatricesHarvester;
 import org.orekit.propagation.BoundedPropagator;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.SpacecraftStateInterpolator;
-import org.orekit.propagation.StateCovariance;
+import org.orekit.propagation.covariance.StateCovariance;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.AbstractTimeInterpolator;
 import org.orekit.time.TimeInterpolator;
@@ -69,19 +69,19 @@ public class Ephemeris extends AbstractAnalyticalPropagator implements BoundedPr
     private final String[] additional;
 
     /** List of spacecraft states. */
-    private final transient ImmutableTimeStampedCache<SpacecraftState> statesCache;
+    private final ImmutableTimeStampedCache<SpacecraftState> statesCache;
 
     /** List of covariances. **/
-    private final transient ImmutableTimeStampedCache<StateCovariance> covariancesCache;
+    private final ImmutableTimeStampedCache<StateCovariance> covariancesCache;
 
     /** Spacecraft state interpolator. */
-    private final transient TimeInterpolator<SpacecraftState> stateInterpolator;
+    private final TimeInterpolator<SpacecraftState> stateInterpolator;
 
     /** State covariance interpolator. */
-    private final transient TimeInterpolator<TimeStampedPair<Orbit, StateCovariance>> covarianceInterpolator;
+    private final TimeInterpolator<TimeStampedPair<Orbit, StateCovariance>> covarianceInterpolator;
 
     /** Flag defining if states are defined using an orbit or an absolute position-velocity-acceleration. */
-    private final transient boolean statesAreOrbitDefined;
+    private final boolean statesAreOrbitDefined;
 
     /**
      * Legacy constructor with tabulated states and default Hermite interpolation.
@@ -410,6 +410,7 @@ public class Ephemeris extends AbstractAnalyticalPropagator implements BoundedPr
      *
      * @param state new initial state to consider
      */
+    @Override
     public void resetInitialState(final SpacecraftState state) {
         throw new OrekitException(OrekitMessages.NON_RESETABLE_STATE);
     }
@@ -420,6 +421,7 @@ public class Ephemeris extends AbstractAnalyticalPropagator implements BoundedPr
     }
 
     /** {@inheritDoc} */
+    @Override
     public SpacecraftState getInitialState() {
         return basicPropagate(getMinDate());
     }
