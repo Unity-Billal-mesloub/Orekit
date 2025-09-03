@@ -82,21 +82,21 @@ public class OrbitElementsTypeTest {
 
         final TimeStampedPVCoordinates p = OrbitElementsType.CARTP.toCartesian(AbsoluteDate.J2000_EPOCH,
                                                                           elements, null, Constants.EIGEN5C_EARTH_MU);
-        Assertions.assertEquals(14.0e12, p.getPosition().getNormSq(),     1.0);
-        Assertions.assertEquals(0.0,     p.getVelocity().getNormSq(),     1.0e-12);
-        Assertions.assertEquals(0.0,     p.getAcceleration().getNormSq(), 1.0e-12);
+        Assertions.assertEquals(14.0e12, p.getPosition().getNorm2Sq(),     1.0);
+        Assertions.assertEquals(0.0,     p.getVelocity().getNorm2Sq(),     1.0e-12);
+        Assertions.assertEquals(0.0,     p.getAcceleration().getNorm2Sq(), 1.0e-12);
 
         final TimeStampedPVCoordinates pv = OrbitElementsType.CARTPV.toCartesian(AbsoluteDate.J2000_EPOCH,
                                                                             elements, null, Constants.EIGEN5C_EARTH_MU);
-        Assertions.assertEquals(14.0e12, pv.getPosition().getNormSq(),     1.0);
-        Assertions.assertEquals(77.0e6,  pv.getVelocity().getNormSq(),     1.0);
-        Assertions.assertEquals(0.0,     pv.getAcceleration().getNormSq(), 1.0e-12);
+        Assertions.assertEquals(14.0e12, pv.getPosition().getNorm2Sq(),     1.0);
+        Assertions.assertEquals(77.0e6,  pv.getVelocity().getNorm2Sq(),     1.0);
+        Assertions.assertEquals(0.0,     pv.getAcceleration().getNorm2Sq(), 1.0e-12);
 
         final TimeStampedPVCoordinates pva = OrbitElementsType.CARTPVA.toCartesian(AbsoluteDate.J2000_EPOCH,
                                                                               elements, null, Constants.EIGEN5C_EARTH_MU);
-        Assertions.assertEquals(14.0e12, pva.getPosition().getNormSq(),     1.0);
-        Assertions.assertEquals(77.0e6,  pva.getVelocity().getNormSq(),     1.0);
-        Assertions.assertEquals(194.0,   pva.getAcceleration().getNormSq(), 1.0);
+        Assertions.assertEquals(14.0e12, pva.getPosition().getNorm2Sq(),     1.0);
+        Assertions.assertEquals(77.0e6,  pva.getVelocity().getNorm2Sq(),     1.0);
+        Assertions.assertEquals(194.0,   pva.getAcceleration().getNorm2Sq(), 1.0);
 
     }
 

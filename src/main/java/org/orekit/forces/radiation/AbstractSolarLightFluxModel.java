@@ -88,7 +88,7 @@ public abstract class AbstractSolarLightFluxModel extends AbstractLightFluxModel
     /** {@inheritDoc} */
     @Override
     protected Vector3D getUnoccultedFluxVector(final Vector3D relativePosition) {
-        final double squaredRadius = relativePosition.getNormSq();
+        final double squaredRadius = relativePosition.getNorm2Sq();
         final double factor = kRef / (squaredRadius * FastMath.sqrt(squaredRadius));
         return relativePosition.scalarMultiply(factor);
     }
@@ -96,7 +96,7 @@ public abstract class AbstractSolarLightFluxModel extends AbstractLightFluxModel
     /** {@inheritDoc} */
     @Override
     protected <T extends CalculusFieldElement<T>> FieldVector3D<T> getUnoccultedFluxVector(final FieldVector3D<T> relativePosition) {
-        final T squaredRadius = relativePosition.getNormSq();
+        final T squaredRadius = relativePosition.getNorm2Sq();
         final T factor = (squaredRadius.multiply(squaredRadius.sqrt())).reciprocal().multiply(kRef);
         return relativePosition.scalarMultiply(factor);
     }

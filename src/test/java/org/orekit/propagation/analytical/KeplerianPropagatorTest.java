@@ -781,7 +781,7 @@ public class KeplerianPropagatorTest {
             final AbsoluteDate date         = new AbsoluteDate(2003, 9, 16, TimeScalesFactory.getUTC());
             final Vector3D     position     = new Vector3D(-6142438.668, 3492467.56, -25767.257);
             final Vector3D     velocity     = new Vector3D(505.848, 942.781, 7435.922);
-            final Vector3D     keplerAcceleration = new Vector3D(-mu / position.getNormSq(), position.normalize());
+            final Vector3D     keplerAcceleration = new Vector3D(-mu / position.getNorm2Sq(), position.normalize());
             final Vector3D     nonKeplerAcceleration = new Vector3D(0.001, 0.002, 0.003);
             final Vector3D     acceleration = keplerAcceleration.add(nonKeplerAcceleration);
             final TimeStampedPVCoordinates pva = new TimeStampedPVCoordinates(date, position, velocity, acceleration);

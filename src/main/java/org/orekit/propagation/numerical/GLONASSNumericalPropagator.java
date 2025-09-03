@@ -735,7 +735,7 @@ public class GLONASSNumericalPropagator extends AbstractIntegratedPropagator {
             final double etamY  = eta - y;
             final double psimZ  = psi - z;
             final Vector3D vector = new Vector3D(epsmX, etamY, psimZ);
-            final double d2 = vector.getNormSq();
+            final double d2 = vector.getNorm2Sq();
             final double deltaM = FastMath.sqrt(d2) * d2;
 
             // Accelerations

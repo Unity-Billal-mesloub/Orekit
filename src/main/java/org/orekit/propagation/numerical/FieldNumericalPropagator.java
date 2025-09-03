@@ -588,7 +588,7 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
                 if (mu.getReal() > 0) {
                     // velocity derivative is Newtonian acceleration
                     final FieldVector3D<T> position = currentState.getPosition();
-                    final T r2         = position.getNormSq();
+                    final T r2         = position.getNorm2Sq();
                     final T coeff      = r2.multiply(r2.sqrt()).reciprocal().negate().multiply(mu);
                     yDot[3] = yDot[3].add(coeff.multiply(position.getX()));
                     yDot[4] = yDot[4].add(coeff.multiply(position.getY()));

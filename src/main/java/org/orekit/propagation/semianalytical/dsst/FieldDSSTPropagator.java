@@ -1045,7 +1045,7 @@ public class FieldDSSTPropagator<T extends CalculusFieldElement<T>> extends Fiel
     public static <T extends CalculusFieldElement<T>> double[][] tolerances(final T dP, final FieldOrbit<T> orbit) {
         // estimate the scalar velocity error
         final FieldPVCoordinates<T> pv = orbit.getPVCoordinates();
-        final T r2 = pv.getPosition().getNormSq();
+        final T r2 = pv.getPosition().getNorm2Sq();
         final T v  = pv.getVelocity().getNorm();
         final T dV = orbit.getMu().multiply(dP).divide(v.multiply(r2));
 

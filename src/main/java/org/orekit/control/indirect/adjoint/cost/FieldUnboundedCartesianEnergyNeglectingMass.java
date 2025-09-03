@@ -85,7 +85,7 @@ public class FieldUnboundedCartesianEnergyNeglectingMass<T extends CalculusField
     @Override
     public T getFieldHamiltonianContribution(final T[] adjointVariables, final T mass) {
         final FieldVector3D<T> thrustAcceleration = getFieldThrustAccelerationVector(adjointVariables, mass);
-        return thrustAcceleration.getNormSq().multiply(-1. / 2.);
+        return thrustAcceleration.getNorm2Sq().multiply(-1. / 2.);
     }
 
     /** {@inheritDoc} */

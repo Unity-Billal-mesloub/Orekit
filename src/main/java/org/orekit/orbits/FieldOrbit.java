@@ -173,10 +173,10 @@ public abstract class FieldOrbit<T extends CalculusFieldElement<T>>
         this.one = this.field.getOne();
         this.date = fieldPVCoordinates.getDate();
         this.mu = mu;
-        if (fieldPVCoordinates.getAcceleration().getNormSq().getReal() == 0.0) {
+        if (fieldPVCoordinates.getAcceleration().getNorm2Sq().getReal() == 0.0) {
             // the acceleration was not provided,
             // compute it from Newtonian attraction
-            final T r2 = fieldPVCoordinates.getPosition().getNormSq();
+            final T r2 = fieldPVCoordinates.getPosition().getNorm2Sq();
             final T r3 = r2.multiply(r2.sqrt());
             this.pvCoordinates = new TimeStampedFieldPVCoordinates<>(fieldPVCoordinates.getDate(),
                                                                      fieldPVCoordinates.getPosition(),
@@ -229,7 +229,7 @@ public abstract class FieldOrbit<T extends CalculusFieldElement<T>>
             }
 
             final FieldVector3D<T> p = pva.getPosition();
-            final T r2 = p.getNormSq();
+            final T r2 = p.getNorm2Sq();
 
             // Check if acceleration is relatively close to 0 compared to the Keplerian acceleration
             final double tolerance = mu.getReal() * 1e-9;

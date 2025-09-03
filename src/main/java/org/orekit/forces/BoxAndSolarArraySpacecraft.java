@@ -176,7 +176,7 @@ public class BoxAndSolarArraySpacecraft implements RadiationSensitive, DragSensi
         final double dragFactor = parameters[0];
 
         // relative velocity in spacecraft frame
-        final double   vNorm2 = relativeVelocity.getNormSq();
+        final double   vNorm2 = relativeVelocity.getNorm2Sq();
         final double   vNorm  = FastMath.sqrt(vNorm2);
         final Vector3D vDir   = state.getAttitude().getRotation().applyTo(relativeVelocity.scalarMultiply(1.0 / vNorm));
         final double   coeff  = density * dragFactor * vNorm2 / (2.0 * state.getMass());
@@ -217,7 +217,7 @@ public class BoxAndSolarArraySpacecraft implements RadiationSensitive, DragSensi
         final T dragFactor = parameters[0];
 
         // relative velocity in spacecraft frame
-        final T                vNorm2 = relativeVelocity.getNormSq();
+        final T                vNorm2 = relativeVelocity.getNorm2Sq();
         final T                vNorm  = FastMath.sqrt(vNorm2);
         final FieldVector3D<T> vDir   = state.getAttitude().getRotation().applyTo(relativeVelocity.scalarMultiply(vNorm.reciprocal()));
         final T                coeff  = density.multiply(dragFactor).multiply(vNorm2).divide(state.getMass().multiply(2.0));
@@ -253,7 +253,7 @@ public class BoxAndSolarArraySpacecraft implements RadiationSensitive, DragSensi
                                                   final Vector3D flux,
                                                   final double[] parameters) {
 
-        if (flux.getNormSq() < Precision.SAFE_MIN) {
+        if (flux.getNorm2Sq() < Precision.SAFE_MIN) {
             // null illumination (we are probably in umbra)
             return Vector3D.ZERO;
         }
@@ -309,7 +309,7 @@ public class BoxAndSolarArraySpacecraft implements RadiationSensitive, DragSensi
                                       final T[] parameters) {
 
         final Field<T> field = state.getDate().getField();
-        if (flux.getNormSq().getReal() < Precision.SAFE_MIN) {
+        if (flux.getNorm2Sq().getReal() < Precision.SAFE_MIN) {
             // null illumination (we are probably in umbra)
             return FieldVector3D.getZero(field);
         }

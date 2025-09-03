@@ -404,7 +404,7 @@ public abstract class AbstractPropagatorConverter implements PropagatorConverter
             // velocity
             if (!onlyPosition) {
                 // velocity weight relative to position
-                final double r2 = pv.getPosition().getNormSq();
+                final double r2 = pv.getPosition().getNorm2Sq();
                 final double v = pv.getVelocity().getNorm();
                 final double vWeight = v * r2 / state.getOrbit().getMu();
 

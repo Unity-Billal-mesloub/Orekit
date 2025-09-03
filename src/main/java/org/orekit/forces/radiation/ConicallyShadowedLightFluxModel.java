@@ -179,7 +179,7 @@ public class ConicallyShadowedLightFluxModel extends AbstractSolarLightFluxModel
     @Override
     protected double getLightingRatio(final Vector3D position, final Vector3D occultedBodyPosition) {
         final double distanceSun = occultedBodyPosition.getNorm();
-        final double squaredDistance = position.getNormSq();
+        final double squaredDistance = position.getNorm2Sq();
         final Vector3D occultedBodyDirection = occultedBodyPosition.normalize();
         final double s0 = -position.dotProduct(occultedBodyDirection);
         if (s0 > 0.0) {
@@ -215,7 +215,7 @@ public class ConicallyShadowedLightFluxModel extends AbstractSolarLightFluxModel
                                                                      final FieldVector3D<T> occultedBodyPosition) {
         final Field<T> field = position.getX().getField();
         final T distanceSun = occultedBodyPosition.getNorm();
-        final T squaredDistance = position.getNormSq();
+        final T squaredDistance = position.getNorm2Sq();
         final FieldVector3D<T> occultedBodyDirection = occultedBodyPosition.normalize();
         final T s0 = position.dotProduct(occultedBodyDirection).negate();
         if (s0.getReal() > 0.0) {
@@ -271,7 +271,7 @@ public class ConicallyShadowedLightFluxModel extends AbstractSolarLightFluxModel
                 final Vector3D occultedBodyDirection = occultedBodyPosition.normalize();
                 final double s0 = -position.dotProduct(occultedBodyDirection);
                 final double distanceSun = occultedBodyPosition.getNorm();
-                final double squaredDistance = position.getNormSq();
+                final double squaredDistance = position.getNorm2Sq();
                 final double sinf2 = (occultedBodyRadius - getOccultingBodyRadius()) / distanceSun;
                 final double l = FastMath.sqrt(squaredDistance - s0 * s0);
                 final double l2 = (s0 * sinf2 - getOccultingBodyRadius()) / FastMath.sqrt(1.0 - sinf2 * sinf2);
@@ -293,7 +293,7 @@ public class ConicallyShadowedLightFluxModel extends AbstractSolarLightFluxModel
                 final Vector3D occultedBodyDirection = occultedBodyPosition.normalize();
                 final double s0 = -position.dotProduct(occultedBodyDirection);
                 final double distanceSun = occultedBodyPosition.getNorm();
-                final double squaredDistance = position.getNormSq();
+                final double squaredDistance = position.getNorm2Sq();
                 final double l = FastMath.sqrt(squaredDistance - s0 * s0);
                 final double sinf1 = (occultedBodyRadius + getOccultingBodyRadius()) / distanceSun;
                 final double l1 = (s0 * sinf1 + getOccultingBodyRadius()) / FastMath.sqrt(1.0 - sinf1 * sinf1);
@@ -368,7 +368,7 @@ public class ConicallyShadowedLightFluxModel extends AbstractSolarLightFluxModel
                 final FieldVector3D<T> occultedBodyDirection = occultedBodyPosition.normalize();
                 final T s0 = position.dotProduct(occultedBodyDirection).negate();
                 final T distanceSun = occultedBodyPosition.getNorm();
-                final T squaredDistance = position.getNormSq();
+                final T squaredDistance = position.getNorm2Sq();
                 final T reciprocalDistanceSun = distanceSun.reciprocal();
                 final T sinf2 = reciprocalDistanceSun.multiply(occultedBodyRadius - getOccultingBodyRadius());
                 final T l2 = (s0.multiply(sinf2).subtract(getOccultingBodyRadius())).divide(FastMath.sqrt(sinf2.square().negate().add(1)));
@@ -393,7 +393,7 @@ public class ConicallyShadowedLightFluxModel extends AbstractSolarLightFluxModel
                 final FieldVector3D<T> occultedBodyDirection = occultedBodyPosition.normalize();
                 final T s0 = position.dotProduct(occultedBodyDirection).negate();
                 final T distanceSun = occultedBodyPosition.getNorm();
-                final T squaredDistance = position.getNormSq();
+                final T squaredDistance = position.getNorm2Sq();
                 final T reciprocalDistanceSun = distanceSun.reciprocal();
                 final T sinf1 = reciprocalDistanceSun.multiply(occultedBodyRadius + getOccultingBodyRadius());
                 final T l1 = (s0.multiply(sinf1).add(getOccultingBodyRadius())).divide(FastMath.sqrt(sinf1.square().negate().add(1)));

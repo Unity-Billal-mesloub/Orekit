@@ -295,7 +295,7 @@ public class CartesianOrbitTest {
         CartesianOrbit orbit = new CartesianOrbit(pvCoordinates, FramesFactory.getEME2000(),
                                                   date, Constants.EIGEN5C_EARTH_MU);
         Assertions.assertTrue(orbit.hasNonKeplerianAcceleration());
-        double r2 = position.getNormSq();
+        double r2 = position.getNorm2Sq();
         double r  = FastMath.sqrt(r2);
         Vector3D keplerianAcceleration = new Vector3D(-orbit.getMu() / (r2 * r), position);
         Assertions.assertEquals(0.0101, Vector3D.distance(keplerianAcceleration, acceleration), 1.0e-4);
@@ -322,7 +322,7 @@ public class CartesianOrbitTest {
         CartesianOrbit orbit = new CartesianOrbit(pvCoordinates, FramesFactory.getEME2000(),
                                                   date, Constants.EIGEN5C_EARTH_MU);
         Assertions.assertTrue(orbit.hasNonKeplerianAcceleration());
-        double r2 = position.getNormSq();
+        double r2 = position.getNorm2Sq();
         double r  = FastMath.sqrt(r2);
         Vector3D keplerianAcceleration = new Vector3D(-orbit.getMu() / (r2 * r), position);
         Assertions.assertEquals(4.78e-4, Vector3D.distance(keplerianAcceleration, acceleration), 1.0e-6);
@@ -518,7 +518,7 @@ public class CartesianOrbitTest {
     public void testEquatorialRetrograde() {
         Vector3D position = new Vector3D(10000000.0, 0.0, 0.0);
         Vector3D velocity = new Vector3D(0.0, -6500.0, 0.0);
-        double r2 = position.getNormSq();
+        double r2 = position.getNorm2Sq();
         double r  = FastMath.sqrt(r2);
         Vector3D acceleration = new Vector3D(-mu / (r * r2), position,
                                              1, new Vector3D(-0.1, 0.2, 0.3));

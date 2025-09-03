@@ -586,7 +586,7 @@ class NumericalPropagatorTest {
         final PVCoordinates pv = initialState.getPVCoordinates();
         final double dP = 0.001;
         final double dV = initialState.getOrbit().getMu() * dP /
-                          (pv.getPosition().getNormSq() * pv.getVelocity().getNorm());
+                          (pv.getPosition().getNorm2Sq() * pv.getVelocity().getNorm());
 
         final PVCoordinates pvcM = propagateInType(initialState, dP, OrbitType.CARTESIAN,   PositionAngleType.MEAN);
         final PVCoordinates pviM = propagateInType(initialState, dP, OrbitType.CIRCULAR,    PositionAngleType.MEAN);
@@ -648,7 +648,7 @@ class NumericalPropagatorTest {
         final PVCoordinates pv = state.getPVCoordinates();
         final double dP = 0.001;
         final double dV = state.getOrbit().getMu() * dP /
-                          (pv.getPosition().getNormSq() * pv.getVelocity().getNorm());
+                          (pv.getPosition().getNorm2Sq() * pv.getVelocity().getNorm());
 
         final PVCoordinates pvcM = propagateInType(state, dP, OrbitType.CARTESIAN, PositionAngleType.MEAN);
         final PVCoordinates pvkM = propagateInType(state, dP, OrbitType.KEPLERIAN, PositionAngleType.MEAN);

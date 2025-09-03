@@ -317,7 +317,7 @@ public class KeplerianOrbit extends Orbit implements PositionAngleBased<Kepleria
 
         // compute inclination
         final Vector3D momentum = pvCoordinates.getMomentum();
-        final double m2 = momentum.getNormSq();
+        final double m2 = momentum.getNorm2Sq();
         i = Vector3D.angle(momentum, Vector3D.PLUS_K);
 
         // compute right ascension of ascending node
@@ -327,9 +327,9 @@ public class KeplerianOrbit extends Orbit implements PositionAngleBased<Kepleria
         final Vector3D pvP     = pvCoordinates.getPosition();
         final Vector3D pvV     = pvCoordinates.getVelocity();
         final Vector3D pvA     = pvCoordinates.getAcceleration();
-        final double   r2      = pvP.getNormSq();
+        final double   r2      = pvP.getNorm2Sq();
         final double   r       = FastMath.sqrt(r2);
-        final double   V2      = pvV.getNormSq();
+        final double   V2      = pvV.getNorm2Sq();
         final double   rV2OnMu = r * V2 / mu;
 
         // compute semi-major axis (will be negative for hyperbolic orbits)
@@ -1017,7 +1017,7 @@ public class KeplerianOrbit extends Orbit implements PositionAngleBased<Kepleria
         computePVWithoutA();
 
         // acceleration
-        final double r2 = partialPV.getPosition().getNormSq();
+        final double r2 = partialPV.getPosition().getNorm2Sq();
         final Vector3D keplerianAcceleration = new Vector3D(-getMu() / (r2 * FastMath.sqrt(r2)), partialPV.getPosition());
         final Vector3D acceleration = hasNonKeplerianAcceleration() ?
                 keplerianAcceleration.add(nonKeplerianAcceleration()) :
@@ -1078,7 +1078,7 @@ public class KeplerianOrbit extends Orbit implements PositionAngleBased<Kepleria
             keplerianShifted.computePVWithoutA();
             final Vector3D fixedP   = new Vector3D(1, keplerianShifted.partialPV.getPosition(),
                     0.5 * dtS * dtS, nonKeplerianAcceleration);
-            final double   fixedR2 = fixedP.getNormSq();
+            final double   fixedR2 = fixedP.getNorm2Sq();
             final double   fixedR  = FastMath.sqrt(fixedR2);
             final Vector3D fixedV  = new Vector3D(1, keplerianShifted.partialPV.getVelocity(),
                     dtS, nonKeplerianAcceleration);
@@ -1124,8 +1124,8 @@ public class KeplerianOrbit extends Orbit implements PositionAngleBased<Kepleria
         final Vector3D position = partialPV.getPosition();
         final Vector3D velocity = partialPV.getVelocity();
         final Vector3D momentum = partialPV.getMomentum();
-        final double v2         = velocity.getNormSq();
-        final double r2         = position.getNormSq();
+        final double v2         = velocity.getNorm2Sq();
+        final double r2         = position.getNorm2Sq();
         final double r          = FastMath.sqrt(r2);
         final double r3         = r * r2;
 
@@ -1264,7 +1264,7 @@ public class KeplerianOrbit extends Orbit implements PositionAngleBased<Kepleria
         final Vector3D position = partialPV.getPosition();
         final Vector3D velocity = partialPV.getVelocity();
         final Vector3D momentum = partialPV.getMomentum();
-        final double r2         = position.getNormSq();
+        final double r2         = position.getNorm2Sq();
         final double r          = FastMath.sqrt(r2);
         final double r3         = r * r2;
 

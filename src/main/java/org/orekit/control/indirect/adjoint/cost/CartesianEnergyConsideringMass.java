@@ -90,7 +90,7 @@ abstract class CartesianEnergyConsideringMass extends AbstractCartesianCost {
     @Override
     public double getHamiltonianContribution(final double[] adjointVariables, final double mass) {
         final Vector3D thrustForce = getThrustAccelerationVector(adjointVariables, mass).scalarMultiply(mass);
-        return -thrustForce.getNormSq() / 2.;
+        return -thrustForce.getNorm2Sq() / 2.;
     }
 
     /**

@@ -103,7 +103,7 @@ public class SolarRadiationPressureTest extends AbstractLegacyForceModelTest {
 
             final Field<DerivativeStructure> field = position.getX().getField();
             final FieldVector3D<DerivativeStructure> sunSatVector = position.subtract(sun.getPosition(date, state.getFrame()));
-            final DerivativeStructure r2  = sunSatVector.getNormSq();
+            final DerivativeStructure r2  = sunSatVector.getNorm2Sq();
 
             // compute flux
             final DerivativeStructure ratio = ((SolarRadiationPressure) forceModel).getLightingRatio(state);
@@ -135,7 +135,7 @@ public class SolarRadiationPressureTest extends AbstractLegacyForceModelTest {
 
             final Field<Gradient> field = position.getX().getField();
             final FieldVector3D<Gradient> sunSatVector = position.subtract(sun.getPosition(date, state.getFrame()));
-            final Gradient r2  = sunSatVector.getNormSq();
+            final Gradient r2  = sunSatVector.getNorm2Sq();
 
             // compute flux
             final Gradient ratio = ((SolarRadiationPressure) forceModel).getLightingRatio(state);

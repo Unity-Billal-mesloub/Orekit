@@ -73,7 +73,7 @@ public class TabulatedEphemerisTest {
                 CartesianOrbit c = (CartesianOrbit) state.getOrbit();
                 Vector3D p    = c.getPosition();
                 Vector3D v    = c.getVelocity();
-                double r2 = p.getNormSq();
+                double r2 = p.getNorm2Sq();
                 double r  = FastMath.sqrt(r2);
                 Vector3D kepA = new Vector3D(-c.getMu() / (r * r2), c.getPosition());
                 return new SpacecraftState(new CartesianOrbit(new TimeStampedPVCoordinates(c.getDate(),

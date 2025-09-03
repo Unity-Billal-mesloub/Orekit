@@ -185,7 +185,7 @@ public class CartesianOrbit extends Orbit {
     /** {@inheritDoc} */
     public double getA() {
         final double r  = getPosition().getNorm();
-        final double V2 = getPVCoordinates().getVelocity().getNormSq();
+        final double V2 = getPVCoordinates().getVelocity().getNorm2Sq();
         return r / (2 - r * V2 / getMu());
     }
 
@@ -194,7 +194,7 @@ public class CartesianOrbit extends Orbit {
         if (hasNonKeplerianAcceleration) {
             final FieldPVCoordinates<UnivariateDerivative2> pv = getPVDerivatives();
             final UnivariateDerivative2 r  = pv.getPosition().getNorm();
-            final UnivariateDerivative2 V2 = pv.getVelocity().getNormSq();
+            final UnivariateDerivative2 V2 = pv.getVelocity().getNorm2Sq();
             final UnivariateDerivative2 a  = r.divide(r.multiply(V2).divide(getMu()).subtract(2).negate());
             return a.getDerivative(1);
         } else {
@@ -209,14 +209,14 @@ public class CartesianOrbit extends Orbit {
             // elliptic or circular orbit
             final Vector3D pvP   = getPosition();
             final Vector3D pvV   = getPVCoordinates().getVelocity();
-            final double rV2OnMu = pvP.getNorm() * pvV.getNormSq() / getMu();
+            final double rV2OnMu = pvP.getNorm() * pvV.getNorm2Sq() / getMu();
             final double eSE     = Vector3D.dotProduct(pvP, pvV) / FastMath.sqrt(muA);
             final double eCE     = rV2OnMu - 1;
             return FastMath.sqrt(eCE * eCE + eSE * eSE);
         } else {
             // hyperbolic orbit
             final Vector3D pvM = getPVCoordinates().getMomentum();
-            return FastMath.sqrt(1 - pvM.getNormSq() / muA);
+            return FastMath.sqrt(1 - pvM.getNorm2Sq() / muA);
         }
     }
 
@@ -227,7 +227,7 @@ public class CartesianOrbit extends Orbit {
             final FieldVector3D<UnivariateDerivative2> pvP   = pv.getPosition();
             final FieldVector3D<UnivariateDerivative2> pvV   = pv.getVelocity();
             final UnivariateDerivative2 r       = pvP.getNorm();
-            final UnivariateDerivative2 V2      = pvV.getNormSq();
+            final UnivariateDerivative2 V2      = pvV.getNorm2Sq();
             final UnivariateDerivative2 rV2OnMu = r.multiply(V2).divide(getMu());
             final UnivariateDerivative2 a       = r.divide(rV2OnMu.negate().add(2));
             final UnivariateDerivative2 eSE     = FieldVector3D.dotProduct(pvP, pvV).divide(a.multiply(getMu()).sqrt());
@@ -431,7 +431,7 @@ public class CartesianOrbit extends Orbit {
         if (dt != 0. && hasNonKeplerianAcceleration) {
 
             // extract non-Keplerian part of the initial acceleration
-            final double r2 = pvP.getNormSq();
+            final double r2 = pvP.getNorm2Sq();
             final double r = FastMath.sqrt(r2);
             final Vector3D nonKeplerianAcceleration = new Vector3D(1, getPVCoordinates().getAcceleration(),
                                                                    getMu() / (r2 * r), pvP);
@@ -441,7 +441,7 @@ public class CartesianOrbit extends Orbit {
             final Vector3D shiftedV = shiftedPV.getVelocity();
             final Vector3D fixedP   = new Vector3D(1, shiftedP,
                                                    0.5 * dt * dt, nonKeplerianAcceleration);
-            final double   fixedR2 = fixedP.getNormSq();
+            final double   fixedR2 = fixedP.getNorm2Sq();
             final double   fixedR  = FastMath.sqrt(fixedR2);
             final Vector3D fixedV  = new Vector3D(1, shiftedV,
                                                   dt, nonKeplerianAcceleration);
@@ -487,7 +487,7 @@ public class CartesianOrbit extends Orbit {
 
         // velocity derivative is Newtonian acceleration
         final Vector3D position = pv.getPosition();
-        final double r2         = position.getNormSq();
+        final double r2         = position.getNorm2Sq();
         final double coeff      = -gm / (r2 * FastMath.sqrt(r2));
         pDot[3] += coeff * position.getX();
         pDot[4] += coeff * position.getY();

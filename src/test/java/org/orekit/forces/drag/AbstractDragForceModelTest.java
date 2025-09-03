@@ -105,12 +105,12 @@ class AbstractDragForceModelTest {
 
         @Override
         public double getDensity(AbsoluteDate date, Vector3D position, Frame frame) {
-            return FastMath.exp(-position.getNormSq());
+            return FastMath.exp(-position.getNorm2Sq());
         }
 
         @Override
         public <T extends CalculusFieldElement<T>> T getDensity(FieldAbsoluteDate<T> date, FieldVector3D<T> position, Frame frame) {
-            return FastMath.exp(position.getNormSq().negate());
+            return FastMath.exp(position.getNorm2Sq().negate());
         }
     }
 

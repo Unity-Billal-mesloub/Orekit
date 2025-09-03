@@ -77,7 +77,7 @@ class FieldOrbitTest {
 
     private static <T extends CalculusFieldElement<T>> FieldPVCoordinates<T> createFieldTPVWithKeplerianAcceleration(final T mu) {
         final Vector3D position = new Vector3D(1e6, 0, 0);
-        final Vector3D keplerianAcceleration = new Vector3D(-mu.getReal() / position.getNormSq() / position.getNorm(),
+        final Vector3D keplerianAcceleration = new Vector3D(-mu.getReal() / position.getNorm2Sq() / position.getNorm(),
                 position);
         return new FieldPVCoordinates<>(mu.getField(), new PVCoordinates(position, Vector3D.ZERO, keplerianAcceleration));
     }

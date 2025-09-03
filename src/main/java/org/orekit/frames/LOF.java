@@ -207,7 +207,7 @@ public interface LOF {
             final FieldVector3D<T> p        = pv.getPosition();
             final FieldVector3D<T> momentum = pv.getMomentum();
             final FieldTransform<T> rotation = new FieldTransform<>(date, r,
-                    new FieldVector3D<>(p.getNormSq().reciprocal(), r.applyTo(momentum)));
+                    new FieldVector3D<>(p.getNorm2Sq().reciprocal(), r.applyTo(momentum)));
 
             return new FieldTransform<>(date, translation, rotation);
 
@@ -316,7 +316,7 @@ public interface LOF {
             final Vector3D  p        = pv.getPosition();
             final Vector3D  momentum = pv.getMomentum();
             final AngularCoordinates angularCoordinates = new AngularCoordinates(r,
-                new Vector3D(1.0 / p.getNormSq(), r.applyTo(momentum)));
+                new Vector3D(1.0 / p.getNorm2Sq(), r.applyTo(momentum)));
 
             return new Transform(date, pv.negate(), angularCoordinates);
 

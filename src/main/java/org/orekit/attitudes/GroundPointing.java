@@ -158,7 +158,7 @@ public abstract class GroundPointing implements AttitudeProvider {
         final Vector3D p  = pva.getPosition();
         final Vector3D v  = pva.getVelocity();
         final Vector3D a  = pva.getAcceleration();
-        final double   r2 = p.getNormSq();
+        final double   r2 = p.getNorm2Sq();
         final double   r  = FastMath.sqrt(r2);
         final Vector3D keplerianJerk = new Vector3D(-3 * Vector3D.dotProduct(p, v) / r2, a, -a.getNorm() / r, v);
         final PVCoordinates velocity = new PVCoordinates(v, a, keplerianJerk);
@@ -193,7 +193,7 @@ public abstract class GroundPointing implements AttitudeProvider {
         final FieldVector3D<T> p  = pva.getPosition();
         final FieldVector3D<T> v  = pva.getVelocity();
         final FieldVector3D<T> a  = pva.getAcceleration();
-        final T   r2 = p.getNormSq();
+        final T   r2 = p.getNorm2Sq();
         final T   r  = r2.sqrt();
         final FieldVector3D<T> keplerianJerk = new FieldVector3D<>(FieldVector3D.dotProduct(p, v).multiply(-3).divide(r2), a, a.getNorm().divide(r).multiply(-1), v);
         final FieldPVCoordinates<T> velocity = new FieldPVCoordinates<>(v, a, keplerianJerk);

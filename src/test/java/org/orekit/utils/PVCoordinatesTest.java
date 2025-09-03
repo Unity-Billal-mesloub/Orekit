@@ -496,7 +496,7 @@ public class PVCoordinatesTest {
         final Vector3D p  = pva.getPosition();
         final Vector3D v  = pva.getVelocity();
         final Vector3D a  = pva.getAcceleration();
-        final double   r2 = p.getNormSq();
+        final double   r2 = p.getNorm2Sq();
         final double   r  = FastMath.sqrt(r2);
         final Vector3D keplerianJerk = new Vector3D(-3 * Vector3D.dotProduct(p, v) / r2, a, -a.getNorm() / r, v);
         final PVCoordinates velocity = new PVCoordinates(v, a, keplerianJerk);
@@ -558,7 +558,7 @@ public class PVCoordinatesTest {
         //action + verify
         Assertions.assertEquals(
                 new PVCoordinates(p, v).getAngularVelocity(),
-                p.crossProduct(v).scalarMultiply(1.0 / p.getNormSq()));
+                p.crossProduct(v).scalarMultiply(1.0 / p.getNorm2Sq()));
         //check extra simple cases
         Assertions.assertEquals(
                 new PVCoordinates(Vector3D.PLUS_I, Vector3D.MINUS_I).getAngularVelocity(),

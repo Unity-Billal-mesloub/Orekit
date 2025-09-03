@@ -618,7 +618,7 @@ public class FieldNumericalPropagatorTest {
         // Propagation of the initial at t + dt
         final FieldPVCoordinates<T> pv = initialState.getPVCoordinates();
         final T dP = zero.add(0.001);
-        final T dV = pv.getPosition().getNormSq().multiply(pv.getVelocity().getNorm()).reciprocal().multiply(dP.multiply(initialState.getOrbit().getMu()));
+        final T dV = pv.getPosition().getNorm2Sq().multiply(pv.getVelocity().getNorm()).reciprocal().multiply(dP.multiply(initialState.getOrbit().getMu()));
 
         final FieldPVCoordinates<T> pvcM = propagateInType(initialState, dP, OrbitType.CARTESIAN,   PositionAngleType.MEAN, propagator);
         final FieldPVCoordinates<T> pviM = propagateInType(initialState, dP, OrbitType.CIRCULAR,    PositionAngleType.MEAN, propagator);
@@ -703,7 +703,7 @@ public class FieldNumericalPropagatorTest {
         final FieldPVCoordinates<T> pv = state.getPVCoordinates();
         final T dP = zero.add(0.001);
         final T dV = dP.multiply(state.getOrbit().getMu()).divide(
-                          pv.getPosition().getNormSq().multiply(pv.getVelocity().getNorm()));
+                          pv.getPosition().getNorm2Sq().multiply(pv.getVelocity().getNorm()));
 
         final FieldPVCoordinates<T> pvcM = propagateInType(state, dP, OrbitType.CARTESIAN, PositionAngleType.MEAN, propagator);
         final FieldPVCoordinates<T> pvkM = propagateInType(state, dP, OrbitType.KEPLERIAN, PositionAngleType.MEAN, propagator);

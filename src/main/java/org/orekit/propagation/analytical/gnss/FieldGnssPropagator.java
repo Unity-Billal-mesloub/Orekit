@@ -449,7 +449,7 @@ public class FieldGnssPropagator<T extends CalculusFieldElement<T>> extends Fiel
 
         // recover eccentricity and anomaly
         final T mu = initialState.getOrbit().getMu();
-        final T rV2OMu           = rk.multiply(v.getNormSq()).divide(mu);
+        final T rV2OMu           = rk.multiply(v.getNorm2Sq()).divide(mu);
         final T sma              = rk.divide(rV2OMu.negate().add(2));
         final T eCosE            = rV2OMu.subtract(1);
         final T eSinE            = FieldVector3D.dotProduct(p, v).divide(FastMath.sqrt(mu.multiply(sma)));

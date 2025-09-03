@@ -273,9 +273,9 @@ public class EquinoctialOrbit extends Orbit implements PositionAngleBased<Equino
         final Vector3D pvP   = pvCoordinates.getPosition();
         final Vector3D pvV   = pvCoordinates.getVelocity();
         final Vector3D pvA   = pvCoordinates.getAcceleration();
-        final double r2      = pvP.getNormSq();
+        final double r2      = pvP.getNorm2Sq();
         final double r       = FastMath.sqrt(r2);
-        final double V2      = pvV.getNormSq();
+        final double V2      = pvV.getNorm2Sq();
         final double rV2OnMu = r * V2 / mu;
 
         // compute semi-major axis
@@ -810,7 +810,7 @@ public class EquinoctialOrbit extends Orbit implements PositionAngleBased<Equino
         computePVWithoutA();
 
         // acceleration
-        final double r2 = partialPV.getPosition().getNormSq();
+        final double r2 = partialPV.getPosition().getNorm2Sq();
         final Vector3D keplerianAcceleration = new Vector3D(-getMu() / (r2 * FastMath.sqrt(r2)), partialPV.getPosition());
         final Vector3D acceleration = hasNonKeplerianRates() ?
                                       keplerianAcceleration.add(nonKeplerianAcceleration()) :
@@ -873,7 +873,7 @@ public class EquinoctialOrbit extends Orbit implements PositionAngleBased<Equino
             keplerianShifted.computePVWithoutA();
             final Vector3D fixedP   = new Vector3D(1, keplerianShifted.partialPV.getPosition(),
                                                    0.5 * dtS * dtS, nonKeplerianAcceleration);
-            final double   fixedR2 = fixedP.getNormSq();
+            final double   fixedR2 = fixedP.getNorm2Sq();
             final double   fixedR  = FastMath.sqrt(fixedR2);
             final Vector3D fixedV  = new Vector3D(1, keplerianShifted.partialPV.getVelocity(),
                                                   dtS, nonKeplerianAcceleration);
@@ -902,7 +902,7 @@ public class EquinoctialOrbit extends Orbit implements PositionAngleBased<Equino
         computePVWithoutA();
         final Vector3D position = partialPV.getPosition();
         final Vector3D velocity = partialPV.getVelocity();
-        final double r2         = position.getNormSq();
+        final double r2         = position.getNorm2Sq();
         final double r          = FastMath.sqrt(r2);
         final double r3         = r * r2;
 
