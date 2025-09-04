@@ -530,7 +530,7 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
             outputField(sis.toString(), 6, false);
             // list the entries in the order specified in SYS / # / OBS TYPES
             for (final String obsType : header.getTypeObs().get(sis.getSystem())) {
-                Integer nbObs = entry1.getValue().get(obsType);
+                final Integer nbObs = entry1.getValue().get(obsType);
                 int next = getColumn() + 6;
                 if (exceedsHeaderLength(next)) {
                     // we need to set up a continuation line
