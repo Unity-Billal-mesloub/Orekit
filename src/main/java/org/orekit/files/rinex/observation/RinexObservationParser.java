@@ -266,10 +266,10 @@ public class RinexObservationParser {
         private int eventFlag;
 
         /** Scaling factors. */
-        private final List<ObservationType> typesObsScaleFactor;
+        private final List<String> typesObsScaleFactor;
 
         /** Types of observations. */
-        private final List<ObservationType> typesObs;
+        private final List<String> typesObs;
 
         /** Observations. */
         private final List<ObservationData> observations;
@@ -480,9 +480,9 @@ public class RinexObservationParser {
                          (line, parseInfo) -> {
                              final int scaleFactor      = FastMath.max(1, ParsingUtils.parseInt(line, 0, 6));
                              final int nbObsScaleFactor = ParsingUtils.parseInt(line, 6, 6);
-                             final List<ObservationType> types = new ArrayList<>(nbObsScaleFactor);
+                             final List<String> types = new ArrayList<>(nbObsScaleFactor);
                              for (int i = 0; i < nbObsScaleFactor; i++) {
-                                 types.add(parseInfo.typeBuilder.apply(ParsingUtils.parseString(line, 16 + (6 * i), 2)));
+                                 types.add(ParsingUtils.parseString(line, 16 + (6 * i), 2));
                              }
                              parseInfo.file.getHeader().addScaleFactorCorrection(parseInfo.file.getHeader().getSatelliteSystem(),
                                                                                  new ScaleFactorCorrection(scaleFactor, types));
@@ -554,13 +554,7 @@ public class RinexObservationParser {
                                    for (int i = firstIndex;
                                                    (i + size) <= header.getLabelIndex() && parseInfo.typesObs.size() < parseInfo.nbTypes;
                                                    i += increment) {
-                                       final String type = ParsingUtils.parseString(line, i, size);
-                                       try {
-                                           parseInfo.typesObs.add(parseInfo.typeBuilder.apply(type));
-                                       } catch (IllegalArgumentException iae) {
-                                           throw new OrekitException(iae, OrekitMessages.UNKNOWN_RINEX_FREQUENCY,
-                                                                     type, parseInfo.name, parseInfo.lineNumber);
-                                       }
+                                       parseInfo.typesObs.add(ParsingUtils.parseString(line, i, size));
                                    }
 
                                    if (parseInfo.typesObs.size() == parseInfo.nbTypes) {
@@ -671,8 +665,7 @@ public class RinexObservationParser {
                                  for (int i = 11;
                                       i < header.getLabelIndex() && parseInfo.typesObsScaleFactor.size() < parseInfo.nbObsScaleFactor;
                                       i += 4) {
-                                     parseInfo.typesObsScaleFactor.add(parseInfo.typeBuilder.apply(
-                                         ParsingUtils.parseString(line, i, 3)));
+                                     parseInfo.typesObsScaleFactor.add(ParsingUtils.parseString(line, i, 3));
                                  }
                              }
 
@@ -801,11 +794,11 @@ public class RinexObservationParser {
                       (line, parseInfo) ->  {
                           final RinexObservationHeader header = parseInfo.file.getHeader();
                           final String systemName = ParsingUtils.parseString(line, 3, 1);
-                          if (!systemName.isEmpty()) {
+                          if (systemName != null && !systemName.isEmpty()) {
                               parseInfo.currentSat = new SatInSystem(line.substring(3, 6));
                               parseInfo.nbTypes    = 0;
                           }
-                          final List<ObservationType> types = header.getTypeObs().get(parseInfo.currentSat.getSystem());
+                          final List<String> types = header.getTypeObs().get(parseInfo.currentSat.getSystem());
 
                           final int firstIndex = 6;
                           final int increment  = 6;
@@ -814,7 +807,7 @@ public class RinexObservationParser {
                                (i + size) <= header.getLabelIndex() && parseInfo.nbTypes < types.size();
                                i += increment) {
                               final String nb = ParsingUtils.parseString(line, i, size);
-                              if (!nb.isEmpty()) {
+                              if (nb != null && !nb.isEmpty()) {
                                   header.setNbObsPerSatellite(parseInfo.currentSat, types.get(parseInfo.nbTypes),
                                                               ParsingUtils.parseInt(line, i, size));
                               }
@@ -973,7 +966,8 @@ public class RinexObservationParser {
         /** Parser for Rinex 2 observation line. */
         RINEX_2_OBSERVATION((header, line) -> true,
                             (line, parseInfo) -> {
-                                final List<ObservationType> types = parseInfo.file.getHeader().getTypeObs().get(parseInfo.file.getHeader().getSatelliteSystem());
+                                final List<String> types = parseInfo.file.getHeader().getTypeObs().
+                                                           get(parseInfo.file.getHeader().getSatelliteSystem());
                                 for (int index = 0;
                                      parseInfo.observations.size() < types.size() && index < 80;
                                      index += 16) {
@@ -983,9 +977,9 @@ public class RinexObservationParser {
                                         observationData = null;
                                     } else {
                                         // this is a regular observation line
-                                        final ObservationType type    = types.get(parseInfo.observations.size());
-                                        final double          scaling = getScaling(parseInfo, type, parseInfo.currentSystem);
-                                        observationData = new ObservationData(type,
+                                        final String type    = types.get(parseInfo.observations.size());
+                                        final double scaling = getScaling(parseInfo, type, parseInfo.currentSystem);
+                                        observationData = new ObservationData(parseInfo.typeBuilder.apply(type),
                                                                               scaling * ParsingUtils.parseDouble(line, index, 14),
                                                                               ParsingUtils.parseInt(line, index + 14, 1),
                                                                               ParsingUtils.parseInt(line, index + 15, 1));
@@ -1013,7 +1007,7 @@ public class RinexObservationParser {
         RINEX_3_OBSERVATION((header, line) -> true,
                             (line, parseInfo) -> {
                                 final SatInSystem sat = new SatInSystem(line.substring(0, 3));
-                                final List<ObservationType> types = parseInfo.file.getHeader().getTypeObs().get(sat.getSystem());
+                                final List<String> types = parseInfo.file.getHeader().getTypeObs().get(sat.getSystem());
                                 for (int index = 3;
                                      parseInfo.observations.size() < types.size();
                                      index += 16) {
@@ -1023,9 +1017,9 @@ public class RinexObservationParser {
                                         observationData = null;
                                     } else {
                                         // this is a regular observation line
-                                        final ObservationType type    = types.get(parseInfo.observations.size());
-                                        final double          scaling = getScaling(parseInfo, type, sat.getSystem());
-                                        observationData = new ObservationData(type,
+                                        final String type    = types.get(parseInfo.observations.size());
+                                        final double scaling = getScaling(parseInfo, type, sat.getSystem());
+                                        observationData = new ObservationData(parseInfo.typeBuilder.apply(type),
                                                                               scaling * ParsingUtils.parseDouble(line, index, 14),
                                                                               ParsingUtils.parseInt(line, index + 14, 1),
                                                                               ParsingUtils.parseInt(line, index + 15, 1));
@@ -1267,7 +1261,7 @@ public class RinexObservationParser {
          * @param system satellite system for the observation
          * @return scaling factor
          */
-        private static double getScaling(final ParseInfo parseInfo, final ObservationType type,
+        private static double getScaling(final ParseInfo parseInfo, final String type,
                                          final SatelliteSystem system) {
 
             for (final ScaleFactorCorrection scaleFactorCorrection :

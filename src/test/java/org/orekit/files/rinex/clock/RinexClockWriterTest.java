@@ -242,9 +242,9 @@ public class RinexClockWriterTest {
             checkPCV(first.getListAppliedPCVS().get(i), second.getListAppliedPCVS().get(i));
         }
         Assertions.assertEquals(first.getTypeObs().size(), second.getTypeObs().size());
-        for (final Map.Entry<SatelliteSystem, List<ObservationType>> firstE : first.getTypeObs().entrySet()) {
-            List<ObservationType> firstT  = firstE.getValue();
-            List<ObservationType> secondT = second.getTypeObs().get(firstE.getKey());
+        for (final Map.Entry<SatelliteSystem, List<String>> firstE : first.getTypeObs().entrySet()) {
+            List<String> firstT  = firstE.getValue();
+            List<String> secondT = second.getTypeObs().get(firstE.getKey());
             Assertions.assertEquals(firstT.size(), secondT.size());
             for (int i = 0; i < firstT.size(); ++i) {
                 Assertions.assertEquals(firstT.get(i), secondT.get(i));

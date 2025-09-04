@@ -19,7 +19,6 @@ package org.orekit.files.rinex.section;
 import org.orekit.files.rinex.AppliedDCBS;
 import org.orekit.files.rinex.AppliedPCVS;
 import org.orekit.files.rinex.utils.RinexFileType;
-import org.orekit.gnss.ObservationType;
 import org.orekit.gnss.SatelliteSystem;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import java.util.Map;
 public abstract class RinexClockObsBaseHeader extends RinexBaseHeader {
 
     /** Observation types for each satellite systems. */
-    private final Map<SatelliteSystem, List<ObservationType>> mapTypeObs;
+    private final Map<SatelliteSystem, List<String>> mapTypeObs;
 
     /** List of applied differential code bias corrections. */
     private final List<AppliedDCBS> listAppliedDCBS;
@@ -56,14 +55,14 @@ public abstract class RinexClockObsBaseHeader extends RinexBaseHeader {
      * @param system satellite system
      * @param types observation types
      */
-    public void setTypeObs(final SatelliteSystem system, final List<ObservationType> types) {
+    public void setTypeObs(final SatelliteSystem system, final List<String> types) {
         mapTypeObs.put(system, new ArrayList<>(types));
     }
 
     /** Get an unmodifiable view of the map of observation types.
      * @return unmodifiable view of the map of observation types
      */
-    public Map<SatelliteSystem, List<ObservationType>> getTypeObs() {
+    public Map<SatelliteSystem, List<String>> getTypeObs() {
         return Collections.unmodifiableMap(mapTypeObs);
     }
 

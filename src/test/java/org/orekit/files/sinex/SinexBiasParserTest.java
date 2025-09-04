@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.orekit.Utils;
 import org.orekit.data.DataSource;
-import org.orekit.gnss.ObservationType;
 import org.orekit.gnss.PredefinedObservationType;
 import org.orekit.gnss.PredefinedTimeSystem;
 import org.orekit.gnss.SatInSystem;
@@ -112,15 +111,19 @@ public class SinexBiasParserTest {
         Assertions.assertTrue(sinexBias.getStationsOsb().isEmpty());
         
         // Observation Pair test
-        HashSet<Pair<ObservationType, ObservationType>> ObsPairs = dsb.getAvailableObservationPairs();
+        HashSet<Pair<String, String>> ObsPairs = dsb.getAvailableObservationPairs();
         
         // Defining the observation pair present in the truncated file.
-        Pair<ObservationType, ObservationType> OP1 = new Pair<>(PredefinedObservationType.C1C, PredefinedObservationType.C1W);
-        Pair<ObservationType, ObservationType> OP2 = new Pair<>(PredefinedObservationType.C1C, PredefinedObservationType.C2W);
-        Pair<ObservationType, ObservationType> OP3 = new Pair<>(PredefinedObservationType.C1C, PredefinedObservationType.C5Q);
-        Pair<ObservationType, ObservationType> OP4 = new Pair<>(PredefinedObservationType.C2W, PredefinedObservationType.C2L);
+        Pair<String, String> OP1 = new Pair<>(PredefinedObservationType.C1C.getName(),
+                                              PredefinedObservationType.C1W.getName());
+        Pair<String, String> OP2 = new Pair<>(PredefinedObservationType.C1C.getName(),
+                                              PredefinedObservationType.C2W.getName());
+        Pair<String, String> OP3 = new Pair<>(PredefinedObservationType.C1C.getName(),
+                                              PredefinedObservationType.C5Q.getName());
+        Pair<String, String> OP4 = new Pair<>(PredefinedObservationType.C2W.getName(),
+                                              PredefinedObservationType.C2L.getName());
         
-        HashSet<Pair<ObservationType, ObservationType>> observationSetsRef = new HashSet<>();
+        HashSet<Pair<String, String>> observationSetsRef = new HashSet<>();
         observationSetsRef.add(OP1);
         observationSetsRef.add(OP2);
         observationSetsRef.add(OP3);
@@ -130,8 +133,8 @@ public class SinexBiasParserTest {
         Assertions.assertEquals(ObsPairs, observationSetsRef);
         
         // Defining observation codes for further checks.
-        ObservationType Obs1 = PredefinedObservationType.C1C;
-        ObservationType Obs2 = PredefinedObservationType.C1W;
+        String Obs1 = PredefinedObservationType.C1C.getName();
+        String Obs2 = PredefinedObservationType.C1W.getName();
         
         // Minimum Date test
         AbsoluteDate refFirstDate = new AbsoluteDate(new DateComponents(2021, 274),
@@ -167,9 +170,10 @@ public class SinexBiasParserTest {
                                                        new TimeComponents(43200),
                                                        TimeScalesFactory.getGPS());
         
-        double valueDsbStation = differentialSignalBiasTestStation.getBias(PredefinedObservationType.C1C,
-                                                       PredefinedObservationType.C1P,
-                                                       refDateStation);
+        double valueDsbStation = differentialSignalBiasTestStation.
+                                 getBias(PredefinedObservationType.C1C.getName(),
+                                         PredefinedObservationType.C1P.getName(),
+                                         refDateStation);
         double valueDsbRealStation = -0.6458e-9 * Constants.SPEED_OF_LIGHT;
         
         Assertions.assertEquals(valueDsbRealStation, valueDsbStation, 1e-13);
@@ -212,28 +216,28 @@ public class SinexBiasParserTest {
         final TimeScale timeScale = ts.getTimeScale(TimeScalesFactory.getTimeScales());
 
         // Observations test
-        HashSet<ObservationType> types = osb.getAvailableObservations();
+        HashSet<String> types = osb.getAvailableObservations();
         Assertions.assertEquals(4, types.size());
-        Assertions.assertTrue(types.contains(PredefinedObservationType.C1C));
-        Assertions.assertTrue(types.contains(PredefinedObservationType.C1X));
-        Assertions.assertTrue(types.contains(PredefinedObservationType.C5Q));
-        Assertions.assertTrue(types.contains(PredefinedObservationType.C5X));
+        Assertions.assertTrue(types.contains(PredefinedObservationType.C1C.getName()));
+        Assertions.assertTrue(types.contains(PredefinedObservationType.C1X.getName()));
+        Assertions.assertTrue(types.contains(PredefinedObservationType.C5Q.getName()));
+        Assertions.assertTrue(types.contains(PredefinedObservationType.C5X.getName()));
 
         // Minimum Date test
         AbsoluteDate refFirstDate = new AbsoluteDate(new DateComponents(2024, 237),
                                                      TimeComponents.H00,
                                                      timeScale);
-        AbsoluteDate firstDate =  osb.getMinimumValidDateForObservation(PredefinedObservationType.C5X);
+        AbsoluteDate firstDate =  osb.getMinimumValidDateForObservation(PredefinedObservationType.C5X.getName());
         Assertions.assertEquals(refFirstDate, firstDate);
 
         // Max Date Test
         AbsoluteDate refLastDate = new AbsoluteDate(new DateComponents(2024, 267),
                                                     TimeComponents.H00,
                                                     timeScale);
-        AbsoluteDate lastDate =  osb.getMaximumValidDateForObservation(PredefinedObservationType.C5X);
+        AbsoluteDate lastDate =  osb.getMaximumValidDateForObservation(PredefinedObservationType.C5X.getName());
         Assertions.assertEquals(refLastDate, lastDate);
 
-        double valueOsb = osb.getBias(PredefinedObservationType.C5X,
+        double valueOsb = osb.getBias(PredefinedObservationType.C5X.getName(),
                                       new AbsoluteDate(new DateComponents(2024, 250),
                                                        TimeComponents.H00,
                                                        timeScale));
@@ -260,27 +264,27 @@ public class SinexBiasParserTest {
         Assertions.assertEquals("TUKT", staOsb.getSiteCode());
 
         // Observations test
-        HashSet<ObservationType> types = osb.getAvailableObservations();
+        HashSet<String> types = osb.getAvailableObservations();
         Assertions.assertEquals(3, types.size());
-        Assertions.assertTrue(types.contains(PredefinedObservationType.C1C));
-        Assertions.assertTrue(types.contains(PredefinedObservationType.C1X));
-        Assertions.assertTrue(types.contains(PredefinedObservationType.C6A));
+        Assertions.assertTrue(types.contains(PredefinedObservationType.C1C.getName()));
+        Assertions.assertTrue(types.contains(PredefinedObservationType.C1X.getName()));
+        Assertions.assertTrue(types.contains(PredefinedObservationType.C6A.getName()));
 
         // Minimum Date test
         AbsoluteDate refFirstDate = new AbsoluteDate(new DateComponents(2024, 237),
                                                      TimeComponents.H00,
                                                      timeScale);
-        AbsoluteDate firstDate =  osb.getMinimumValidDateForObservation(PredefinedObservationType.C1C);
+        AbsoluteDate firstDate =  osb.getMinimumValidDateForObservation(PredefinedObservationType.C1C.getName());
         Assertions.assertEquals(refFirstDate, firstDate);
 
         // Max Date Test
         AbsoluteDate refLastDate = new AbsoluteDate(new DateComponents(2024, 267),
                                                     TimeComponents.H00,
                                                     timeScale);
-        AbsoluteDate lastDate =  osb.getMaximumValidDateForObservation(PredefinedObservationType.C1X);
+        AbsoluteDate lastDate =  osb.getMaximumValidDateForObservation(PredefinedObservationType.C1X.getName());
         Assertions.assertEquals(refLastDate, lastDate);
 
-        double valueOsb = osb.getBias(PredefinedObservationType.C6A,
+        double valueOsb = osb.getBias(PredefinedObservationType.C6A.getName(),
                                       new AbsoluteDate(new DateComponents(2024, 250),
                                                        TimeComponents.H00,
                                                        timeScale));
@@ -292,14 +296,14 @@ public class SinexBiasParserTest {
                                  getStationsOsb().
                                  get("BRUX").
                                  getOsb(SatelliteSystem.GALILEO).
-                                 getBias(PredefinedObservationType.L6A,
+                                 getBias(PredefinedObservationType.L6A.getName(),
                                          new AbsoluteDate(new DateComponents(2024, 250), TimeComponents.H00, timeScale));
         Assertions.assertEquals(1.7e-3, phaseBias, 1.0e-15);
 
     }
 
     private SinexBias load(final String name) {
-        return new SinexBiasParser(TimeScalesFactory.getTimeScales(), SinexBiasParser::defaultTypeBuilder).
+        return new SinexBiasParser(TimeScalesFactory.getTimeScales()).
                parse(new DataSource(name, () -> SinexParserTest.class.getResourceAsStream(name)));
     }
 

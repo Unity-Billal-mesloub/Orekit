@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
@@ -206,7 +207,8 @@ public class RinexObservationParserTest {
         final String name = "rinex/custom-system.01o";
         final DataSource dataSource = new DataSource(name, () -> Utils.class.getClassLoader().getResourceAsStream(name));
         final AtomicBoolean found = new AtomicBoolean(false);
-        final RinexObservation loaded = new RinexObservationParser(CustomType::new,
+        final Function<? super String, ? extends ObservationType> typeBuilder = CustomType::new;
+        final RinexObservation loaded = new RinexObservationParser(typeBuilder,
                                                                    (system, timeScales) -> {
                                                                        Assertions.assertEquals(SatelliteSystem.USER_DEFINED_K, system);
                                                                        found.set(true);
@@ -216,20 +218,22 @@ public class RinexObservationParserTest {
                                                                    TimeScalesFactory.getTimeScales()).
                                         parse(dataSource);
         Assertions.assertTrue(found.get());
-        final Map<SatelliteSystem, List<ObservationType>> map = loaded.getHeader().getTypeObs();
+        final Map<SatelliteSystem, List<String>> map = loaded.getHeader().getTypeObs();
         Assertions.assertEquals(1, map.size());
-        final List<ObservationType> types = map.get(SatelliteSystem.USER_DEFINED_K);
+        final List<String> types = map.get(SatelliteSystem.USER_DEFINED_K);
         Assertions.assertEquals(2, types.size());
-        Assertions.assertEquals("X1C", types.get(0).getName());
-        Assertions.assertEquals(MeasurementType.TWO_WAY_TIME_TRANSFER, types.get(0).getMeasurementType());
-        Assertions.assertEquals(1.0, types.get(0).getSignal(SatelliteSystem.USER_DEFINED_K).getRatio(), 1.0e-15);
-        Assertions.assertEquals("U09", types.get(0).getSignal(SatelliteSystem.USER_DEFINED_K).getName());
-        Assertions.assertEquals(SatelliteSystem.USER_DEFINED_K, types.get(0).getSignal(SatelliteSystem.USER_DEFINED_K).getSatelliteSystem());
-        Assertions.assertEquals(GnssSignal.F0, types.get(0).getSignal(SatelliteSystem.USER_DEFINED_K).getFrequency(), 1.0);
-        Assertions.assertNull(types.get(0).getSignal(SatelliteSystem.USER_DEFINED_A));
-        Assertions.assertNull(types.get(0).getSignal(SatelliteSystem.GALILEO));
-        Assertions.assertEquals("Y1C", types.get(1).getName());
-        Assertions.assertEquals(MeasurementType.CARRIER_PHASE, types.get(1).getMeasurementType());
+        final ObservationType t0 = typeBuilder.apply(types.get(0));
+        Assertions.assertEquals("X1C", t0.getName());
+        Assertions.assertEquals(MeasurementType.TWO_WAY_TIME_TRANSFER, t0.getMeasurementType());
+        Assertions.assertEquals(1.0, t0.getSignal(SatelliteSystem.USER_DEFINED_K).getRatio(), 1.0e-15);
+        Assertions.assertEquals("U09", t0.getSignal(SatelliteSystem.USER_DEFINED_K).getName());
+        Assertions.assertEquals(SatelliteSystem.USER_DEFINED_K, t0.getSignal(SatelliteSystem.USER_DEFINED_K).getSatelliteSystem());
+        Assertions.assertEquals(GnssSignal.F0, t0.getSignal(SatelliteSystem.USER_DEFINED_K).getFrequency(), 1.0);
+        Assertions.assertNull(t0.getSignal(SatelliteSystem.USER_DEFINED_A));
+        Assertions.assertNull(t0.getSignal(SatelliteSystem.GALILEO));
+        final ObservationType t1 = typeBuilder.apply(types.get(1));
+        Assertions.assertEquals("Y1C", t1.getName());
+        Assertions.assertEquals(MeasurementType.CARRIER_PHASE, t1.getMeasurementType());
     }
 
     @Test
@@ -886,18 +890,6 @@ public class RinexObservationParserTest {
     }
 
     @Test
-    public void testUnknownFrequency() {
-        try {
-            load("rinex/unknown-rinex-frequency.00o");
-            Assertions.fail("an exception should have been thrown");
-        } catch (OrekitException oe) {
-            Assertions.assertEquals(OrekitMessages.UNKNOWN_RINEX_FREQUENCY, oe.getSpecifier());
-            Assertions.assertEquals("AAA", oe.getParts()[0]);
-            Assertions.assertEquals(14, ((Integer) oe.getParts()[2]).intValue());
-        }
-    }
-
-    @Test
     public void testDCBSApplied() {
         RinexObservation l = load("rinex/dcbs.00o");
         Assertions.assertEquals(51, l.getObservationDataSets().size());
@@ -915,15 +907,24 @@ public class RinexObservationParserTest {
         Assertions.assertEquals(12, header.getTypeObs().get(SatelliteSystem.GLONASS).size());
         Assertions.assertEquals(12, header.getTypeObs().get(SatelliteSystem.GALILEO).size());
         Assertions.assertEquals( 9, header.getTypeObs().get(SatelliteSystem.BEIDOU).size());
-        Assertions.assertEquals(PredefinedObservationType.C1I, header.getTypeObs().get(SatelliteSystem.BEIDOU).get(0));
-        Assertions.assertEquals(PredefinedObservationType.L1I, header.getTypeObs().get(SatelliteSystem.BEIDOU).get(1));
-        Assertions.assertEquals(PredefinedObservationType.S1I, header.getTypeObs().get(SatelliteSystem.BEIDOU).get(2));
-        Assertions.assertEquals(PredefinedObservationType.C7I, header.getTypeObs().get(SatelliteSystem.BEIDOU).get(3));
-        Assertions.assertEquals(PredefinedObservationType.L7I, header.getTypeObs().get(SatelliteSystem.BEIDOU).get(4));
-        Assertions.assertEquals(PredefinedObservationType.S7I, header.getTypeObs().get(SatelliteSystem.BEIDOU).get(5));
-        Assertions.assertEquals(PredefinedObservationType.C6I, header.getTypeObs().get(SatelliteSystem.BEIDOU).get(6));
-        Assertions.assertEquals(PredefinedObservationType.L6I, header.getTypeObs().get(SatelliteSystem.BEIDOU).get(7));
-        Assertions.assertEquals(PredefinedObservationType.S6I, header.getTypeObs().get(SatelliteSystem.BEIDOU).get(8));
+        Assertions.assertEquals(PredefinedObservationType.C1I.getName(),
+                                header.getTypeObs().get(SatelliteSystem.BEIDOU).get(0));
+        Assertions.assertEquals(PredefinedObservationType.L1I.getName(),
+                                header.getTypeObs().get(SatelliteSystem.BEIDOU).get(1));
+        Assertions.assertEquals(PredefinedObservationType.S1I.getName(),
+                                header.getTypeObs().get(SatelliteSystem.BEIDOU).get(2));
+        Assertions.assertEquals(PredefinedObservationType.C7I.getName(),
+                                header.getTypeObs().get(SatelliteSystem.BEIDOU).get(3));
+        Assertions.assertEquals(PredefinedObservationType.L7I.getName(),
+                                header.getTypeObs().get(SatelliteSystem.BEIDOU).get(4));
+        Assertions.assertEquals(PredefinedObservationType.S7I.getName(),
+                                header.getTypeObs().get(SatelliteSystem.BEIDOU).get(5));
+        Assertions.assertEquals(PredefinedObservationType.C6I.getName(),
+                                header.getTypeObs().get(SatelliteSystem.BEIDOU).get(6));
+        Assertions.assertEquals(PredefinedObservationType.L6I.getName(),
+                                header.getTypeObs().get(SatelliteSystem.BEIDOU).get(7));
+        Assertions.assertEquals(PredefinedObservationType.S6I.getName(),
+                                header.getTypeObs().get(SatelliteSystem.BEIDOU).get(8));
     }
 
     @Test

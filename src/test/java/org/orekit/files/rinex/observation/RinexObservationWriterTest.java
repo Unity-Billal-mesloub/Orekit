@@ -284,9 +284,9 @@ public class RinexObservationWriterTest {
             checkPCV(first.getListAppliedPCVS().get(i), second.getListAppliedPCVS().get(i));
         }
         Assertions.assertEquals(first.getTypeObs().size(), second.getTypeObs().size());
-        for (final Map.Entry<SatelliteSystem, List<ObservationType>> firstE : first.getTypeObs().entrySet()) {
-            List<ObservationType> firstT  = firstE.getValue();
-            List<ObservationType> secondT = second.getTypeObs().get(firstE.getKey());
+        for (final Map.Entry<SatelliteSystem, List<String>> firstE : first.getTypeObs().entrySet()) {
+            List<String> firstT  = firstE.getValue();
+            List<String> secondT = second.getTypeObs().get(firstE.getKey());
             Assertions.assertEquals(firstT.size(), secondT.size());
             for (int i = 0; i < firstT.size(); ++i) {
                 Assertions.assertEquals(firstT.get(i), secondT.get(i));
@@ -337,11 +337,11 @@ public class RinexObservationWriterTest {
         }
         Assertions.assertEquals(first.getNbSat(),      second.getNbSat());
         Assertions.assertEquals(first.getNbObsPerSat().size(), second.getNbObsPerSat().size());
-        for (final Map.Entry<SatInSystem, Map<ObservationType, Integer>> firstE : first.getNbObsPerSat().entrySet()) {
-            Map<ObservationType, Integer> firstV  = firstE.getValue();
-            Map<ObservationType, Integer> secondV = second.getNbObsPerSat().get(firstE.getKey());
+        for (final Map.Entry<SatInSystem, Map<String, Integer>> firstE : first.getNbObsPerSat().entrySet()) {
+            Map<String, Integer> firstV  = firstE.getValue();
+            Map<String, Integer> secondV = second.getNbObsPerSat().get(firstE.getKey());
             Assertions.assertEquals(firstV.size(), secondV.size());
-            for (final Map.Entry<ObservationType, Integer> firstF : firstV.entrySet()) {
+            for (final Map.Entry<String, Integer> firstF : firstV.entrySet()) {
                 Assertions.assertEquals(firstF.getValue(), secondV.get(firstF.getKey()));
             }
         }

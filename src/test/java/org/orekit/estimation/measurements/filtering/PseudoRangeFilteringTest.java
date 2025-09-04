@@ -96,9 +96,9 @@ public class PseudoRangeFilteringTest {
         copiedListObsDataSet.add(obsDataSetNullDoppler);
 
         SingleFrequencySmoother prs = new SingleFrequencySmoother(MeasurementType.DOPPLER, 100.0, 1, 50.0);
-        prs.filterDataSet(copiedListObsDataSet, system, prnNumber, PredefinedObservationType.D1C);
+        prs.filterDataSet(copiedListObsDataSet, system, prnNumber, PredefinedObservationType.D1C.getName());
 
-        List<SmoothedObservationDataSet> listObsDataSetUpdate = prs.getFilteredDataMap().get(rangeType);
+        List<SmoothedObservationDataSet> listObsDataSetUpdate = prs.getFilteredDataMap().get(rangeType.getName());
 
         double lastUpdatedValue = listObsDataSetUpdate.get(listObsDataSetUpdate.size() - 1).getSmoothedData().getValue();
         Assertions.assertEquals(2.0650729099E7, lastUpdatedValue, 1E-6);
@@ -171,12 +171,12 @@ public class PseudoRangeFilteringTest {
 
         //
         DualFrequencySmoother prs = new DualFrequencySmoother(100.0, 60);
-        prs.filterDataSet(copiedListObsDataSet, system, prnNumber, phaseTypeF1, phaseTypeF2);
+        prs.filterDataSet(copiedListObsDataSet, system, prnNumber, phaseTypeF1.getName(), phaseTypeF2.getName());
         SingleFrequencySmoother prsSF = new SingleFrequencySmoother(MeasurementType.CARRIER_PHASE, 100.0, 60, 50.0);
-        prsSF.filterDataSet(copiedListObsDataSet, system, prnNumber, phaseTypeF1);
+        prsSF.filterDataSet(copiedListObsDataSet, system, prnNumber, phaseTypeF1.getName());
 
-        DualFrequencyHatchFilter filter = prs.getMapFilters().get(rangeType);
-        SingleFrequencyHatchFilter filterSF = prsSF.getMapFilters().get(rangeType);
+        DualFrequencyHatchFilter filter = prs.getMapFilters().get(rangeType.getName());
+        SingleFrequencyHatchFilter filterSF = prsSF.getMapFilters().get(rangeType.getName());
 
         ArrayList<Double> filteredSF = filterSF.getSmoothedCodeHistory();
         ArrayList<Double> filteredDF = filter.getSmoothedCodeHistory();
@@ -207,9 +207,9 @@ public class PseudoRangeFilteringTest {
 
     @Test
     public void testHatchCarrierPhase2() {
-        ObservationType rangeType = PredefinedObservationType.C1;
-        ObservationType phaseTypeF1 = PredefinedObservationType.L1;
-        ObservationType phaseTypeF2 = PredefinedObservationType.L2;
+        String rangeType = PredefinedObservationType.C1.getName();
+        String phaseTypeF1 = PredefinedObservationType.L1.getName();
+        String phaseTypeF2 = PredefinedObservationType.L2.getName();
 
         SatelliteSystem system = SatelliteSystem.GPS;
         int prnNumber = 7;

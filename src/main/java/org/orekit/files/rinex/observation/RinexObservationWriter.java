@@ -31,7 +31,6 @@ import org.orekit.files.rinex.AppliedPCVS;
 import org.orekit.files.rinex.section.CommonLabel;
 import org.orekit.files.rinex.section.Label;
 import org.orekit.files.rinex.utils.BaseRinexWriter;
-import org.orekit.gnss.ObservationType;
 import org.orekit.gnss.PredefinedObservationType;
 import org.orekit.gnss.SatInSystem;
 import org.orekit.gnss.SatelliteSystem;
@@ -302,7 +301,7 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
                         outputField(SIX_DIGITS_INTEGER, (int) FastMath.round(sfc.getCorrection()), 6);
                         outputField(SIX_DIGITS_INTEGER, sfc.getTypesObsScaled().size(), 12);
                         for (int i = 0; i < sfc.getTypesObsScaled().size(); ++i) {
-                            outputField(sfc.getTypesObsScaled().get(i).getName(), 18 + 6 * i, false);
+                            outputField(sfc.getTypesObsScaled().get(i), 18 + 6 * i, false);
                         }
                         finishHeaderLine(ObservationLabel.OBS_SCALE_FACTOR);
                     }
@@ -323,14 +322,14 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
         writeHeaderLine(header.getStationInformation(), CommonLabel.STATION_INFORMATION);
 
         // SYS / # / OBS TYPES
-        for (Map.Entry<SatelliteSystem, List<ObservationType>> entry : header.getTypeObs().entrySet()) {
+        for (Map.Entry<SatelliteSystem, List<String>> entry : header.getTypeObs().entrySet()) {
             if (header.getFormatVersion() < 3.0) {
                 outputField(SIX_DIGITS_INTEGER, entry.getValue().size(), 6);
             } else {
                 outputField(entry.getKey().getKey(), 1);
                 outputField(THREE_DIGITS_INTEGER, entry.getValue().size(), 6);
             }
-            for (final ObservationType observationType : entry.getValue()) {
+            for (final String observationType : entry.getValue()) {
                 int next = getColumn() + (header.getFormatVersion() < 3.0 ? 6 : 4);
                 if (exceedsHeaderLength(next)) {
                     // we need to set up a continuation line
@@ -340,7 +339,7 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
                     outputField("", 6, true);
                     next = getColumn() + (header.getFormatVersion() < 3.0 ? 6 : 4);
                 }
-                outputField(observationType.getName(), next, false);
+                outputField(observationType, next, false);
             }
             finishHeaderLine(header.getFormatVersion() < 3.0 ?
                              ObservationLabel.NB_TYPES_OF_OBSERV :
@@ -413,7 +412,7 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
                         if (sfc.getTypesObsScaled().size() < header.getTypeObs().get(system).size()) {
                             outputField("", 8, true);
                             outputField(TWO_DIGITS_INTEGER,  sfc.getTypesObsScaled().size(), 10);
-                            for (ObservationType observationType : sfc.getTypesObsScaled()) {
+                            for (String observationType : sfc.getTypesObsScaled()) {
                                 int next = getColumn() + 4;
                                 if (exceedsHeaderLength(next)) {
                                     // we need to set up a continuation line
@@ -422,7 +421,7 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
                                     next = getColumn() + 4;
                                 }
                                 outputField("", next - 3, true);
-                                outputField(observationType.getName(), next, true);
+                                outputField(observationType, next, true);
                             }
                         }
                         finishHeaderLine(ObservationLabel.SYS_SCALE_FACTOR);
@@ -526,10 +525,10 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
         }
 
         // PRN / # OF OBS
-        for (final Map.Entry<SatInSystem, Map<ObservationType, Integer>> entry1 : header.getNbObsPerSat().entrySet()) {
+        for (final Map.Entry<SatInSystem, Map<String, Integer>> entry1 : header.getNbObsPerSat().entrySet()) {
             final SatInSystem sis = entry1.getKey();
             outputField(sis.toString(), 6, false);
-            for (final Map.Entry<ObservationType, Integer> entry2 : entry1.getValue().entrySet()) {
+            for (final Map.Entry<String, Integer> entry2 : entry1.getValue().entrySet()) {
                 int next = getColumn() + 6;
                 if (exceedsHeaderLength(next)) {
                     // we need to set up a continuation line
@@ -654,7 +653,7 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
                     finishLine();
                     next = getColumn() + 16;
                 }
-                final double scaling = getScaling(od.getObservationType(), ods.getSatellite().getSystem());
+                final double scaling = getScaling(od.getObservationType().getName(), ods.getSatellite().getSystem());
                 outputField(FOURTEEN_THREE_DIGITS_FLOAT, scaling * od.getValue(), next - 2);
                 if (od.getLossOfLockIndicator() == 0) {
                     outputField("", next - 1, true);
@@ -714,7 +713,7 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
             outputField(ods.getSatellite().toString(), 3, false);
             for (final ObservationData od : ods.getObservationData()) {
                 final int next = getColumn() + 16;
-                final double scaling = getScaling(od.getObservationType(), ods.getSatellite().getSystem());
+                final double scaling = getScaling(od.getObservationType().getName(), ods.getSatellite().getSystem());
                 outputField(FOURTEEN_THREE_DIGITS_FLOAT, scaling * od.getValue(), next - 2);
                 if (od.getLossOfLockIndicator() == 0) {
                     outputField("", next - 1, true);
@@ -751,7 +750,7 @@ public class RinexObservationWriter extends BaseRinexWriter<RinexObservationHead
      * @param system satellite system for the observation
      * @return scaling factor
      */
-    private double getScaling(final ObservationType type, final SatelliteSystem system) {
+    private double getScaling(final String type, final SatelliteSystem system) {
 
         for (final ScaleFactorCorrection scaleFactorCorrection : getHeader().getScaleFactorCorrections(system)) {
             // check if the next Observation Type to read needs to be scaled

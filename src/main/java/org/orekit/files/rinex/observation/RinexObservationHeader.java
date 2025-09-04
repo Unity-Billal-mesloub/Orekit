@@ -28,7 +28,6 @@ import org.orekit.files.rinex.section.Label;
 import org.orekit.files.rinex.section.RinexClockObsBaseHeader;
 import org.orekit.files.rinex.utils.ParsingUtils;
 import org.orekit.files.rinex.utils.RinexFileType;
-import org.orekit.gnss.ObservationType;
 import org.orekit.gnss.SatInSystem;
 import org.orekit.gnss.SatelliteSystem;
 import org.orekit.time.AbsoluteDate;
@@ -136,7 +135,7 @@ public class RinexObservationHeader extends RinexClockObsBaseHeader {
     /** Number of observations per satellite.
      * @since 12.0
      */
-    private final Map<SatInSystem, Map<ObservationType, Integer>> nbObsPerSat;
+    private final Map<SatInSystem, Map<String, Integer>> nbObsPerSat;
 
     /** Code phase bias correction for GLONASS C1C signal.
      * @since 12.0
@@ -595,8 +594,8 @@ public class RinexObservationHeader extends RinexClockObsBaseHeader {
      * @param nbObs number of observations of this type for this satellite
      * @since 12.0
      */
-    public void setNbObsPerSatellite(final SatInSystem sat, final ObservationType type, final int nbObs) {
-        final Map<ObservationType, Integer> satNbObs;
+    public void setNbObsPerSatellite(final SatInSystem sat, final String type, final int nbObs) {
+        final Map<String, Integer> satNbObs;
         synchronized (nbObsPerSat) {
             satNbObs = nbObsPerSat.computeIfAbsent(sat, k -> new HashMap<>());
         }
@@ -607,7 +606,7 @@ public class RinexObservationHeader extends RinexClockObsBaseHeader {
      * @return unmodifiable view of the map of number of observations per satellites
      * @since 12.0
      */
-    public Map<SatInSystem, Map<ObservationType, Integer>> getNbObsPerSat() {
+    public Map<SatInSystem, Map<String, Integer>> getNbObsPerSat() {
         return Collections.unmodifiableMap(nbObsPerSat);
     }
 

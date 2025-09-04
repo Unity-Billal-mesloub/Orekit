@@ -24,7 +24,6 @@ import org.orekit.time.TimeScales;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiFunction;
 
 /** Parser for Solution INdependent EXchange (SINEX) bias files.
  * @author Luc Maisonobe
@@ -32,25 +31,15 @@ import java.util.function.BiFunction;
  */
 public class SinexBiasParser extends AbstractSinexParser<SinexBias, SinexBiasParseInfo> {
 
-    /** Mapper from string to observation type. */
-    private final BiFunction<? super SatelliteSystem, ? super String, ? extends ObservationType> typeBuilder;
-
     /** Top level parsers. */
     private final List<LineParser<SinexBiasParseInfo>> topParsers;
 
     /** Simple constructor.
      * @param timeScales time scales
-     * @param typeBuilder mapper from string to observation type
-     *                    (typically {@code SinexBiasParser::defaultTypeBuilder} if the file uses only
-     *                    predefined types)
-     * @see #defaultTypeBuilder(SatelliteSystem, String)
      */
-    public SinexBiasParser(final TimeScales timeScales,
-                           final BiFunction<? super SatelliteSystem, ? super String, ? extends ObservationType> typeBuilder) {
+    public SinexBiasParser(final TimeScales timeScales) {
 
         super(timeScales);
-
-        this.typeBuilder = typeBuilder;
 
         // set up parsers for supported blocks
         final List<BlockParser<SinexBiasParseInfo>> blockParsers = new ArrayList<>();
@@ -94,21 +83,9 @@ public class SinexBiasParser extends AbstractSinexParser<SinexBias, SinexBiasPar
     /** {@inheritDoc} */
     @Override
     protected SinexBiasParseInfo buildParseInfo() {
-        final SinexBiasParseInfo parseInfo = new SinexBiasParseInfo(getTimeScales(), typeBuilder);
+        final SinexBiasParseInfo parseInfo = new SinexBiasParseInfo(getTimeScales());
         parseInfo.setTimeScale(getTimeScales().getUTC());
         return parseInfo;
-    }
-
-    /** Default type builder.
-     * <p>
-     * This default type builder directly calls {@link PredefinedObservationType#valueOf(String)}
-     * </p>
-     * @param ignoredSystem satellite system (ignored here)
-     * @param typeName name of the observation type
-     * @return observation type
-     */
-    public static ObservationType defaultTypeBuilder(final SatelliteSystem ignoredSystem, final String typeName) {
-        return PredefinedObservationType.valueOf(typeName);
     }
 
 }
