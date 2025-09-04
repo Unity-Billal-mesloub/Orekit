@@ -16,9 +16,6 @@
  */
 package org.orekit.files.sinex;
 
-import org.orekit.gnss.ObservationType;
-import org.orekit.gnss.PredefinedObservationType;
-import org.orekit.gnss.SatelliteSystem;
 import org.orekit.time.TimeScales;
 
 import java.util.ArrayList;
