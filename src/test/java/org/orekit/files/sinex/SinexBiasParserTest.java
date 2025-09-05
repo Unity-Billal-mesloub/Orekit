@@ -37,6 +37,7 @@ import org.orekit.time.TimeComponents;
 import org.orekit.time.TimeScale;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
+import org.orekit.utils.TimeSpanMap;
 
 public class SinexBiasParserTest {
 
@@ -151,7 +152,7 @@ public class SinexBiasParserTest {
         AbsoluteDate lastDate =  dsb.getMaximumValidDateForObservationPair(Obs1, Obs2);
         
         Assertions.assertEquals(refLastDate, lastDate);
-        
+
         // Value test for Satellites
         AbsoluteDate refDate = new AbsoluteDate(new DateComponents(2021, 280),
                                                 new TimeComponents(43200),
@@ -162,6 +163,14 @@ public class SinexBiasParserTest {
         
         Assertions.assertEquals(valueDsbReal, valueDsb, 1e-5);
         
+        final TimeSpanMap<Double> tsm = dsb.getTimeSpanMap(Obs1, Obs2);
+        tsm.getFirstTransition().resetDate(AbsoluteDate.PAST_INFINITY, true);
+        tsm.getFirstTransition().resetDate(AbsoluteDate.FUTURE_INFINITY, true);
+        Assertions.assertEquals(AbsoluteDate.PAST_INFINITY,
+                                dsb.getMinimumValidDateForObservationPair(Obs1, Obs2));
+        Assertions.assertEquals(AbsoluteDate.FUTURE_INFINITY,
+                                dsb.getMaximumValidDateForObservationPair(Obs1, Obs2));
+
         // Value Test for a Station
         StationDifferentialSignalBias StationDifferentialSignalBias = sinexBias.getStationsDsb().get("ALIC");
         DifferentialSignalBias differentialSignalBiasTestStation = StationDifferentialSignalBias.getDsb(SatelliteSystem.parseSatelliteSystem("R"));
@@ -192,10 +201,10 @@ public class SinexBiasParserTest {
         SinexBias sinexBias = load("/sinex/DLR0MGXFIN_20212740000_03L_01D_DSB_trunc_sat.BSX");
         String stationIdRef = "AGGO";
         StationDifferentialSignalBias DSBTest = sinexBias.getStationsDsb().get(stationIdRef);
-         
+
         // Test getStationId : Station Case
         Assertions.assertEquals(stationIdRef, DSBTest.getSiteCode());
-         
+
         final Collection<SatelliteSystem> availableSystems = DSBTest.getAvailableSatelliteSystems();
         Assertions.assertEquals(2, availableSystems.size());
         Assertions.assertTrue(availableSystems.contains(SatelliteSystem.GPS));
@@ -244,6 +253,14 @@ public class SinexBiasParserTest {
         double valueOsbReal = -6.7298e-9 * Constants.SPEED_OF_LIGHT;
 
         Assertions.assertEquals(valueOsbReal, valueOsb, 1e-5);
+
+        final TimeSpanMap<Double> tsm = osb.getTimeSpanMap(PredefinedObservationType.C5X.getName());
+        tsm.getFirstTransition().resetDate(AbsoluteDate.PAST_INFINITY, true);
+        tsm.getFirstTransition().resetDate(AbsoluteDate.FUTURE_INFINITY, true);
+        Assertions.assertEquals(AbsoluteDate.PAST_INFINITY,
+                                osb.getMinimumValidDateForObservation(PredefinedObservationType.C5X.getName()));
+        Assertions.assertEquals(AbsoluteDate.FUTURE_INFINITY,
+                                osb.getMaximumValidDateForObservation(PredefinedObservationType.C5X.getName()));
 
     }
 
