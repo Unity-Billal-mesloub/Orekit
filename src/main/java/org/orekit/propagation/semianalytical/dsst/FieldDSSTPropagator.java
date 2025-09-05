@@ -59,9 +59,9 @@ import org.orekit.propagation.semianalytical.dsst.forces.DSSTForceModel;
 import org.orekit.propagation.semianalytical.dsst.forces.DSSTNewtonianAttraction;
 import org.orekit.propagation.semianalytical.dsst.forces.FieldShortPeriodTerms;
 import org.orekit.propagation.semianalytical.dsst.utilities.FieldAuxiliaryElements;
-import org.orekit.propagation.semianalytical.dsst.utilities.FieldFixedNumberInterpolationGrid;
-import org.orekit.propagation.semianalytical.dsst.utilities.FieldInterpolationGrid;
-import org.orekit.propagation.semianalytical.dsst.utilities.FieldMaxGapInterpolationGrid;
+import org.orekit.propagation.semianalytical.dsst.utilities.FixedNumberInterpolationGrid;
+import org.orekit.propagation.semianalytical.dsst.utilities.InterpolationGrid;
+import org.orekit.propagation.semianalytical.dsst.utilities.MaxGapInterpolationGrid;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.FieldDataDictionary;
@@ -165,7 +165,7 @@ public class FieldDSSTPropagator<T extends CalculusFieldElement<T>> extends Fiel
     private FieldMeanPlusShortPeriodicMapper mapper;
 
     /** Generator for the interpolation grid. */
-    private FieldInterpolationGrid<T> interpolationgrid;
+    private InterpolationGrid interpolationgrid;
 
     /**
      * Create a new instance of DSSTPropagator.
@@ -379,7 +379,7 @@ public class FieldDSSTPropagator<T extends CalculusFieldElement<T>> extends Fiel
      * @since 7.1
      */
     public void setInterpolationGridToFixedNumberOfPoints(final int interpolationPoints) {
-        interpolationgrid = new FieldFixedNumberInterpolationGrid<>(interpolationPoints);
+        interpolationgrid = new FixedNumberInterpolationGrid(interpolationPoints);
     }
 
     /** Set the interpolation grid generator.
@@ -397,7 +397,7 @@ public class FieldDSSTPropagator<T extends CalculusFieldElement<T>> extends Fiel
      * @since 7.1
      */
     public void setInterpolationGridToMaxTimeGap(final T maxGap) {
-        interpolationgrid = new FieldMaxGapInterpolationGrid<>(maxGap);
+        interpolationgrid = new MaxGapInterpolationGrid(maxGap.getReal());
     }
 
     /** Add a force model to the global perturbation model.
