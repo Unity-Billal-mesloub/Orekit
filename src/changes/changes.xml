@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
+        <action dev="bryan" type="update" issue="1808">
+            Removed useless field parameter in FieldDSSTPropagator and FieldNumericalPropagator.
+        </action>
         <action dev="serrof" type="update" issue="1807">
             Created cr3bp package inside orbit.
         </action>

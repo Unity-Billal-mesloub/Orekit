@@ -1001,7 +1001,7 @@ public class FieldEcksteinHechlerPropagatorTest {
         double[][] tol = ToleranceProvider.getDefaultToleranceProvider(0.1).getTolerances(initialOsculating, OrbitType.CIRCULAR);
         AdaptiveStepsizeFieldIntegrator<T> integrator = new DormandPrince853FieldIntegrator<>(field, 0.001, 1000, tol[0], tol[1]);
         integrator.setInitialStepSize(60);
-        FieldNumericalPropagator<T> num = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<T> num = new FieldNumericalPropagator<>(integrator);
         Frame itrf = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
         num.addForceModel(new HolmesFeatherstoneAttractionModel(itrf, GravityFieldFactory.getNormalizedProvider(provider)));
         num.setInitialState(new FieldSpacecraftState<>(initialOsculating));

@@ -342,7 +342,7 @@ class FieldSpacecraftStateInterpolatorTest {
         // Create propagator
         final FieldODEIntegrator<Binary64> integrator = setUpDefaultIntegrator();
 
-        final FieldNumericalPropagator<Binary64> propagator = new FieldNumericalPropagator<>(field, integrator);
+        final FieldNumericalPropagator<Binary64> propagator = new FieldNumericalPropagator<>(integrator);
 
         // Configure propagator
         propagator.setOrbitType(null);

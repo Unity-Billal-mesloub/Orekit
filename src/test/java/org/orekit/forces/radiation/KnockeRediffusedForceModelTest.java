@@ -212,7 +212,7 @@ class KnockeRediffusedForceModelTest extends AbstractForceModelTest{
         OrbitType type = OrbitType.KEPLERIAN;
 
         // Field and classical numerical propagators
-        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(type);
         FNP.setInitialState(initialState);
 
@@ -282,7 +282,7 @@ class KnockeRediffusedForceModelTest extends AbstractForceModelTest{
         final OrbitType type = OrbitType.KEPLERIAN;
 
         // Field and classical numerical propagators
-        final FieldNumericalPropagator<Gradient> FNP = new FieldNumericalPropagator<>(field, integrator);
+        final FieldNumericalPropagator<Gradient> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(type);
         FNP.setInitialState(initialState);
 

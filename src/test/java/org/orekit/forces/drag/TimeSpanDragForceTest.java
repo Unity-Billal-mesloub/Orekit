@@ -1231,7 +1231,7 @@ class TimeSpanDragForceTest extends AbstractLegacyForceModelTest {
         OrbitType type = OrbitType.EQUINOCTIAL;
 
         // Field and classical numerical propagators
-        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(type);
         FNP.setInitialState(initialState);
 
@@ -1334,7 +1334,7 @@ class TimeSpanDragForceTest extends AbstractLegacyForceModelTest {
         OrbitType type = OrbitType.EQUINOCTIAL;
 
         // Field and classical numerical propagators
-        FieldNumericalPropagator<Gradient> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<Gradient> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(type);
         FNP.setInitialState(initialState);
         FNP.setPositionAngleType(PositionAngleType.TRUE);
@@ -1439,7 +1439,7 @@ class TimeSpanDragForceTest extends AbstractLegacyForceModelTest {
         OrbitType type = OrbitType.EQUINOCTIAL;
 
         // Field and classical numerical propagators
-        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(type);
         FNP.setInitialState(initialState);
 

@@ -348,7 +348,7 @@ public class TimeSpanParametricAccelerationTest extends AbstractForceModelTest {
         OrbitType type = OrbitType.EQUINOCTIAL;
 
         // Field and classical numerical propagators
-        FieldNumericalPropagator<Gradient> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<Gradient> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(type);
         FNP.setInitialState(initialState);
 

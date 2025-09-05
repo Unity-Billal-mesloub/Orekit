@@ -69,7 +69,7 @@ class FieldCartesianAdjointDerivativesProviderTest {
                 new FieldUnboundedCartesianEnergyNeglectingMass<>(name, field), new CartesianAdjointKeplerianTerm(mu));
         final ClassicalRungeKuttaFieldIntegrator<Binary64> integrator = new ClassicalRungeKuttaFieldIntegrator<>(field,
                 Binary64.ONE.multiply(100.));
-        final FieldNumericalPropagator<Binary64> propagator = new FieldNumericalPropagator<>(field, integrator);
+        final FieldNumericalPropagator<Binary64> propagator = new FieldNumericalPropagator<>(integrator);
         final Orbit orbit = new CartesianOrbit(new PVCoordinates(new Vector3D(7e6, 1e3, 0), new Vector3D(10., 7e3, -200)),
                 FramesFactory.getGCRF(), AbsoluteDate.ARBITRARY_EPOCH, mu);
         final FieldSpacecraftState<Binary64> initialState = new FieldSpacecraftState<>(field, new SpacecraftState(orbit));

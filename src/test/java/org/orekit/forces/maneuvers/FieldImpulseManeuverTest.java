@@ -415,8 +415,7 @@ class FieldImpulseManeuverTest {
         final T fieldStepSize = field.getOne().add(stepSize);
         final ClassicalRungeKuttaFieldIntegrator<T> fieldIntegrator = new ClassicalRungeKuttaFieldIntegrator<>(field,
                 fieldStepSize);
-        final FieldNumericalPropagator<T> fieldPropagator = new FieldNumericalPropagator<>(field,
-                fieldIntegrator);
+        final FieldNumericalPropagator<T> fieldPropagator = new FieldNumericalPropagator<>(fieldIntegrator);
         final FieldOrbit<T> fieldInitialOrbit = createConstantFieldOrbit(field, initialOrbit);
         final T fieldInitialMass = field.getZero().add(initialMass);
         fieldPropagator.setInitialState(new FieldSpacecraftState<>(fieldInitialOrbit).withMass(fieldInitialMass));

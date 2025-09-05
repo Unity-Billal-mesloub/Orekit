@@ -16,7 +16,6 @@
  */
 package org.orekit.propagation.semianalytical.dsst.utilities;
 
-import org.hipparchus.Field;
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathArrays;
@@ -36,15 +35,12 @@ public class FieldMaxGapInterpolationGrid <T extends CalculusFieldElement<T>> im
     /** Maximum time gap. */
     private final T maxGap;
 
-    /** Field used by default. */
-    private final Field<T> field;
-
-    /** Constructor.
-     * @param field field used by default
+    /**
+     * Constructor.
+     *
      * @param maxGap maximum time gap between interpolation points
      */
-    public FieldMaxGapInterpolationGrid(final Field<T> field, final T maxGap) {
-        this.field  = field;
+    public FieldMaxGapInterpolationGrid(final T maxGap) {
         this.maxGap = maxGap;
     }
 
@@ -52,7 +48,7 @@ public class FieldMaxGapInterpolationGrid <T extends CalculusFieldElement<T>> im
     @Override
     public T[] getGridPoints(final T stepStart, final T stepEnd) {
         final int pointsPerStep = FastMath.max(2, (int) FastMath.ceil(FastMath.abs(stepEnd.getReal() - stepStart.getReal()) / maxGap.getReal()));;
-        final T[] grid = MathArrays.buildArray(field, pointsPerStep);
+        final T[] grid = MathArrays.buildArray(stepStart.getField(), pointsPerStep);
 
         final T stepSize = stepEnd.subtract(stepStart).divide(pointsPerStep - 1.);
         for (int i = 0; i < pointsPerStep; i++) {

@@ -661,7 +661,7 @@ public class SolarRadiationPressureTest extends AbstractLegacyForceModelTest {
         RIntegrator.setInitialStepSize(60);
 
         // Field and classical numerical propagators
-        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(type);
         FNP.setInitialState(initialState);
 
@@ -729,7 +729,7 @@ public class SolarRadiationPressureTest extends AbstractLegacyForceModelTest {
                         new DormandPrince853Integrator(0.001, 200, tolerance[0], tolerance[1]);
         RIntegrator.setInitialStepSize(60);
 
-        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(type);
         FNP.setInitialState(initialState);
 
@@ -1104,8 +1104,7 @@ public class SolarRadiationPressureTest extends AbstractLegacyForceModelTest {
         final OrbitType type = OrbitType.CARTESIAN;
         double[][] tol = ToleranceProvider.getDefaultToleranceProvider(1e-6).getTolerances(orbit, type);
         final FieldNumericalPropagator<T> propagatorWithFlattening =
-                        new FieldNumericalPropagator<>(field,
-                                        new DormandPrince853FieldIntegrator<>(field, 1.0e-9, 300, tol[0], tol[1]));
+                        new FieldNumericalPropagator<>(new DormandPrince853FieldIntegrator<>(field, 1.0e-9, 300, tol[0], tol[1]));
         propagatorWithFlattening.setOrbitType(type);
         propagatorWithFlattening.setInitialState(initialState);
         propagatorWithFlattening.addForceModel(srpWithFlattening);
@@ -1118,8 +1117,7 @@ public class SolarRadiationPressureTest extends AbstractLegacyForceModelTest {
         Assertions.assertEquals(expectedMoonPenumbraSteps,  handler.moonPenumbraSteps);
 
         final FieldNumericalPropagator<T> propagatorWithoutFlattening =
-                        new FieldNumericalPropagator<>(field,
-                                        new DormandPrince853FieldIntegrator<>(field, 1.0e-9, 300, tol[0], tol[1]));
+                        new FieldNumericalPropagator<>(new DormandPrince853FieldIntegrator<>(field, 1.0e-9, 300, tol[0], tol[1]));
         propagatorWithoutFlattening.setOrbitType(type);
         propagatorWithoutFlattening.setInitialState(initialState);
         propagatorWithoutFlattening.addForceModel(srpWithoutFlattening);

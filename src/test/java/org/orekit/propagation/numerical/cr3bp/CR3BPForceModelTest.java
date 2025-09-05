@@ -157,7 +157,7 @@ public class CR3BPForceModelTest {
 
         ClassicalRungeKuttaIntegrator RIntegrator = new ClassicalRungeKuttaIntegrator(1.0);
 
-        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(null);
         FNP.setIgnoreCentralAttraction(true);
         FNP.setInitialState(initialState);
