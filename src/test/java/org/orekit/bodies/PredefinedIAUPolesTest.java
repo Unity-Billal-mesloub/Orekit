@@ -119,7 +119,7 @@ public class PredefinedIAUPolesTest {
 
                     // check matrix
                     Vector3D qNode = Vector3D.crossProduct(Vector3D.PLUS_K, pole);
-                    if (qNode.getNormSq() < Precision.SAFE_MIN) {
+                    if (qNode.getNorm2Sq() < Precision.SAFE_MIN) {
                         qNode = Vector3D.PLUS_I;
                     }
                     final Rotation rotation = new Rotation(Vector3D.PLUS_K, wRef, RotationConvention.FRAME_TRANSFORM).

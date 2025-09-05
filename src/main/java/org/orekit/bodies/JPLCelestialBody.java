@@ -266,7 +266,7 @@ class JPLCelestialBody implements CelestialBody {
                     // methods
                     final FieldVector3D<T> pole  = iauPole.getPole(date);
                     FieldVector3D<T> qNode = FieldVector3D.crossProduct(Vector3D.PLUS_K, pole);
-                    if (qNode.getNormSq().getReal() < Precision.SAFE_MIN) {
+                    if (qNode.getNorm2Sq().getReal() < Precision.SAFE_MIN) {
                         qNode = FieldVector3D.getPlusI(date.getField());
                     }
                     final FieldTransform<T> rotation =

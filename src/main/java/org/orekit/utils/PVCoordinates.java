@@ -332,7 +332,7 @@ public class PVCoordinates implements TimeShiftable<PVCoordinates>, Blendable<PV
                 break;
             case 1 : {
                 factory = new DSFactory(1, order);
-                final double   r2            = position.getNormSq();
+                final double   r2            = position.getNorm2Sq();
                 final double   r             = FastMath.sqrt(r2);
                 final double   pvOr2         = Vector3D.dotProduct(position, velocity) / r2;
                 final double   a             = acceleration.getNorm();
@@ -351,13 +351,13 @@ public class PVCoordinates implements TimeShiftable<PVCoordinates>, Blendable<PV
             }
             case 2 : {
                 factory = new DSFactory(1, order);
-                final double   r2              = position.getNormSq();
+                final double   r2              = position.getNorm2Sq();
                 final double   r               = FastMath.sqrt(r2);
                 final double   pvOr2           = Vector3D.dotProduct(position, velocity) / r2;
                 final double   a               = acceleration.getNorm();
                 final double   aOr             = a / r;
                 final Vector3D keplerianJerk   = new Vector3D(-3 * pvOr2, acceleration, -aOr, velocity);
-                final double   v2              = velocity.getNormSq();
+                final double   v2              = velocity.getNorm2Sq();
                 final double   pa              = Vector3D.dotProduct(position, acceleration);
                 final double   aj              = Vector3D.dotProduct(acceleration, keplerianJerk);
                 final Vector3D keplerianJounce = new Vector3D(-3 * (v2 + pa) / r2 + 15 * pvOr2 * pvOr2 - aOr, acceleration,
@@ -394,7 +394,7 @@ public class PVCoordinates implements TimeShiftable<PVCoordinates>, Blendable<PV
      */
     public FieldPVCoordinates<UnivariateDerivative1> toUnivariateDerivative1PV() {
 
-        final double   r2            = position.getNormSq();
+        final double   r2            = position.getNorm2Sq();
         final double   r             = FastMath.sqrt(r2);
         final double   pvOr2         = Vector3D.dotProduct(position, velocity) / r2;
         final double   a             = acceleration.getNorm();
@@ -430,13 +430,13 @@ public class PVCoordinates implements TimeShiftable<PVCoordinates>, Blendable<PV
      */
     public FieldPVCoordinates<UnivariateDerivative2> toUnivariateDerivative2PV() {
 
-        final double   r2              = position.getNormSq();
+        final double   r2              = position.getNorm2Sq();
         final double   r               = FastMath.sqrt(r2);
         final double   pvOr2           = Vector3D.dotProduct(position, velocity) / r2;
         final double   a               = acceleration.getNorm();
         final double   aOr             = a / r;
         final Vector3D keplerianJerk   = new Vector3D(-3 * pvOr2, acceleration, -aOr, velocity);
-        final double   v2              = velocity.getNormSq();
+        final double   v2              = velocity.getNorm2Sq();
         final double   pa              = Vector3D.dotProduct(position, acceleration);
         final double   aj              = Vector3D.dotProduct(acceleration, keplerianJerk);
         final Vector3D keplerianJounce = new Vector3D(-3 * (v2 + pa) / r2 + 15 * pvOr2 * pvOr2 - aOr, acceleration,
@@ -549,7 +549,7 @@ public class PVCoordinates implements TimeShiftable<PVCoordinates>, Blendable<PV
      *      Wikipedia</a>
      */
     public Vector3D getAngularVelocity() {
-        return this.getMomentum().scalarMultiply(1.0 / this.getPosition().getNormSq());
+        return this.getMomentum().scalarMultiply(1.0 / this.getPosition().getNorm2Sq());
     }
 
     /** Get the opposite of the instance.

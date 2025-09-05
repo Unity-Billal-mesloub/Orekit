@@ -1124,7 +1124,7 @@ public class DSSTPropagatorTest {
         final double dP = 10.0;
 
         // Computes dV
-        final double r2 = pv.getPosition().getNormSq();
+        final double r2 = pv.getPosition().getNorm2Sq();
         final double v  = pv.getVelocity().getNorm();
         final double dV = orbit.getMu() * dP / (v * r2);
 

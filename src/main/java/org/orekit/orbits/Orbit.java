@@ -145,10 +145,10 @@ public abstract class Orbit
         ensurePseudoInertialFrame(frame);
         this.date = pvCoordinates.getDate();
         this.mu = mu;
-        if (pvCoordinates.getAcceleration().getNormSq() == 0) {
+        if (pvCoordinates.getAcceleration().getNorm2Sq() == 0) {
             // the acceleration was not provided,
             // compute it from Newtonian attraction
-            final double r2 = pvCoordinates.getPosition().getNormSq();
+            final double r2 = pvCoordinates.getPosition().getNorm2Sq();
             final double r3 = r2 * FastMath.sqrt(r2);
             this.pvCoordinates = new TimeStampedPVCoordinates(pvCoordinates.getDate(),
                                                               pvCoordinates.getPosition(),
@@ -195,7 +195,7 @@ public abstract class Orbit
         }
 
         final Vector3D p = pva.getPosition();
-        final double r2 = p.getNormSq();
+        final double r2 = p.getNorm2Sq();
 
         // Check if acceleration is relatively close to 0 compared to the Keplerian acceleration
         final double tolerance = mu * 1e-9;

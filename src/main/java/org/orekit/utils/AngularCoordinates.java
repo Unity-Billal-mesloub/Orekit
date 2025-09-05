@@ -253,9 +253,9 @@ public class AngularCoordinates implements TimeShiftable<AngularCoordinates>, Se
                                                  final double tolerance)
         throws MathIllegalArgumentException {
 
-        final double v12 = v1.getNormSq();
+        final double v12 = v1.getNorm2Sq();
         final double v1n = FastMath.sqrt(v12);
-        final double v22 = v2.getNormSq();
+        final double v22 = v2.getNorm2Sq();
         final double v2n = FastMath.sqrt(v22);
         final double threshold = tolerance * FastMath.max(v1n, v2n);
 
@@ -291,9 +291,9 @@ public class AngularCoordinates implements TimeShiftable<AngularCoordinates>, Se
             if (miae.getSpecifier() == LocalizedCoreFormats.SINGULAR_MATRIX) {
 
                 // handle some special cases for which we can compute a solution
-                final double c12 = c1.getNormSq();
+                final double c12 = c1.getNorm2Sq();
                 final double c1n = FastMath.sqrt(c12);
-                final double c22 = c2.getNormSq();
+                final double c22 = c2.getNorm2Sq();
                 final double c2n = FastMath.sqrt(c22);
 
                 if (c1n <= threshold && c2n <= threshold) {

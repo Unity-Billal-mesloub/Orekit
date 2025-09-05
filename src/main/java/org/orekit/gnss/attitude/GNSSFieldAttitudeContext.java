@@ -438,7 +438,7 @@ class GNSSFieldAttitudeContext<T extends CalculusFieldElement<T>> implements Fie
         final FieldVector3D<T>      p             = svPV.getPosition();
         final FieldVector3D<T>      v             = svPV.getVelocity();
         final FieldVector3D<T>      a             = svPV.getAcceleration();
-        final T                     r2            = p.getNormSq();
+        final T                     r2            = p.getNorm2Sq();
         final T                     r             = FastMath.sqrt(r2);
         final FieldVector3D<T>      keplerianJerk = new FieldVector3D<>(FieldVector3D.dotProduct(p, v).multiply(-3).divide(r2), a,
                                                                         a.getNorm().negate().divide(r), v);

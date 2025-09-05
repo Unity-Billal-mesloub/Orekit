@@ -421,7 +421,7 @@ class GNSSAttitudeContext implements TimeStamped {
         final Vector3D      p             = svPV.getPosition();
         final Vector3D      v             = svPV.getVelocity();
         final Vector3D      a             = svPV.getAcceleration();
-        final double        r2            = p.getNormSq();
+        final double        r2            = p.getNorm2Sq();
         final double        r             = FastMath.sqrt(r2);
         final Vector3D      keplerianJerk = new Vector3D(-3 * Vector3D.dotProduct(p, v) / r2, a, -a.getNorm() / r, v);
         final PVCoordinates velocity      = new PVCoordinates(v, a, keplerianJerk);

@@ -877,7 +877,7 @@ public class FieldKeplerianPropagatorTest {
             final FieldVector3D<T>     velocity     = new FieldVector3D<>(zero.add(505.848),
                                                                           zero.add(942.781),
                                                                           zero.add(7435.922));
-            final FieldVector3D<T>     keplerAcceleration = new FieldVector3D<>(position.getNormSq().reciprocal().multiply(zero.add(mu).negate()),
+            final FieldVector3D<T>     keplerAcceleration = new FieldVector3D<>(position.getNorm2Sq().reciprocal().multiply(zero.add(mu).negate()),
                                                                                position.normalize());
             final FieldVector3D<T>     nonKeplerAcceleration = new FieldVector3D<>(zero.add(0.001),
                                                                                    zero.add(0.002),

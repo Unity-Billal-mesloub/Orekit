@@ -94,7 +94,7 @@ abstract class FieldCartesianEnergyConsideringMass<T extends CalculusFieldElemen
     @Override
     public T getFieldHamiltonianContribution(final T[] adjointVariables, final T mass) {
         final FieldVector3D<T> thrustForce = getFieldThrustAccelerationVector(adjointVariables, mass).scalarMultiply(mass);
-        return thrustForce.getNormSq().multiply(-1. / 2.);
+        return thrustForce.getNorm2Sq().multiply(-1. / 2.);
     }
 
     /**

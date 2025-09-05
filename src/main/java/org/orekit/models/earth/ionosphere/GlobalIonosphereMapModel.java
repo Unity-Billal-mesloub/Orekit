@@ -427,7 +427,7 @@ public class GlobalIonosphereMapModel implements IonosphericModel, IonosphericDe
         final TECMapPair pair = getPairAtDate(date);
         final double     r    = pair.r0 + pair.h;
         final double     r2   = r * r;
-        final double     p2   = recPoint.getNormSq();
+        final double     p2   = recPoint.getNorm2Sq();
         if (p2 >= r2) {
             // we are above ionosphere single layer
             return null;

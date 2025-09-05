@@ -1187,7 +1187,7 @@ public class FieldDSSTPropagatorTest {
         final T dP = field.getZero().add(10.0);
 
         // Computes dV
-        final T r2 = pv.getPosition().getNormSq();
+        final T r2 = pv.getPosition().getNorm2Sq();
         final T v  = pv.getVelocity().getNorm();
         final T dV = dP.multiply(orbit.getMu()).divide(v.multiply(r2));
 

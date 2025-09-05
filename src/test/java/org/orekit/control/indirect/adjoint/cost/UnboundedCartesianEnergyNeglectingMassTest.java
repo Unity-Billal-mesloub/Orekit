@@ -35,7 +35,7 @@ class UnboundedCartesianEnergyNeglectingMassTest {
         // WHEN
         final double contribution = mockedEnergy.getHamiltonianContribution(adjoint, mass);
         // THEN
-        Assertions.assertEquals(-vector.getNormSq() * 0.5, contribution);
+        Assertions.assertEquals(-vector.getNorm2Sq() * 0.5, contribution);
     }
 
 

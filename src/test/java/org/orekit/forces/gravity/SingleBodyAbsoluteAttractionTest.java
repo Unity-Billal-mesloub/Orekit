@@ -86,7 +86,7 @@ public class SingleBodyAbsoluteAttractionTest extends AbstractLegacyForceModelTe
             // compute bodies separation vectors and squared norm
             final Vector3D centralToBody    = body.getPosition(date, state.getFrame());
             final FieldVector3D<DerivativeStructure> satToBody = position.subtract(centralToBody).negate();
-            final DerivativeStructure r2Sat = satToBody.getNormSq();
+            final DerivativeStructure r2Sat = satToBody.getNorm2Sq();
 
             // compute relative acceleration
             final FieldVector3D<DerivativeStructure> satAcc =
@@ -116,7 +116,7 @@ public class SingleBodyAbsoluteAttractionTest extends AbstractLegacyForceModelTe
             // compute bodies separation vectors and squared norm
             final Vector3D centralToBody    = body.getPosition(date, state.getFrame());
             final FieldVector3D<Gradient> satToBody = position.subtract(centralToBody).negate();
-            final Gradient r2Sat = satToBody.getNormSq();
+            final Gradient r2Sat = satToBody.getNorm2Sq();
 
             // compute relative acceleration
             final FieldVector3D<Gradient> satAcc =
@@ -439,7 +439,7 @@ public class SingleBodyAbsoluteAttractionTest extends AbstractLegacyForceModelTe
         final FieldVector3D<Gradient> accelerationVector = forceModel.acceleration(stateMock, new Gradient[] { gm });
 
         // THEN
-        final double[] derivatives = accelerationVector.getNormSq().getGradient();
+        final double[] derivatives = accelerationVector.getNorm2Sq().getGradient();
         Assertions.assertNotEquals(0., MatrixUtils.createRealVector(derivatives).getNorm());
     }
 

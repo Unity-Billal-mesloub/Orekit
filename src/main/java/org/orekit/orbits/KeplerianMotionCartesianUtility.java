@@ -58,7 +58,7 @@ public class KeplerianMotionCartesianUtility {
     public static PVCoordinates predictPositionVelocity(final double dt, final Vector3D position, final Vector3D velocity,
                                                         final double mu) {
         final double r = position.getNorm();
-        final double a = r / (2 - r * velocity.getNormSq() / mu);
+        final double a = r / (2 - r * velocity.getNorm2Sq() / mu);
         if (a >= 0.) {
             return predictPVElliptic(dt, position, velocity, mu, a, r);
         } else {
@@ -136,7 +136,7 @@ public class KeplerianMotionCartesianUtility {
         // preliminary computations
         final Vector3D pvM   = position.crossProduct(velocity);
         final double muA     = mu * a;
-        final double e       = FastMath.sqrt(1 - pvM.getNormSq() / muA);
+        final double e       = FastMath.sqrt(1 - pvM.getNorm2Sq() / muA);
         final double sqrt    = FastMath.sqrt((e + 1) / (e - 1));
 
         // compute mean anomaly
@@ -190,7 +190,7 @@ public class KeplerianMotionCartesianUtility {
                                                                                                     final FieldVector3D<T> velocity,
                                                                                                     final T mu) {
         final T r = position.getNorm();
-        final T a = r.divide(r.multiply(velocity.getNormSq()).divide(mu).negate().add(2));
+        final T a = r.divide(r.multiply(velocity.getNorm2Sq()).divide(mu).negate().add(2));
         if (a.getReal() >= 0.) {
             return predictPVElliptic(dt, position, velocity, mu, a, r);
         } else {
@@ -299,7 +299,7 @@ public class KeplerianMotionCartesianUtility {
         // preliminary computations
         final FieldVector3D<T> pvM   = position.crossProduct(velocity);
         final T muA     = a.multiply(mu);
-        final T e       = a.newInstance(1.).subtract(pvM.getNormSq().divide(muA)).sqrt();
+        final T e       = a.newInstance(1.).subtract(pvM.getNorm2Sq().divide(muA)).sqrt();
         final T ePlusOne = e.add(1);
         final T eMinusOne = e.subtract(1);
         final T sqrt    = ePlusOne.divide(eMinusOne).sqrt();

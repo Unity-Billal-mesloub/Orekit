@@ -82,7 +82,7 @@ public class SingleBodyRelativeAttractionTest extends AbstractLegacyForceModelTe
             // compute bodies separation vectors and squared norm
             final FieldPVCoordinates<DerivativeStructure> bodyPV = body.getPVCoordinates(state.getDate(), state.getFrame());
             final FieldVector3D<DerivativeStructure> satToBody = position.subtract(bodyPV.getPosition()).negate();
-            final DerivativeStructure r2Sat = satToBody.getNormSq();
+            final DerivativeStructure r2Sat = satToBody.getNorm2Sq();
 
             // compute relative acceleration
             final FieldVector3D<DerivativeStructure> satAcc =
@@ -112,7 +112,7 @@ public class SingleBodyRelativeAttractionTest extends AbstractLegacyForceModelTe
             // compute bodies separation vectors and squared norm
             final FieldPVCoordinates<Gradient> bodyPV = body.getPVCoordinates(state.getDate(), state.getFrame());
             final FieldVector3D<Gradient> satToBody = position.subtract(bodyPV.getPosition()).negate();
-            final Gradient r2Sat = satToBody.getNormSq();
+            final Gradient r2Sat = satToBody.getNorm2Sq();
 
             // compute relative acceleration
             final FieldVector3D<Gradient> satAcc =

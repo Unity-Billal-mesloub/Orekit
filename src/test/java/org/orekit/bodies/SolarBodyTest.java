@@ -468,7 +468,7 @@ public class SolarBodyTest {
             // compute bodies separation vectors and squared norm
             final Vector3D centralToBody = body.getPosition(s.getDate(), s.getFrame());
             final Vector3D satToBody     = centralToBody.subtract(s.getPosition());
-            final double   r2Sat         = satToBody.getNormSq();
+            final double   r2Sat         = satToBody.getNorm2Sq();
 
             // compute relative acceleration
             return new Vector3D(gm / (r2Sat * FastMath.sqrt(r2Sat)), satToBody);
@@ -486,7 +486,7 @@ public class SolarBodyTest {
             // compute bodies separation vectors and squared norm
             final FieldVector3D<T> centralToBody = body.getPosition(s.getDate(), s.getFrame());
             final FieldVector3D<T> satToBody     = centralToBody.subtract(s.getPosition());
-            final T                r2Sat         = satToBody.getNormSq();
+            final T                r2Sat         = satToBody.getNorm2Sq();
 
             // compute absolute acceleration
             return new FieldVector3D<>(r2Sat.multiply(r2Sat.sqrt()).reciprocal().multiply(gm), satToBody);

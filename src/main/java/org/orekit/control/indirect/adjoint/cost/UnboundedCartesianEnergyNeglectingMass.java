@@ -56,7 +56,7 @@ public class UnboundedCartesianEnergyNeglectingMass extends AbstractCartesianCos
     @Override
     public double getHamiltonianContribution(final double[] adjointVariables, final double mass) {
         final Vector3D thrustAcceleration = getThrustAccelerationVector(adjointVariables, mass);
-        return -thrustAcceleration.getNormSq() / 2.;
+        return -thrustAcceleration.getNorm2Sq() / 2.;
     }
 
     /** {@inheritDoc} */

@@ -1106,7 +1106,7 @@ public enum OrbitType {
 
         // estimate the scalar velocity error
         final PVCoordinates pv = orbit.getPVCoordinates();
-        final double r2 = pv.getPosition().getNormSq();
+        final double r2 = pv.getPosition().getNorm2Sq();
         final double v  = pv.getVelocity().getNorm();
         final double dV = orbit.getMu() * dP / (v * r2);
 

@@ -1264,7 +1264,7 @@ public class HolmesFeatherstoneAttractionModelTest extends AbstractLegacyForceMo
         final FieldVector3D<Gradient> accelerationVector = model.acceleration(stateMock, new Gradient[] { dummyGm });
 
         // THEN
-        final double[] derivatives = accelerationVector.getNormSq().getGradient();
+        final double[] derivatives = accelerationVector.getNorm2Sq().getGradient();
         Assertions.assertNotEquals(0., MatrixUtils.createRealVector(derivatives).getNorm());
     }
 

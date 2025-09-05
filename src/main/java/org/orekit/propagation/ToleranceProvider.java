@@ -209,7 +209,7 @@ public interface ToleranceProvider extends CartesianToleranceProvider {
                 Arrays.fill(cartAbsTol, 0, 3, dP);
                 // estimate the scalar velocity error
                 final PVCoordinates pv = referenceOrbit.getPVCoordinates();
-                final double r2 = pv.getPosition().getNormSq();
+                final double r2 = pv.getPosition().getNorm2Sq();
                 final double v  = pv.getVelocity().getNorm();
                 final double dV = referenceOrbit.getMu() * dP / (v * r2);
                 Arrays.fill(cartAbsTol, 3, 6, dV);

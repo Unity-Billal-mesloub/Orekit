@@ -281,9 +281,9 @@ public class FieldEquinoctialOrbit<T extends CalculusFieldElement<T>> extends Fi
         final FieldVector3D<T> pvP = pvCoordinates.getPosition();
         final FieldVector3D<T> pvV = pvCoordinates.getVelocity();
         final FieldVector3D<T> pvA = pvCoordinates.getAcceleration();
-        final T r2 = pvP.getNormSq();
+        final T r2 = pvP.getNorm2Sq();
         final T r  = r2.sqrt();
-        final T V2 = pvV.getNormSq();
+        final T V2 = pvV.getNorm2Sq();
         final T rV2OnMu = r.multiply(V2).divide(mu);
 
         // compute semi-major axis
@@ -862,7 +862,7 @@ public class FieldEquinoctialOrbit<T extends CalculusFieldElement<T>> extends Fi
         computePVWithoutA();
 
         // acceleration
-        final T r2 = partialPV.getPosition().getNormSq();
+        final T r2 = partialPV.getPosition().getNorm2Sq();
         final FieldVector3D<T> keplerianAcceleration = new FieldVector3D<>(r2.multiply(r2.sqrt()).reciprocal().multiply(getMu().negate()),
                                                                            partialPV.getPosition());
         final FieldVector3D<T> acceleration = hasNonKeplerianRates() ?
@@ -923,7 +923,7 @@ public class FieldEquinoctialOrbit<T extends CalculusFieldElement<T>> extends Fi
             keplerianShifted.computePVWithoutA();
             final FieldVector3D<T> fixedP   = new FieldVector3D<>(getOne(), keplerianShifted.partialPV.getPosition(),
                                                                   dt.square().multiply(0.5), nonKeplerianAcceleration);
-            final T   fixedR2 = fixedP.getNormSq();
+            final T   fixedR2 = fixedP.getNorm2Sq();
             final T   fixedR  = fixedR2.sqrt();
             final FieldVector3D<T> fixedV  = new FieldVector3D<>(getOne(), keplerianShifted.partialPV.getVelocity(),
                                                                  dt, nonKeplerianAcceleration);
@@ -953,7 +953,7 @@ public class FieldEquinoctialOrbit<T extends CalculusFieldElement<T>> extends Fi
         computePVWithoutA();
         final FieldVector3D<T> position = partialPV.getPosition();
         final FieldVector3D<T> velocity = partialPV.getVelocity();
-        final T r2         = position.getNormSq();
+        final T r2         = position.getNorm2Sq();
         final T r          = r2.sqrt();
         final T r3         = r.multiply(r2);
 

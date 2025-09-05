@@ -335,7 +335,7 @@ public class FieldKeplerianOrbit<T extends CalculusFieldElement<T>> extends Fiel
 
         // compute inclination
         final FieldVector3D<T> momentum = pvCoordinates.getMomentum();
-        final T m2 = momentum.getNormSq();
+        final T m2 = momentum.getNorm2Sq();
 
         i = FieldVector3D.angle(momentum, PLUS_K);
         // compute right ascension of ascending node
@@ -345,9 +345,9 @@ public class FieldKeplerianOrbit<T extends CalculusFieldElement<T>> extends Fiel
         final FieldVector3D<T> pvV     = pvCoordinates.getVelocity();
         final FieldVector3D<T> pvA     = pvCoordinates.getAcceleration();
 
-        final T   r2      = pvP.getNormSq();
+        final T   r2      = pvP.getNorm2Sq();
         final T   r       = r2.sqrt();
-        final T   V2      = pvV.getNormSq();
+        final T   V2      = pvV.getNorm2Sq();
         final T   rV2OnMu = r.multiply(V2).divide(mu);
 
         // compute semi-major axis (will be negative for hyperbolic orbits)
@@ -1062,7 +1062,7 @@ public class FieldKeplerianOrbit<T extends CalculusFieldElement<T>> extends Fiel
         computePVWithoutA();
 
         // acceleration
-        final T r2 = partialPV.getPosition().getNormSq();
+        final T r2 = partialPV.getPosition().getNorm2Sq();
         final FieldVector3D<T> keplerianAcceleration = new FieldVector3D<>(r2.multiply(FastMath.sqrt(r2)).reciprocal().multiply(getMu().negate()),
                                                                            partialPV.getPosition());
         final FieldVector3D<T> acceleration = hasNonKeplerianRates() ?
@@ -1122,7 +1122,7 @@ public class FieldKeplerianOrbit<T extends CalculusFieldElement<T>> extends Fiel
             keplerianShifted.computePVWithoutA();
             final FieldVector3D<T> fixedP   = new FieldVector3D<>(getOne(), keplerianShifted.partialPV.getPosition(),
                                                                   dt.square().multiply(0.5), nonKeplerianAcceleration);
-            final T   fixedR2 = fixedP.getNormSq();
+            final T   fixedR2 = fixedP.getNorm2Sq();
             final T   fixedR  = fixedR2.sqrt();
             final FieldVector3D<T> fixedV  = new FieldVector3D<>(getOne(), keplerianShifted.partialPV.getVelocity(),
                                                                  dt, nonKeplerianAcceleration);
@@ -1169,8 +1169,8 @@ public class FieldKeplerianOrbit<T extends CalculusFieldElement<T>> extends Fiel
         final FieldVector3D<T> position = partialPV.getPosition();
         final FieldVector3D<T> velocity = partialPV.getVelocity();
         final FieldVector3D<T> momentum = partialPV.getMomentum();
-        final T v2         = velocity.getNormSq();
-        final T r2         = position.getNormSq();
+        final T v2         = velocity.getNorm2Sq();
+        final T r2         = position.getNorm2Sq();
         final T r          = r2.sqrt();
         final T r3         = r.multiply(r2);
 
@@ -1309,7 +1309,7 @@ public class FieldKeplerianOrbit<T extends CalculusFieldElement<T>> extends Fiel
         final FieldVector3D<T> position = partialPV.getPosition();
         final FieldVector3D<T> velocity = partialPV.getVelocity();
         final FieldVector3D<T> momentum = partialPV.getMomentum();
-        final T r2         = position.getNormSq();
+        final T r2         = position.getNorm2Sq();
         final T r          = r2.sqrt();
         final T r3         = r.multiply(r2);
 

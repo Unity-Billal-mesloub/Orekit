@@ -184,7 +184,7 @@ public class AberrationModifier implements EstimationModifier<AngularRaDec> {
         final Vector3D direction = new Vector3D(raDec[0], raDec[1]);
 
         // Coefficients for calculations
-        final double inverseBeta = FastMath.sqrt(1.0 - velocity.getNormSq());
+        final double inverseBeta = FastMath.sqrt(1.0 - velocity.getNorm2Sq());
         final double velocityScale = 1.0 + direction.dotProduct(velocity) / (1.0 + inverseBeta);
 
         // From Seidelmann, equation 3.252-3 (unnormalised)
@@ -315,7 +315,7 @@ public class AberrationModifier implements EstimationModifier<AngularRaDec> {
         final FieldVector3D<Gradient> direction = new FieldVector3D<>(raDec[0], raDec[1]);
 
         // Coefficients for calculations
-        final Gradient inverseBeta = (velocity.getNormSq().negate().add(1.0)).sqrt();
+        final Gradient inverseBeta = (velocity.getNorm2Sq().negate().add(1.0)).sqrt();
         final Gradient velocityScale = (direction.dotProduct(velocity)).divide(inverseBeta.add(1.0)).add(1.0);
 
         // From Seidelmann, equation 3.252-3 (unnormalised)
