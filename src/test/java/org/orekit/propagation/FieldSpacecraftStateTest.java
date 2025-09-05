@@ -1042,8 +1042,7 @@ class FieldSpacecraftStateTest {
 
         FieldAbsolutePVCoordinates<T> absPV_f = new FieldAbsolutePVCoordinates<>(FramesFactory.getEME2000(), date, pva_f);
 
-        FieldNumericalPropagator<T> prop = new FieldNumericalPropagator<>(field,
-                        new DormandPrince853FieldIntegrator<>(field, 0.1, 500, 0.001, 0.001));
+        FieldNumericalPropagator<T> prop = new FieldNumericalPropagator<>(new DormandPrince853FieldIntegrator<>(field, 0.1, 500, 0.001, 0.001));
         prop.setOrbitType(null);
 
         final FieldSpacecraftState<T> initialState = new FieldSpacecraftState<>(absPV_f);
@@ -1126,8 +1125,7 @@ class FieldSpacecraftStateTest {
 
         FieldAbsolutePVCoordinates<T> absPV_f = new FieldAbsolutePVCoordinates<>(FramesFactory.getEME2000(), date, pva_f);
 
-        FieldNumericalPropagator<T> prop = new FieldNumericalPropagator<>(field,
-                        new DormandPrince853FieldIntegrator<>(field, 0.1, 500, 0.001, 0.001));
+        FieldNumericalPropagator<T> prop = new FieldNumericalPropagator<>(new DormandPrince853FieldIntegrator<>(field, 0.1, 500, 0.001, 0.001));
         prop.setOrbitType(null);
 
         final FieldSpacecraftState<T> initialState = new FieldSpacecraftState<>(absPV_f);
@@ -1253,7 +1251,7 @@ class FieldSpacecraftStateTest {
 
         // Build propagator
         FieldODEIntegrator<T> odeIntegrator = new DormandPrince853FieldIntegrator<>(field, 1E-3, 1E3, 1E-6, 1E-6);
-        FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(field, odeIntegrator);
+        FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(odeIntegrator);
 
         // Create initial state with one additional state and add it to the propagator
         final String name = "A";

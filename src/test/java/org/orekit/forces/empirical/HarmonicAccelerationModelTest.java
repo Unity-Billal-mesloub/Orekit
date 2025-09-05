@@ -272,7 +272,7 @@ public class HarmonicAccelerationModelTest extends AbstractForceModelTest {
         AdaptiveStepsizeFieldIntegrator<T> integrator0 =
             new DormandPrince853FieldIntegrator<>(field, 0.001, 100, tolerance[0], tolerance[1]);
         integrator0.setInitialStepSize(60);
-        final FieldNumericalPropagator<T> propagator0 = new FieldNumericalPropagator<>(field, integrator0);
+        final FieldNumericalPropagator<T> propagator0 = new FieldNumericalPropagator<>(integrator0);
         propagator0.setOrbitType(OrbitType.EQUINOCTIAL);
         propagator0.setPositionAngleType(PositionAngleType.TRUE);
         propagator0.setInitialState(initialState);
@@ -286,7 +286,7 @@ public class HarmonicAccelerationModelTest extends AbstractForceModelTest {
         AdaptiveStepsizeFieldIntegrator<T> integrator1 =
                         new DormandPrince853FieldIntegrator<>(field, 0.001, 100, tolerance[0], tolerance[1]);
         integrator1.setInitialStepSize(60);
-        final FieldNumericalPropagator<T> propagator1 = new FieldNumericalPropagator<>(field, integrator1);
+        final FieldNumericalPropagator<T> propagator1 = new FieldNumericalPropagator<>(integrator1);
         propagator1.setOrbitType(propagator0.getOrbitType());
         propagator1.setPositionAngleType(propagator0.getPositionAngleType());
         propagator1.setInitialState(initialState);

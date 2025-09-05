@@ -284,7 +284,7 @@ public class ECOM2Test extends AbstractForceModelTest {
         OrbitType type = OrbitType.EQUINOCTIAL;
 
         // Field and classical numerical propagators
-        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(type);
         FNP.setInitialState(initialState);
 
@@ -345,7 +345,7 @@ public class ECOM2Test extends AbstractForceModelTest {
         OrbitType type = OrbitType.EQUINOCTIAL;
 
         // Field and classical numerical propagators
-        FieldNumericalPropagator<Gradient> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<Gradient> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(type);
         FNP.setInitialState(initialState);
 

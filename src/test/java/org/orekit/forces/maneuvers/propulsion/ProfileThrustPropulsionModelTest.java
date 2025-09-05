@@ -241,7 +241,7 @@ class ProfileThrustPropulsionModelTest {
         AdaptiveStepsizeFieldIntegrator<T> integrator =
             new DormandPrince853FieldIntegrator<>(field, 1.0e-6, rampDuration, tolerance[0], tolerance[1]);
         integrator.setInitialStepSize(0.1);
-        final FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(field, integrator);
+        final FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(integrator);
         propagator.setOrbitType(initOrbit.getType());
         propagator.setPositionAngleType(positionAngleType);
         propagator.setInitialState(initialState);

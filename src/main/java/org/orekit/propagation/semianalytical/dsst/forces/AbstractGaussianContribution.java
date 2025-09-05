@@ -2010,6 +2010,7 @@ public abstract class AbstractGaussianContribution implements DSSTForceModel {
         }
 
         /** {@inheritDoc} */
+        @Override
         public String getCoefficientsKeyPrefix() {
             return coefficientsKeyPrefix;
         }
@@ -2285,6 +2286,7 @@ public abstract class AbstractGaussianContribution implements DSSTForceModel {
         }
 
         /** {@inheritDoc} */
+        @Override
         public String getCoefficientsKeyPrefix() {
             return coefficientsKeyPrefix;
         }

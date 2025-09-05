@@ -194,11 +194,13 @@ public class DSSTSolarRadiationPressure extends AbstractGaussianContribution {
     }
 
     /** {@inheritDoc} */
+    @Override
     protected List<ParameterDriver> getParametersDriversWithoutMu() {
         return spacecraft.getRadiationParametersDrivers();
     }
 
     /** {@inheritDoc} */
+    @Override
     protected double[] getLLimits(final SpacecraftState state, final AuxiliaryElements auxiliaryElements) {
 
         // Default bounds without shadow [-PI, PI]
@@ -288,8 +290,9 @@ public class DSSTSolarRadiationPressure extends AbstractGaussianContribution {
     }
 
     /** {@inheritDoc} */
+    @Override
     protected <T extends CalculusFieldElement<T>> T[] getLLimits(final FieldSpacecraftState<T> state,
-                                                             final FieldAuxiliaryElements<T> auxiliaryElements) {
+                                                                 final FieldAuxiliaryElements<T> auxiliaryElements) {
 
         final Field<T> field = state.getDate().getField();
         final T zero = field.getZero();

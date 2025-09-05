@@ -328,7 +328,7 @@ public abstract class AbstractManeuverTriggersTest<T extends AbstractManeuverTri
         double[][] tol = ToleranceProvider.getDefaultToleranceProvider(1e-3).getTolerances(initialState.getOrbit(), orbitType);
         AdaptiveStepsizeFieldIntegrator<S> integrator = new DormandPrince853FieldIntegrator<>(field, 0.001, 1000, tol[0], tol[1]);
         integrator.setInitialStepSize(60);
-        final FieldNumericalPropagator<S> propagator = new FieldNumericalPropagator<>(field, integrator);
+        final FieldNumericalPropagator<S> propagator = new FieldNumericalPropagator<>(integrator);
         propagator.setOrbitType(orbitType);
         propagator.setInitialState(initialState);
         propagator.setAttitudeProvider(attitudeProvider);

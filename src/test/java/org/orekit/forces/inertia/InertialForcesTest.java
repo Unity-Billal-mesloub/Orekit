@@ -225,7 +225,7 @@ public class InertialForcesTest extends AbstractLegacyForceModelTest {
                                                        vecRelativeTolerances);
         RIntegrator.setInitialStepSize(60);
 
-        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(field, integrator);
+        FieldNumericalPropagator<DerivativeStructure> FNP = new FieldNumericalPropagator<>(integrator);
         FNP.setOrbitType(null);
         FNP.setIgnoreCentralAttraction(true);
         FNP.setInitialState(initialState);

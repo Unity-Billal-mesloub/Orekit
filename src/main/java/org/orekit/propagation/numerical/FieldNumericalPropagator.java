@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hipparchus.CalculusFieldElement;
-import org.hipparchus.Field;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.ode.FieldODEIntegrator;
 import org.hipparchus.util.MathArrays;
@@ -151,9 +150,6 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
     /** Force models used during the extrapolation of the FieldOrbit<T>, without Jacobians. */
     private final List<ForceModel> forceModels;
 
-    /** Field used by this class.*/
-    private final Field<T> field;
-
     /** boolean to ignore or not the creation of a NewtonianAttraction. */
     private boolean ignoreCentralAttraction = false;
 
@@ -162,7 +158,8 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
      */
     private boolean needFullAttitudeForDerivatives = true;
 
-    /** Create a new instance of NumericalPropagator, based on orbit definition mu.
+    /**
+     * Create a new instance of NumericalPropagator, based on orbit definition mu.
      * After creation, the instance is empty, i.e. the attitude provider is set to an
      * unspecified default law and there are no perturbing forces at all.
      * This means that if {@link #addForceModel addForceModel} is not
@@ -175,15 +172,15 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
      * <p>This constructor uses the {@link DataContext#getDefault() default data context}.
      *
      * @param integrator numerical integrator to use for propagation.
-     * @param field Field used by default
-     * @see #FieldNumericalPropagator(Field, FieldODEIntegrator, AttitudeProvider)
+     * @see #FieldNumericalPropagator(FieldODEIntegrator, AttitudeProvider)
      */
     @DefaultDataContext
-    public FieldNumericalPropagator(final Field<T> field, final FieldODEIntegrator<T> integrator) {
-        this(field, integrator, Propagator.getDefaultLaw(DataContext.getDefault().getFrames()));
+    public FieldNumericalPropagator(final FieldODEIntegrator<T> integrator) {
+        this(integrator, Propagator.getDefaultLaw(DataContext.getDefault().getFrames()));
     }
 
-    /** Create a new instance of NumericalPropagator, based on orbit definition mu.
+    /**
+     * Create a new instance of NumericalPropagator, based on orbit definition mu.
      * After creation, the instance is empty, i.e. the attitude provider is set to an
      * unspecified default law and there are no perturbing forces at all.
      * This means that if {@link #addForceModel addForceModel} is not
@@ -192,20 +189,18 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
      * for {@link #setOrbitType(OrbitType) propagation
      * orbit type} and {@link PositionAngleType#ECCENTRIC} for {@link
      * #setPositionAngleType(PositionAngleType) position angle type}.
-     * @param field Field used by default
-     * @param integrator numerical integrator to use for propagation.
+     *
+     * @param integrator       numerical integrator to use for propagation.
      * @param attitudeProvider attitude law to use.
      * @since 10.1
      */
-    public FieldNumericalPropagator(final Field<T> field,
-                                    final FieldODEIntegrator<T> integrator,
+    public FieldNumericalPropagator(final FieldODEIntegrator<T> integrator,
                                     final AttitudeProvider attitudeProvider) {
-        super(field, integrator, PropagationType.OSCULATING);
-        this.field = field;
+        super(integrator.getCurrentSignedStepsize().getField(), integrator, PropagationType.OSCULATING);
         forceModels = new ArrayList<>();
-        initMapper(field);
+        initMapper(getField());
         setAttitudeProvider(attitudeProvider);
-        setMu(field.getZero().add(Double.NaN));
+        setMu(getField().getZero().add(Double.NaN));
         clearStepHandlers();
         setOrbitType(NumericalPropagator.DEFAULT_ORBIT_TYPE);
         setPositionAngleType(NumericalPropagator.DEFAULT_POSITION_ANGLE_TYPE);
@@ -275,13 +270,13 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
                     @Override
                     public void valueChanged(final double previousValue, final ParameterDriver driver, final AbsoluteDate date) {
                         // mu PDriver should have only 1 span
-                        superSetMu(field.getZero().newInstance(driver.getValue(date)));
+                        superSetMu(getField().getZero().newInstance(driver.getValue(date)));
                     }
                     /** {@inheritDoc} */
                     @Override
                     public void valueSpanMapChanged(final TimeSpanMap<Double> previousValue, final ParameterDriver driver) {
                         // mu PDriver should have only 1 span
-                        superSetMu(field.getZero().newInstance(driver.getValue()));
+                        superSetMu(getField().getZero().newInstance(driver.getValue()));
                     }
                 });
             } catch (OrekitException oe) {
@@ -400,9 +395,10 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
     }
 
     /** {@inheritDoc} */
+    @Override
     protected FieldStateMapper<T> createMapper(final FieldAbsoluteDate<T> referenceDate, final T mu,
-                                       final OrbitType orbitType, final PositionAngleType positionAngleType,
-                                       final AttitudeProvider attitudeProvider, final Frame frame) {
+                                               final OrbitType orbitType, final PositionAngleType positionAngleType,
+                                               final AttitudeProvider attitudeProvider, final Frame frame) {
         return new FieldOsculatingMapper(referenceDate, mu, orbitType, positionAngleType, attitudeProvider, frame);
     }
 
@@ -430,6 +426,7 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
         }
 
         /** {@inheritDoc} */
+        @Override
         public FieldSpacecraftState<T> mapArrayToState(final FieldAbsoluteDate<T> date, final T[] y, final T[] yDot,
                                                        final PropagationType type) {
             // the parameter type is ignored for the Numerical Propagator
@@ -464,6 +461,7 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
         }
 
         /** {@inheritDoc} */
+        @Override
         public void mapStateToArray(final FieldSpacecraftState<T> state, final T[] y, final T[] yDot) {
             if (superGetOrbitType() == null) {
                 // propagation uses absolute position-velocity-acceleration
@@ -475,17 +473,17 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
                 y[3] = v.getX();
                 y[4] = v.getY();
                 y[5] = v.getZ();
-                y[6] = state.getMass();
             }
             else {
                 superGetOrbitType().mapOrbitToArray(state.getOrbit(), super.getPositionAngleType(), y, yDot);
-                y[6] = state.getMass();
             }
+            y[6] = state.getMass();
         }
 
     }
 
     /** {@inheritDoc} */
+    @Override
     protected MainStateEquations<T> getMainStateEquations(final FieldODEIntegrator<T> integrator) {
         return new Main(integrator);
     }

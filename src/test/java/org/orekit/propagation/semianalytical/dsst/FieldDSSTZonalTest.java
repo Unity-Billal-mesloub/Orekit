@@ -623,7 +623,7 @@ public class FieldDSSTZonalTest {
         final ClassicalRungeKuttaFieldIntegrator<T> integrator =
                         new ClassicalRungeKuttaFieldIntegrator<>(field, zero.newInstance(step));
 
-        final FieldNumericalPropagator<T> numProp = new FieldNumericalPropagator<>(field, integrator);
+        final FieldNumericalPropagator<T> numProp = new FieldNumericalPropagator<>(integrator);
         numProp.setOrbitType(oscOrbit0.getType());
         numProp.setInitialState(oscState0);
         numProp.setAttitudeProvider(attProvider);
@@ -633,7 +633,7 @@ public class FieldDSSTZonalTest {
         // DSST prop: max step could be much higher but made explicitly equal to numerical to rule out a step difference
         final ClassicalRungeKuttaFieldIntegrator<T> integratorDsst =
                         new ClassicalRungeKuttaFieldIntegrator<>(field, zero.newInstance(step));
-        final FieldDSSTPropagator<T> dsstProp = new FieldDSSTPropagator<T>(field, integratorDsst, PropagationType.OSCULATING);
+        final FieldDSSTPropagator<T> dsstProp = new FieldDSSTPropagator<T>(integratorDsst, PropagationType.OSCULATING);
         dsstProp.setInitialState(oscState0, PropagationType.OSCULATING); // Initial state is OSCULATING
         dsstProp.setAttitudeProvider(attProvider);
         final DSSTForceModel zonal = new DSSTZonal(bodyFixedFrame, unnormalized); // J2-only with custom Earth-fixed frame

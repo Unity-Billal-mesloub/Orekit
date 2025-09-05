@@ -87,7 +87,6 @@ public class FieldHansenTesseralLinear <T extends CalculusFieldElement<T>> {
      * @param maxHansen maximum power of the eccentricity to use in Hansen coefficient Kernel expansion.
      * @param field field used by default
      */
-    @SuppressWarnings("unchecked")
     public FieldHansenTesseralLinear(final int nMax, final int s, final int j, final int n0,
                                      final int maxHansen, final Field<T> field) {
         //Initialize the fields
@@ -99,7 +98,7 @@ public class FieldHansenTesseralLinear <T extends CalculusFieldElement<T>> {
         //Ensure that only the needed terms are computed
         this.hansenInit = (FieldHansenCoefficientsBySeries<T>[]) Array.newInstance(FieldHansenCoefficientsBySeries.class, maxRoots);
         for (int i = 0; i < maxRoots; i++) {
-            this.hansenInit[i] = new FieldHansenCoefficientsBySeries<>(N0 - i + 3, s, j, maxHansen, field);
+            this.hansenInit[i] = new FieldHansenCoefficientsBySeries<>(N0 - i + 3, s, j, maxHansen);
         }
 
         // The first 4 values are computed with series. No linear combination is needed.
@@ -268,14 +267,13 @@ public class FieldHansenTesseralLinear <T extends CalculusFieldElement<T>> {
         /**
          * Class constructor.
          *
-         * @param mnm1 -n-1 value
-         * @param s s value
-         * @param j j value
+         * @param mnm1      -n-1 value
+         * @param s         s value
+         * @param j         j value
          * @param maxHansen max power of e² in series expansion
-         * @param field field for the function parameters and value
          */
         FieldHansenCoefficientsBySeries(final int mnm1, final int s,
-                                          final int j, final int maxHansen, final Field<T> field) {
+                                        final int j, final int maxHansen) {
             this.mnm1 = mnm1;
             this.s = s;
             this.j = j;

@@ -66,7 +66,7 @@ public class FieldBetaAngleDetectorTest {
         AdaptiveStepsizeFieldIntegrator<Binary64> integrator =
             new DormandPrince853FieldIntegrator<>(Binary64Field.getInstance(), 0.001, 1000, absTolerance, relTolerance);
         integrator.setInitialStepSize(60);
-        propagator = new FieldNumericalPropagator<>(Binary64Field.getInstance(), integrator);
+        propagator = new FieldNumericalPropagator<>(integrator);
         ((FieldNumericalPropagator<Binary64>) propagator).setInitialState(initialState);
         date = iniDate;
     }

@@ -84,7 +84,7 @@ public class FieldAdditionalDataProviderTest {
         // Create propagator
         final FieldSpacecraftState<T> state = createState(field);
         final AdaptiveStepsizeFieldIntegrator<T> integrator = createIntegrator(field, state);
-        final FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(field, integrator);
+        final FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(integrator);
         propagator.setInitialState(state);
 
         // Create state modifier
@@ -115,7 +115,7 @@ public class FieldAdditionalDataProviderTest {
         // Create propagator
         final FieldSpacecraftState<T> state = createState(field);
         final AdaptiveStepsizeFieldIntegrator<T> integrator = createIntegrator(field, state);
-        final FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(field, integrator);
+        final FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(integrator);
         propagator.setInitialState(state);
 
         // Create additional state provider
@@ -206,7 +206,7 @@ public class FieldAdditionalDataProviderTest {
 
         final FieldSpacecraftState<T> state = createState(field);
         final AdaptiveStepsizeFieldIntegrator<T> integrator = createIntegrator(field, state);
-        final FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(field, integrator);
+        final FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(integrator);
         propagator.setInitialState(state);
 
         final MainStringDataModifier<T> modifier = new MainStringDataModifier<>();
@@ -224,7 +224,7 @@ public class FieldAdditionalDataProviderTest {
     private <T extends CalculusFieldElement<T>> void doTestInterpolationAdditionalStringData(Field<T> field) {
         final FieldSpacecraftState<T> state = createState(field);
         final AdaptiveStepsizeFieldIntegrator<T> integrator = createIntegrator(field, state);
-        final FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(field, integrator);
+        final FieldNumericalPropagator<T> propagator = new FieldNumericalPropagator<>(integrator);
         propagator.setInitialState(state);
 
         final MainStringDataModifier<T> modifier = new MainStringDataModifier<>();
