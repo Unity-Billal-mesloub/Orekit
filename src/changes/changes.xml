@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
+        <action dev="serrof" type="add" issue="1813">
+            Add FieldLatitudeExtremumDetector and FieldLongitudeExtremumDetector.
+        </action>
         <action dev="bryan" type="update" issue="1808">
             Removed useless field parameter in FieldDSSTPropagator and FieldNumericalPropagator.
         </action>
