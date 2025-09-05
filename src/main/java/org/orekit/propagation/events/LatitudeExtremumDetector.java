@@ -17,14 +17,11 @@
 package org.orekit.propagation.events;
 
 import org.hipparchus.analysis.differentiation.UnivariateDerivative2;
-import org.hipparchus.analysis.differentiation.UnivariateDerivative2Field;
 import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.FieldGeodeticPoint;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnIncreasing;
-import org.orekit.time.FieldAbsoluteDate;
-import org.orekit.utils.FieldPVCoordinates;
 
 /** Detector for geographic latitude extremum.
  * <p>This detector identifies when a spacecraft reaches its
@@ -32,7 +29,7 @@ import org.orekit.utils.FieldPVCoordinates;
  * @author Luc Maisonobe
  * @since 7.1
  */
-public class LatitudeExtremumDetector extends AbstractGeographicalDetector<LatitudeExtremumDetector> {
+public class LatitudeExtremumDetector extends AbstractGeodeticExtremumDetector<LatitudeExtremumDetector> {
 
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
@@ -84,13 +81,8 @@ public class LatitudeExtremumDetector extends AbstractGeographicalDetector<Latit
      * @return spacecraft latitude time derivative
      */
     public double g(final SpacecraftState s) {
-
         // convert state to geodetic coordinates
-        final FieldPVCoordinates<UnivariateDerivative2> pv = s.getPVCoordinates().toUnivariateDerivative2PV();
-        final UnivariateDerivative2Field field = UnivariateDerivative2Field.getInstance();
-        final UnivariateDerivative2 dt = new UnivariateDerivative2(0, 1, 0);
-        final FieldAbsoluteDate<UnivariateDerivative2> fieldDate = new FieldAbsoluteDate<>(field, s.getDate()).shiftedBy(dt);
-        final FieldGeodeticPoint<UnivariateDerivative2> gp = getBodyShape().transform(pv.getPosition(), s.getFrame(), fieldDate);
+        final FieldGeodeticPoint<UnivariateDerivative2> gp = transformToFieldGeodeticPoint(s);
 
         // latitude time derivative
         return gp.getLatitude().getFirstDerivative();
