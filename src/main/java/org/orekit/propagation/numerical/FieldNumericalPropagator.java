@@ -473,12 +473,11 @@ public class FieldNumericalPropagator<T extends CalculusFieldElement<T>> extends
                 y[3] = v.getX();
                 y[4] = v.getY();
                 y[5] = v.getZ();
-                y[6] = state.getMass();
             }
             else {
                 superGetOrbitType().mapOrbitToArray(state.getOrbit(), super.getPositionAngleType(), y, yDot);
-                y[6] = state.getMass();
             }
+            y[6] = state.getMass();
         }
 
     }
