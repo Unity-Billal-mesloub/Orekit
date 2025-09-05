@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="13.1.1" date="TBC" description="TBC">
+        <action dev="luc" type="fix" issue="1812">
+          Fixed NullPointerException in Sinex bias handling.
+        </action>
         <action dev="luc" type="fix" issue="1811">
           Fixed observables ordering error when writing Rinex observation header.
         </action>

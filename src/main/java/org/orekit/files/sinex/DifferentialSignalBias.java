@@ -100,7 +100,8 @@ public class DifferentialSignalBias {
      * @return minimum valid date for the observation pair
      */
     public AbsoluteDate getMinimumValidDateForObservationPair(final ObservationType obs1, final ObservationType obs2) {
-        return getTimeSpanMap(obs1, obs2).getFirstTransition().getDate();
+        final TimeSpanMap.Transition<Double> transition = getTimeSpanMap(obs1, obs2).getFirstTransition();
+        return transition == null ? AbsoluteDate.PAST_INFINITY : transition.getDate();
     }
 
     /** Get the maximum valid date for a given observation pair.
@@ -109,7 +110,8 @@ public class DifferentialSignalBias {
      * @return maximum valid date for the observation pair
      */
     public AbsoluteDate getMaximumValidDateForObservationPair(final ObservationType obs1, final ObservationType obs2) {
-        return getTimeSpanMap(obs1, obs2).getLastTransition().getDate();
+        final TimeSpanMap.Transition<Double> transition = getTimeSpanMap(obs1, obs2).getLastTransition();
+        return transition == null ? AbsoluteDate.FUTURE_INFINITY : transition.getDate();
     }
 
     /** Get the TimeSpanMap object for a given observation type pair,
