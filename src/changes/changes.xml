@@ -23,6 +23,9 @@
         <action dev="luc" type="fix" issue="1798">
           Fixed time interpolation in Global Ionospheric Model (ionex files).
         </action>
+        <action dev="serrof" type="fix" issue="1816">
+            Improved performance of STM propagation with many forces.
+        </action>
         <action dev="luc" type="fix" issue="1812">
           Fixed NullPointerException in Sinex bias handling.
         </action>
