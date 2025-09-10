@@ -519,7 +519,7 @@ public abstract class FieldAbstractIntegratedPropagator<T extends CalculusFieldE
 
             if (getInitialState().getMass().getReal() <= 0.0) {
                 throw new OrekitException(OrekitMessages.NOT_POSITIVE_SPACECRAFT_MASS,
-                                               getInitialState().getMass());
+                                               getInitialState().getMass().getReal());
             }
 
             // convert space flight dynamics API to math API

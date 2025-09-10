@@ -44,6 +44,9 @@
         <action dev="evan" type="fix">
             Fix exception message when parsing a CDM with an invalid date.
         </action>
+        <action dev="evan" type="fix">
+            Fix exception messages with FieldElements.
+        </action>
     </release>
     <release version="13.1" date="2025-08-01" description="13.1 is a minor release.">
         <action dev="serrof" type="fix" issue="1782">
