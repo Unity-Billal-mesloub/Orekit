@@ -774,6 +774,15 @@ class SpacecraftStateTest {
         }
     }
 
+    @Deprecated
+    @Test
+    void testDeprecated() {
+        final AbsolutePVCoordinates absolutePVCoordinates = new AbsolutePVCoordinates(orbit.getFrame(), orbit.getDate(),
+                orbit.getPVCoordinates());
+        Assertions.assertEquals(mass, new SpacecraftState(orbit, mass).getMass());
+        Assertions.assertEquals(mass, new SpacecraftState(absolutePVCoordinates, mass).getMass());
+    }
+
     @AfterEach
     public void tearDown() {
         mass  = Double.NaN;
