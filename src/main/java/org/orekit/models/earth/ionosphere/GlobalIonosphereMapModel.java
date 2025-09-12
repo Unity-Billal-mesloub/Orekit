@@ -29,7 +29,10 @@ import java.util.List;
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.interpolation.BilinearInterpolatingFunction;
 import org.hipparchus.exception.DummyLocalizable;
+import org.hipparchus.exception.LocalizedCoreFormats;
+import org.hipparchus.geometry.euclidean.threed.FieldLine;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
+import org.hipparchus.geometry.euclidean.threed.Line;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathUtils;
@@ -37,6 +40,7 @@ import org.orekit.annotation.DefaultDataContext;
 import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.FieldGeodeticPoint;
 import org.orekit.bodies.GeodeticPoint;
+import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.data.DataContext;
 import org.orekit.data.DataLoader;
 import org.orekit.data.DataProvidersManager;
@@ -117,7 +121,12 @@ import org.orekit.utils.TimeSpanMap;
  *    92   92   92   92   92   92   92   92   92
  *    ...
  * </pre>
- *
+ * <p>
+ * Note that this model {@link #pathDelay(SpacecraftState, TopocentricFrame, double,
+ * double[]) pathDelay} methods <em>requires</em> the {@link TopocentricFrame topocentric frame}
+ * to lie on a {@link OneAxisEllipsoid} body shape, because the single layer on which
+ * pierce point is computed must be an ellipsoidal shape at some altitude.
+ * </p>
  * @see "Schaer, S., W. Gurtner, and J. Feltens, 1998, IONEX: The IONosphere Map EXchange
  *       Format Version 1, February 25, 1998, Proceedings of the IGS AC Workshop
  *       Darmstadt, Germany, February 9–11, 1998"
@@ -317,11 +326,24 @@ public class GlobalIonosphereMapModel implements IonosphericModel, IonosphericDe
         if (elevation > 0.0) {
             // Normalized Line Of Sight in body frame
             final Vector3D los = satPoint.subtract(baseFrame.getCartesianPoint()).normalize();
-            // Ionosphere Pierce Point
-            final GeodeticPoint ipp = piercePoint(state.getDate(), baseFrame.getCartesianPoint(), los, baseFrame.getParentShape());
-            if (ipp != null) {
-                // Delay
+            try {
+
+                // ionosphere Pierce Point
+                final GeodeticPoint ipp = piercePoint(state.getDate(), baseFrame.getCartesianPoint(), los,
+                                                      baseFrame.getParentShape());
+
+                // delay
                 return pathDelayAtIPP(state.getDate(), ipp, elevation, frequency);
+
+            } catch (final OrekitException oe) {
+                if (oe.getSpecifier() == OrekitMessages.LINE_NEVER_CROSSES_ALTITUDE ||
+                    oe.getSpecifier() == LocalizedCoreFormats.CONVERGENCE_FAILED) {
+                    // we don't cross ionosphere layer (or we just skim it)
+                    return 0.0;
+                } else {
+                    // this is an unexpected error
+                    throw oe;
+                }
             }
         }
 
@@ -393,12 +415,24 @@ public class GlobalIonosphereMapModel implements IonosphericModel, IonosphericDe
         if (elevation.getReal() > 0.0) {
             // Normalized Line Of Sight in body frame
             final FieldVector3D<T> los = satPoint.subtract(baseFrame.getCartesianPoint()).normalize();
-            // Ionosphere Pierce Point
-            final FieldGeodeticPoint<T> ipp = piercePoint(state.getDate(), baseFrame.getCartesianPoint(),
-                                                          los, baseFrame.getParentShape());
-            if (ipp != null) {
-                // Delay
+            try {
+
+                // ionosphere Pierce Point
+                final FieldGeodeticPoint<T> ipp = piercePoint(state.getDate(), baseFrame.getCartesianPoint(),
+                                                              los, baseFrame.getParentShape());
+
+                // delay
                 return pathDelayAtIPP(state.getDate(), ipp, elevation, frequency);
+
+            } catch (final OrekitException oe) {
+                if (oe.getSpecifier() == OrekitMessages.LINE_NEVER_CROSSES_ALTITUDE ||
+                    oe.getSpecifier() == LocalizedCoreFormats.CONVERGENCE_FAILED) {
+                    // we don't cross ionosphere layer (or we just skim it)
+                    return elevation.getField().getZero();
+                } else {
+                    // this is an unexpected error
+                    throw oe;
+                }
             }
         }
 
@@ -481,25 +515,20 @@ public class GlobalIonosphereMapModel implements IonosphericModel, IonosphericDe
     private GeodeticPoint piercePoint(final AbsoluteDate date,
                                       final Vector3D recPoint, final Vector3D los,
                                       final BodyShape bodyShape) {
+        if (bodyShape instanceof OneAxisEllipsoid) {
 
-        final TECMapPair pair = getPairAtDate(date);
-        final double     r    = pair.r0 + pair.h;
-        final double     r2   = r * r;
-        final double     p2   = recPoint.getNormSq();
-        if (p2 >= r2) {
-            // we are above ionosphere single layer
-            return null;
+            // pierce point of ellipsoidal shape
+            final OneAxisEllipsoid ellipsoid = (OneAxisEllipsoid) bodyShape;
+            final Line line = new Line(recPoint, new Vector3D(1.0, recPoint, 1.0e6, los), 1.0e-12);
+            final double h = getPairAtDate(date).h;
+            final Vector3D ipp = ellipsoid.pointAtAltitude(line, h, recPoint, bodyShape.getBodyFrame(), date);
+
+            // convert to geocentric (NOT geodetic) coordinates
+            return new GeodeticPoint(ipp.getDelta(), ipp.getAlpha(), h);
+
+        } else {
+            throw new OrekitException(OrekitMessages.BODY_SHAPE_MUST_BE_A_ONE_AXIS_ELLIPSOID);
         }
-
-        // compute positive k such that recPoint + k los is on the spherical shell at radius r
-        final double dot = Vector3D.dotProduct(recPoint, los);
-        final double k   = FastMath.sqrt(dot * dot + r2 - p2) - dot;
-
-        // Ionosphere Pierce Point in body frame
-        final Vector3D ipp = new Vector3D(1, recPoint, k, los);
-
-        return bodyShape.transform(ipp, bodyShape.getBodyFrame(), null);
-
     }
 
     /** Compute Ionospheric Pierce Point.
@@ -518,25 +547,23 @@ public class GlobalIonosphereMapModel implements IonosphericModel, IonosphericDe
                                                                                   final Vector3D recPoint,
                                                                                   final FieldVector3D<T> los,
                                                                                   final BodyShape bodyShape) {
+        if (bodyShape instanceof OneAxisEllipsoid) {
 
-        final TECMapPair pair = getPairAtDate(date.toAbsoluteDate());
-        final double     r    = pair.r0 + pair.h;
-        final double     r2   = r * r;
-        final double     p2   = recPoint.getNormSq();
-        if (p2 >= r2) {
-            // we are above ionosphere single layer
-            return null;
+            // pierce point of ellipsoidal shape
+            final OneAxisEllipsoid ellipsoid = (OneAxisEllipsoid) bodyShape;
+            final FieldVector3D<T> recPointF = new FieldVector3D<>(date.getField(), recPoint);
+            final FieldLine<T> line = new FieldLine<>(recPointF,
+                                                      new FieldVector3D<>(1.0, recPointF, 1.0e6, los),
+                                                      1.0e-12);
+            final T h = date.getField().getZero().newInstance(getPairAtDate(date.toAbsoluteDate()).h);
+            final FieldVector3D<T> ipp = ellipsoid.pointAtAltitude(line, h, recPointF, bodyShape.getBodyFrame(), date);
+
+            // convert to geocentric (NOT geodetic) coordinates
+            return new FieldGeodeticPoint<>(ipp.getDelta(), ipp.getAlpha(), h);
+
+        } else {
+            throw new OrekitException(OrekitMessages.BODY_SHAPE_MUST_BE_A_ONE_AXIS_ELLIPSOID);
         }
-
-        // compute positive k such that recPoint + k los is on the spherical shell at radius r
-        final T dot = FieldVector3D.dotProduct(recPoint, los);
-        final T k   = FastMath.sqrt(dot.multiply(dot).add(r2 - p2)).subtract(dot);
-
-        // Ionosphere Pierce Point in body frame
-        final FieldVector3D<T> ipp = new FieldVector3D<>(k, los).add(recPoint);
-
-        return bodyShape.transform(ipp, bodyShape.getBodyFrame(), null);
-
     }
 
     /** Parser for IONEX files. */

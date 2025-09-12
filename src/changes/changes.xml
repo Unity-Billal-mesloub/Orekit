@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="13.1.1" date="TBD" description="13.1 is a patch release.">
+        <action dev="luc" type="fix" issue="1817">
+          Fixed Ionosphere Piercing Point computation in Global Ionosphere Model.
+        </action>
         <action dev="luc" type="fix" issue="1819">
           Added pointAtAltitude in OneAxisEllipsoid.
         </action>

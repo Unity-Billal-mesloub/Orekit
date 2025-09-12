@@ -47,6 +47,8 @@ import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.gnss.PredefinedGnssSignal;
+import org.orekit.models.earth.Geoid;
+import org.orekit.models.earth.ReferenceEllipsoid;
 import org.orekit.orbits.CartesianOrbit;
 import org.orekit.orbits.FieldCartesianOrbit;
 import org.orekit.orbits.FieldKeplerianOrbit;
@@ -161,7 +163,7 @@ public class GlobalIonosphereMapModelTest {
                                                                              36.0),
                                                            "Cuttack");
         final double delay = model.pathDelay(state, topo, PredefinedGnssSignal.G01.getFrequency(), null);
-        Assertions.assertEquals(2.810, delay, epsilonDelay);
+        Assertions.assertEquals(2.811, delay, epsilonDelay);
 
         // the delay at station longitude is different, due to IPP
         try {
@@ -232,7 +234,7 @@ public class GlobalIonosphereMapModelTest {
                                                                              36.0),
                                                            "Cuttack");
         final T delay = model.pathDelay(state, topo, PredefinedGnssSignal.G01.getFrequency(), null);
-        Assertions.assertEquals(2.810, delay.getReal(), epsilonDelay);
+        Assertions.assertEquals(2.811, delay.getReal(), epsilonDelay);
 
         // the delay at station longitude is different, due to IPP
         try {
@@ -432,7 +434,11 @@ public class GlobalIonosphereMapModelTest {
             new GlobalIonosphereMapModel(utc,
                                          GlobalIonosphereMapModel.TimeInterpolator.ROTATED_LINEAR,
                                          new DataSource(uri));
-        final TopocentricFrame topo = new TopocentricFrame(earth,
+        final OneAxisEllipsoid sphericalEarth = new OneAxisEllipsoid(Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
+                                                                     0.0,
+                                                                     FramesFactory.getITRF(IERSConventions.IERS_2010,
+                                                                                           true));
+        final TopocentricFrame topo = new TopocentricFrame(sphericalEarth,
                                                            new GeodeticPoint(FastMath.toRadians(55.0),
                                                                              FastMath.toRadians(15.0),
                                                                              0.0),
@@ -514,7 +520,11 @@ public class GlobalIonosphereMapModelTest {
             new GlobalIonosphereMapModel(utc,
                                          GlobalIonosphereMapModel.TimeInterpolator.ROTATED_LINEAR,
                                          new DataSource(uri));
-        final TopocentricFrame topo = new TopocentricFrame(earth,
+        final OneAxisEllipsoid sphericalEarth = new OneAxisEllipsoid(Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
+                                                                     0.0,
+                                                                     FramesFactory.getITRF(IERSConventions.IERS_2010,
+                                                                                           true));
+        final TopocentricFrame topo = new TopocentricFrame(sphericalEarth,
                                                            new GeodeticPoint(FastMath.toRadians(55.0),
                                                                              FastMath.toRadians(15.0),
                                                                              0.0),
@@ -581,6 +591,59 @@ public class GlobalIonosphereMapModelTest {
                                 rotated.pathDelay(sInterp, topo, frequency, rotated.getParameters(field, tInterp)).getReal(),
                                 1.0e-15);
 
+    }
+
+    @Test
+    public void testNotEllipsoid() throws URISyntaxException {
+        Utils.setDataRoot("regular-data:ionex:potential");
+        final DataContext dataContext = DataContext.getDefault();
+        final TimeScale   utc         = dataContext.getTimeScales().getUTC();
+        final URI         uri         = DirectoryCrawlerTest.class.getClassLoader().getResource("ionex/gpsg0150.19i").toURI();
+        final GlobalIonosphereMapModel gim =
+            new GlobalIonosphereMapModel(utc,
+                                         GlobalIonosphereMapModel.TimeInterpolator.ROTATED_LINEAR,
+                                         new DataSource(uri));
+        try {
+            final SpacecraftState shifted = state.shiftedBy(2000.0);
+            final Frame       itrf        = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
+            final Geoid       geoid       = new Geoid(dataContext.getGravityFields().getNormalizedProvider(2, 0),
+                                                      ReferenceEllipsoid.getWgs84(itrf));
+            gim.pathDelay(shifted,
+                          new TopocentricFrame(geoid, new GeodeticPoint(0, 0, 0.0), "dummy"),
+                          PredefinedGnssSignal.G01.getFrequency(), gim.getParameters(shifted.getDate()));
+            Assertions.fail("an exception should have been thrown");
+        } catch (OrekitException oe) {
+            Assertions.assertEquals(OrekitMessages.BODY_SHAPE_MUST_BE_A_ONE_AXIS_ELLIPSOID, oe.getSpecifier());
+        }
+    }
+
+   @Test
+    public void testFieldNotEllipsoid() throws URISyntaxException {
+        doTestFieldNotEllipsoid(Binary64Field.getInstance());
+   }
+
+   private <T extends CalculusFieldElement<T>> void doTestFieldNotEllipsoid(final Field<T> field)
+       throws URISyntaxException {
+        Utils.setDataRoot("regular-data:ionex:potential");
+        final DataContext dataContext = DataContext.getDefault();
+        final TimeScale   utc         = dataContext.getTimeScales().getUTC();
+        final URI         uri         = DirectoryCrawlerTest.class.getClassLoader().getResource("ionex/gpsg0150.19i").toURI();
+        final GlobalIonosphereMapModel gim =
+            new GlobalIonosphereMapModel(utc,
+                                         GlobalIonosphereMapModel.TimeInterpolator.ROTATED_LINEAR,
+                                         new DataSource(uri));
+        try {
+            final FieldSpacecraftState<T> shifted = new FieldSpacecraftState<>(field, state.shiftedBy(2000.0));
+            final Frame       itrf        = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
+            final Geoid       geoid       = new Geoid(dataContext.getGravityFields().getNormalizedProvider(2, 0),
+                                                      ReferenceEllipsoid.getWgs84(itrf));
+            gim.pathDelay(shifted,
+                          new TopocentricFrame(geoid, new GeodeticPoint(0, 0, 0.0), "dummy"),
+                          PredefinedGnssSignal.G01.getFrequency(), gim.getParameters(field, shifted.getDate()));
+            Assertions.fail("an exception should have been thrown");
+        } catch (OrekitException oe) {
+            Assertions.assertEquals(OrekitMessages.BODY_SHAPE_MUST_BE_A_ONE_AXIS_ELLIPSOID, oe.getSpecifier());
+        }
     }
 
     @Test
