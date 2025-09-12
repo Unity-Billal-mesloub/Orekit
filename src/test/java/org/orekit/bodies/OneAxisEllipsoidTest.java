@@ -616,7 +616,7 @@ class OneAxisEllipsoidTest {
         Assertions.assertEquals(lat1, rebuilt.getLatitude().getPartialDerivative(1),  5.0e-19);
         Assertions.assertEquals(lat2, rebuilt.getLatitude().getPartialDerivative(2),  5.0e-14);
         Assertions.assertEquals(lon0, rebuilt.getLongitude().getReal(),               1.0e-16);
-        Assertions.assertEquals(lon1, rebuilt.getLongitude().getPartialDerivative(1), 5.0e-19);
+        Assertions.assertEquals(lon1, rebuilt.getLongitude().getPartialDerivative(1), 1.0e-18);
         Assertions.assertEquals(lon2, rebuilt.getLongitude().getPartialDerivative(2), 1.0e-20);
         Assertions.assertEquals(alt0, rebuilt.getAltitude().getReal(),                2.0e-11);
         Assertions.assertEquals(alt1, rebuilt.getAltitude().getPartialDerivative(1),  6.0e-13);

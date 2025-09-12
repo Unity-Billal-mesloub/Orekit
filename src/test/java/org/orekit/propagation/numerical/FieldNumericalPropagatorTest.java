@@ -67,6 +67,9 @@ import org.orekit.forces.gravity.potential.GRGSFormatReader;
 import org.orekit.forces.gravity.potential.GravityFieldFactory;
 import org.orekit.forces.gravity.potential.NormalizedSphericalHarmonicsProvider;
 import org.orekit.forces.gravity.potential.SHMFormatReader;
+import org.orekit.forces.maneuvers.Maneuver;
+import org.orekit.forces.maneuvers.propulsion.BasicConstantThrustPropulsionModel;
+import org.orekit.forces.maneuvers.trigger.TimeIntervalsManeuverTrigger;
 import org.orekit.forces.radiation.IsotropicRadiationSingleCoefficient;
 import org.orekit.forces.radiation.SolarRadiationPressure;
 import org.orekit.frames.Frame;
@@ -88,13 +91,46 @@ import org.orekit.time.DateComponents;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.FieldTimeStamped;
 import org.orekit.time.TimeComponents;
+import org.orekit.time.TimeInterval;
 import org.orekit.time.TimeScale;
 import org.orekit.time.TimeScalesFactory;
+import org.orekit.time.UTCScale;
 import org.orekit.utils.*;
 
 public class FieldNumericalPropagatorTest {
 
     private double               mu;
+
+    // This test highlights the fix of: https://gitlab.orekit.org/orekit/orekit/-/issues/1808
+    @Test
+    void testPropagationEndCoincidingWithManeuverThrustEndForIssue1808() {
+        final Field<Binary64> field = Binary64Field.getInstance();
+        final Binary64 zero = field.getZero();
+        final UTCScale utc = TimeScalesFactory.getUTC();
+        // Initialize spacecraft
+        final FieldAbsoluteDate<Binary64> orbitEpoch = new FieldAbsoluteDate<>(field, 2025, 6, 25, 14, 30, 32.965, utc);
+        final FieldCartesianOrbit<Binary64> cartesian = new FieldCartesianOrbit<>(new FieldPVCoordinates<>(new FieldVector3D<>(zero.add(1897711.783316963),
+                                                                                                                               zero.add(4938498.102677712),
+                                                                                                                               zero.add(-4414426.470208112)),
+                                                                                                           new FieldVector3D<>(zero.add(-525.3256319053179),
+                                                                                                                               zero.add(-4937.568767036118),
+                                                                                                                               zero.add(-5754.938592063509))),
+                                                                                  FramesFactory.getTOD(false), orbitEpoch, zero.add(Constants.WGS84_EARTH_MU));
+        // Maneuver
+        final FieldAbsoluteDate<Binary64> maneuverStart = new FieldAbsoluteDate<>(field, 2025, 6, 25, 14, 54, 53.247, utc);
+        final FieldAbsoluteDate<Binary64> maneuverEnd = maneuverStart.shiftedBy(720.0);
+
+        // Initialize propagator
+        final FieldNumericalPropagator<Binary64> numerical = new FieldNumericalPropagator<>(field, new ClassicalRungeKuttaFieldIntegrator<>(field, zero.add(60.0)));
+        numerical.addForceModel(new Maneuver(null,
+                                             TimeIntervalsManeuverTrigger.of(TimeInterval.of(maneuverStart.toAbsoluteDate(), maneuverEnd.toAbsoluteDate())),
+                                             new BasicConstantThrustPropulsionModel(0.02, 1160, Vector3D.PLUS_I, "tangential")));
+        numerical.setInitialState(new FieldSpacecraftState<>(cartesian));
+
+        // Propagate
+        final FieldAbsoluteDate<Binary64> propagationStart = new FieldAbsoluteDate<>(field, 2025, 6, 25, 10, 23, 17.009, utc);
+        Assertions.assertNotNull(numerical.propagate(propagationStart, maneuverEnd));
+    }
 
     @Test
     void testIssue1032() {
