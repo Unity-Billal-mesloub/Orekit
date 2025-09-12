@@ -52,16 +52,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.orekit.OrekitMatchers;
+import org.orekit.TestUtils;
 import org.orekit.Utils;
 import org.orekit.attitudes.FrameAlignedProvider;
 import org.orekit.bodies.CelestialBodyFactory;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
+import org.orekit.errors.OrekitIllegalArgumentException;
 import org.orekit.errors.OrekitMessages;
 import org.orekit.forces.ForceModel;
+import org.orekit.forces.ForceModelModifier;
 import org.orekit.forces.drag.DragForce;
 import org.orekit.forces.drag.IsotropicDrag;
 import org.orekit.forces.gravity.HolmesFeatherstoneAttractionModel;
+import org.orekit.forces.gravity.NewtonianAttraction;
 import org.orekit.forces.gravity.ThirdBodyAttraction;
 import org.orekit.forces.gravity.potential.GRGSFormatReader;
 import org.orekit.forces.gravity.potential.GravityFieldFactory;
@@ -1739,6 +1743,47 @@ public class FieldNumericalPropagatorTest {
     private <T extends CalculusFieldElement<T>> void doTestShiftEquinoctialMeanWithDerivatives(final Field<T> field) {
         doTestShift(createEllipticOrbit(field), OrbitType.EQUINOCTIAL, PositionAngleType.MEAN, true,
                     1.14, 9.1, 140.3, 1066.7, 3306.9);
+    }
+
+    @Test
+    void testNegativeMassException() {
+        // GIVEN
+        final Binary64Field field = Binary64Field.getInstance();
+        final FieldODEIntegrator<Binary64> fieldODEIntegrator = new ClassicalRungeKuttaFieldIntegrator<>(field, Binary64.ONE);
+        final FieldNumericalPropagator<Binary64> fieldNumericalPropagator = new FieldNumericalPropagator<>(field, fieldODEIntegrator);
+        final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(field,
+                new SpacecraftState(TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH))).withMass(Binary64.ONE.negate());
+        fieldNumericalPropagator.setInitialState(fieldState);
+        // WHEN & THEN
+        Assertions.assertThrows(OrekitException.class,
+                () -> fieldNumericalPropagator.propagate(fieldState.getDate().shiftedBy(1)));
+    }
+
+    @Test
+    void testNegativeMassRateException() {
+        // GIVEN
+        final Binary64Field field = Binary64Field.getInstance();
+        final FieldODEIntegrator<Binary64> fieldODEIntegrator = new ClassicalRungeKuttaFieldIntegrator<>(field, Binary64.ONE);
+        final FieldNumericalPropagator<Binary64> fieldNumericalPropagator = new FieldNumericalPropagator<>(field, fieldODEIntegrator);
+        fieldNumericalPropagator.addForceModel(new TestNegativeMassRateForce());
+        final FieldAbstractIntegratedPropagator.MainStateEquations<Binary64> main = fieldNumericalPropagator.getMainStateEquations(fieldODEIntegrator);
+        final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(field,
+                new SpacecraftState(TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH)));
+        // WHEN & THEN
+        Assertions.assertThrows(OrekitIllegalArgumentException.class, () -> main.computeDerivatives(fieldState));
+    }
+
+    private static class TestNegativeMassRateForce implements ForceModelModifier {
+
+        @Override
+        public ForceModel getUnderlyingModel() {
+            return new NewtonianAttraction(Constants.EGM96_EARTH_MU);
+        }
+
+        @Override
+        public <T extends CalculusFieldElement<T>> void addContribution(FieldSpacecraftState<T> s, FieldTimeDerivativesEquations<T> adder) {
+            adder.addMassDerivative(s.getMass().getField().getOne());
+        }
     }
 
     @Test

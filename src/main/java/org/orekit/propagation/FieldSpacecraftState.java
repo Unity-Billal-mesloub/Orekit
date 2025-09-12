@@ -525,11 +525,11 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
     @Override
     public FieldSpacecraftState<T> shiftedBy(final double dt) {
         if (isOrbitDefined()) {
-            return new FieldSpacecraftState<>(orbit.shiftedBy(dt), attitude.shiftedBy(dt),
-                                              mass, shiftAdditional(dt), additionalDot);
+            return new FieldSpacecraftState<>(orbit.shiftedBy(dt), null, attitude.shiftedBy(dt),
+                                              mass, shiftAdditional(dt), new FieldArrayDictionary<>(additionalDot), false);
         } else {
-            return new FieldSpacecraftState<>(absPva.shiftedBy(dt), attitude.shiftedBy(dt),
-                                              mass, shiftAdditional(dt), additionalDot);
+            return new FieldSpacecraftState<>(null, absPva.shiftedBy(dt), attitude.shiftedBy(dt),
+                                              mass, shiftAdditional(dt), new FieldArrayDictionary<>(additionalDot), false);
         }
     }
 
@@ -567,11 +567,11 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
     @Override
     public FieldSpacecraftState<T> shiftedBy(final T dt) {
         if (isOrbitDefined()) {
-            return new FieldSpacecraftState<>(orbit.shiftedBy(dt), attitude.shiftedBy(dt),
-                                              mass, shiftAdditional(dt), additionalDot);
+            return new FieldSpacecraftState<>(orbit.shiftedBy(dt), null, attitude.shiftedBy(dt),
+                                              mass, shiftAdditional(dt), new FieldArrayDictionary<>(additionalDot), false);
         } else {
-            return new FieldSpacecraftState<>(absPva.shiftedBy(dt), attitude.shiftedBy(dt),
-                                              mass, shiftAdditional(dt), additionalDot);
+            return new FieldSpacecraftState<>(null, absPva.shiftedBy(dt), attitude.shiftedBy(dt),
+                                              mass, shiftAdditional(dt), new FieldArrayDictionary<>(additionalDot), false);
         }
     }
 

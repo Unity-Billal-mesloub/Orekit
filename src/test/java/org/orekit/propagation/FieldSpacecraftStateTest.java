@@ -784,6 +784,30 @@ class FieldSpacecraftStateTest {
 
     }
 
+    @Test
+    void testWithAdditionalEmpty() {
+        // GIVEN
+        final SpacecraftState state = new SpacecraftState(TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH));
+        final Binary64Field field = Binary64Field.getInstance();
+        final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(field, state);
+        // WHEN
+        final FieldSpacecraftState<Binary64> newState = fieldState.withAdditionalData(null);
+        // THEN
+        Assertions.assertEquals(0, newState.getAdditionalDataValues().size());
+    }
+
+    @Test
+    void testWithAdditionalStatesDerivatives() {
+        // GIVEN
+        final SpacecraftState state = new SpacecraftState(TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH));
+        final Binary64Field field = Binary64Field.getInstance();
+        final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(field, state);
+        // WHEN
+        final FieldSpacecraftState<Binary64> newState = fieldState.withAdditionalStatesDerivatives(null);
+        // THEN
+        Assertions.assertEquals(0, newState.getAdditionalStatesDerivatives().size());
+    }
+
     private <T extends CalculusFieldElement<T>> void doTestFieldVsRealAbsPV(final Field<T> field) {
         T zero = field.getZero();
 

@@ -461,6 +461,17 @@ class SpacecraftStateTest {
     }
 
     @Test
+    @Deprecated
+    void testConstructor() {
+        final AbsolutePVCoordinates absPV = new AbsolutePVCoordinates(orbit.getFrame(), orbit.getDate(),
+                orbit.getPVCoordinates());
+        final Attitude attitude = attitudeLaw.getAttitude(absPV, absPV.getDate(), absPV.getFrame());
+        final double expectedMass = 1;
+        final SpacecraftState state = new SpacecraftState(absPV, attitude, expectedMass);
+        Assertions.assertEquals(expectedMass, state.getMass());
+    }
+
+    @Test
     void testAdditionalTestResetOnEventNumerical() {
 
         // Build orbit

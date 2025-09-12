@@ -467,11 +467,11 @@ public class SpacecraftState implements TimeStamped, TimeShiftable<SpacecraftSta
     @Override
     public SpacecraftState shiftedBy(final double dt) {
         if (isOrbitDefined()) {
-            return new SpacecraftState(orbit.shiftedBy(dt), attitude.shiftedBy(dt),
-                                       mass, shiftAdditional(dt), additionalDot);
+            return new SpacecraftState(orbit.shiftedBy(dt), null, attitude.shiftedBy(dt),
+                                       mass, shiftAdditional(dt), new DoubleArrayDictionary(additionalDot), false);
         } else {
-            return new SpacecraftState(absPva.shiftedBy(dt), attitude.shiftedBy(dt),
-                                       mass, shiftAdditional(dt), additionalDot);
+            return new SpacecraftState(null, absPva.shiftedBy(dt), attitude.shiftedBy(dt),
+                                       mass, shiftAdditional(dt), new DoubleArrayDictionary(additionalDot), false);
         }
     }
 
