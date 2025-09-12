@@ -986,7 +986,10 @@ public enum OrekitMessages implements Localizable {
     INCONSISTENT_STATE_DIMENSIONS("state vector (dimension {0}) and covariance (dimension {1}) are inconsistent"),
 
     /** EXPUNGED_SPAN. */
-    EXPUNGED_SPAN("data at date {0} has already been automatically expunged");
+    EXPUNGED_SPAN("data at date {0} has already been automatically expunged"),
+
+    /** LINE_NEVER_CROSSES_ALTITUDE. */
+    LINE_NEVER_CROSSES_ALTITUDE("line never crosses altitude {0}");
 
     /** Base name of the resource bundle in classpath. */
     private static final String RESOURCE_BASE_NAME = "assets/org/orekit/localization/OrekitMessages";
