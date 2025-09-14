@@ -615,7 +615,9 @@ public class RinexObservationWriter implements AutoCloseable {
         for (final Map.Entry<SatInSystem, Map<ObservationType, Integer>> entry1 : header.getNbObsPerSat().entrySet()) {
             final SatInSystem sis = entry1.getKey();
             outputField(sis.toString(), 6, false);
-            for (final Map.Entry<ObservationType, Integer> entry2 : entry1.getValue().entrySet()) {
+            // list the entries in the order specified in SYS / # / OBS TYPES
+            for (final ObservationType obsType : header.getTypeObs().get(sis.getSystem())) {
+                final Integer nbObs = entry1.getValue().get(obsType);
                 int next = column + 6;
                 if (next > LABEL_INDEX) {
                     // we need to set up a continuation line
@@ -623,7 +625,7 @@ public class RinexObservationWriter implements AutoCloseable {
                     outputField("", 6, true);
                     next = column + 6;
                 }
-                outputField(SIX_DIGITS_INTEGER, entry2.getValue(), next);
+                outputField(SIX_DIGITS_INTEGER, nbObs == null ? 0 : nbObs, next);
             }
             finishHeaderLine(RinexLabels.PRN_NB_OF_OBS);
         }

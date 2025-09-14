@@ -19,6 +19,53 @@
     <title>Orekit Changes</title>
   </properties>
   <body>
+    <release version="13.1.1" date="2025-09-14" description="Orekit 13.1 is a patch release. It fixes documentation issues and various bugs, including some related to performance.">
+        <action dev="luc" type="fix" issue="1817">
+          Fixed Ionosphere Piercing Point computation in Global Ionosphere Model.
+        </action>
+        <action dev="luc" type="fix" issue="1819">
+          Added pointAtAltitude in OneAxisEllipsoid.
+        </action>
+        <action dev="serrof" type="fix" issue="1820">
+            Fix numerical error in FieldEclipseDetector.
+        </action>
+        <action dev="luc" type="fix" issue="1798">
+          Fixed time interpolation in Global Ionospheric Model (ionex files).
+        </action>
+        <action dev="serrof" type="fix" issue="1816">
+            Improved performance of STM propagation with many forces.
+        </action>
+        <action dev="luc" type="fix" issue="1812">
+          Fixed NullPointerException in Sinex bias handling.
+        </action>
+        <action dev="luc" type="fix" issue="1811">
+          Fixed observables ordering error when writing Rinex observation header.
+        </action>
+        <action dev="bryan" type="fix" issue="1808">
+            Fixed inconsistency between Abstract{Field}ODEStateInterpolator and {Field}DetectorBasedEventState for event time handling.
+        </action>
+        <action dev="sdinot" type="fix" issue="1790">
+            Fixed duplicated 13.1 version in faq.md.
+        </action>
+        <action dev="sdinot" type="fix" issue="1783">
+            Link to "changes" web page on technical site not working on develop version.
+        </action>
+        <action dev="serrof" type="fix" issue="1788">
+            Pass event detectors from attitude provider in (Field)DSSTPropagator.
+        </action>
+        <action dev="bryan" type="fix" issue="1629">
+            Fixed limitation of ECOM2 model to default data context.
+        </action>
+        <action dev="sdinot" type="fix" issue="1564">
+            Fixed dead link to in "Development Guidelines" site page.
+        </action>
+        <action dev="evan" type="fix">
+            Fix exception message when parsing a CDM with an invalid date.
+        </action>
+        <action dev="evan" type="fix">
+            Fix exception messages with FieldElements.
+        </action>
+    </release>
     <release version="13.1" date="2025-08-01" description="13.1 is a minor release.">
         <action dev="serrof" type="fix" issue="1782">
             Improve performance and accuracy of getJd.
@@ -5934,7 +5981,7 @@
       </action>
       <action dev="pascal" type="update">
         Orekit supports the two different naming patterns for bulletins B provided by IERS
-        on http://www.iers.org/ and http://hpiers.obspm.fr/eop-pc/.
+        on https://www.iers.org/ and https://hpiers.obspm.fr/eop-pc/.
       </action>
       <action dev="luc" type="update">
         the predefined times scales (TAI, UTC ...) are now built using a factory. The various

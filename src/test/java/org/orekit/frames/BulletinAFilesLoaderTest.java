@@ -80,6 +80,18 @@ public class BulletinAFilesLoaderTest extends AbstractFilesLoaderTest {
     }
 
     @Test
+    public void testPredictedValuesContent() {
+        setRoot("bulletinA");
+        SortedSet<EOPEntry> data = new TreeSet<>(new ChronologicalComparator());
+        new BulletinAFilesLoader(FramesFactory.BULLETINA_FILENAME, manager, () -> utc).fillHistory(null, data);
+        EOPHistory history = new EOPHistory(IERSConventions.IERS_2010, EOPHistory.DEFAULT_INTERPOLATION_DEGREE,
+                                            data, true);
+        AbsoluteDate date = new AbsoluteDate(2013, 12, 1, 12, 0, 0, TimeScalesFactory.getUTC());
+        // the following values are from bulletina-xxvi-045.txt, predicted values section, lines 108-472
+        Assertions.assertEquals(EopDataType.PREDICTED, history.getEopDataType(date));
+    }
+
+    @Test
     public void testRapidDataContent() {
         setRoot("bulletinA");
         SortedSet<EOPEntry> data = new TreeSet<EOPEntry>(new ChronologicalComparator());
@@ -91,6 +103,7 @@ public class BulletinAFilesLoaderTest extends AbstractFilesLoaderTest {
         Assertions.assertEquals(        (-3 * -0.001957 + 27 * -0.003274 + 27 * -0.004706 - 3 * -0.006211) / 48,  history.getUT1MinusUTC(date), 1.0e-10);
         Assertions.assertEquals(asToRad((-3 *  0.11518  + 27 *  0.11389  + 27 *  0.11285  - 3 *  0.11171)  / 48), history.getPoleCorrection(date).getXp(), 1.0e-10);
         Assertions.assertEquals(asToRad((-3 *  0.28484  + 27 *  0.28449  + 27 *  0.28408  - 3 *  0.28379)  / 48), history.getPoleCorrection(date).getYp(), 1.0e-10);
+        Assertions.assertEquals(EopDataType.RAPID, history.getEopDataType(date));
     }
 
     @Test
@@ -105,6 +118,7 @@ public class BulletinAFilesLoaderTest extends AbstractFilesLoaderTest {
         Assertions.assertEquals(        (-3 * 0.04058 + 27 * 0.04000 + 27 * 0.03953 - 3 * 0.03917) / 48,  history.getUT1MinusUTC(date), 1.0e-10);
         Assertions.assertEquals(asToRad((-3 * 0.1692  + 27 * 0.1689  + 27 * 0.1685  - 3 * 0.1684)  / 48), history.getPoleCorrection(date).getXp(), 1.0e-10);
         Assertions.assertEquals(asToRad((-3 * 0.3336  + 27 * 0.3322  + 27 * 0.3307  - 3 * 0.3294)  / 48), history.getPoleCorrection(date).getYp(), 1.0e-10);
+        Assertions.assertEquals(EopDataType.FINAL, history.getEopDataType(date));
     }
 
     private double asToRad(double mas) {

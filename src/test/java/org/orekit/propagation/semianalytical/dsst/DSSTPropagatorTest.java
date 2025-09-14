@@ -56,6 +56,7 @@ import org.junit.jupiter.api.Test;
 import org.orekit.OrekitMatchers;
 import org.orekit.Utils;
 import org.orekit.attitudes.AttitudeProvider;
+import org.orekit.attitudes.AttitudeProviderModifier;
 import org.orekit.attitudes.FrameAlignedProvider;
 import org.orekit.attitudes.LofOffset;
 import org.orekit.bodies.CelestialBody;
@@ -91,6 +92,7 @@ import org.orekit.propagation.events.EventDetector;
 import org.orekit.propagation.events.FieldEventDetector;
 import org.orekit.propagation.events.LatitudeCrossingDetector;
 import org.orekit.propagation.events.NodeDetector;
+import org.orekit.propagation.events.handlers.CountAndContinue;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.numerical.NumericalPropagator;
 import org.orekit.propagation.semianalytical.dsst.forces.AbstractGaussianContribution;
@@ -1757,4 +1759,42 @@ public class DSSTPropagatorTest {
         return propagator.propagate(new AbsoluteDate(initialDate, 1800.));
     }
 
+    @Test
+    void testIssue1788() {
+        // GIVEN
+        final ClassicalRungeKuttaIntegrator integrator = new ClassicalRungeKuttaIntegrator(1000);
+        final CountAndContinue countAndContinue = new CountAndContinue();
+        final KeplerianOrbit orbit = new KeplerianOrbit(42166000.0, 0.00028, FastMath.toRadians(0.05), FastMath.toRadians(66.0),
+                FastMath.toRadians(270.0), FastMath.toRadians(11.94), PositionAngleType.MEAN,
+                FramesFactory.getGCRF(), AbsoluteDate.ARBITRARY_EPOCH, Constants.WGS84_EARTH_MU);
+        final SpacecraftState initialState = new SpacecraftState(orbit);
+        final double timeOfFlight = 1e4;
+        final DSSTPropagator propagator = new DSSTPropagator(integrator, PropagationType.OSCULATING,
+                new TestAttitudeProvider(countAndContinue, initialState.getDate().shiftedBy(timeOfFlight/2)));
+        propagator.setInitialState(initialState);
+        // WHEN
+        propagator.propagate(initialState.getDate().shiftedBy(timeOfFlight));
+        // THEN
+        Assertions.assertEquals(1, countAndContinue.getCount());
+    }
+
+    private static class TestAttitudeProvider implements AttitudeProviderModifier {
+
+        private final DateDetector detector;
+
+        TestAttitudeProvider(final CountAndContinue countingHandler,
+                             final AbsoluteDate date) {
+            this.detector = new DateDetector(date).withHandler(countingHandler);
+        }
+
+        @Override
+        public Stream<EventDetector> getEventDetectors() {
+            return Stream.of(detector);
+        }
+
+        @Override
+        public AttitudeProvider getUnderlyingAttitudeProvider() {
+            return new FrameAlignedProvider(FramesFactory.getEME2000());
+        }
+    }
 }

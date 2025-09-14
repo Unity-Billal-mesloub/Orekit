@@ -1121,7 +1121,8 @@ public class DSSTPropagator extends AbstractIntegratedPropagator {
         Main(final ODEIntegrator integrator) {
             yDot = new double[7];
 
-            // Setup event detectors for each force model
+            // Setup event detectors from attitude provider and each force model
+            getAttitudeProvider().getEventDetectors().forEach(eventDetector -> setUpEventDetector(integrator, eventDetector));
             forceModels.forEach(dsstForceModel -> dsstForceModel.getEventDetectors().
                                 forEach(eventDetector -> setUpEventDetector(integrator, eventDetector)));
         }
