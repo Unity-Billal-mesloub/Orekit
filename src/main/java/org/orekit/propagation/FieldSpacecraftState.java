@@ -137,32 +137,6 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
      * @param orbit the orbit
      * @param attitude attitude
      * @param mass the mass (kg)
-     * @param massRate mass rate (kg/s)
-     * @param additional additional states (may be null if no additional states are available)
-     * @param additionalDot additional states derivatives(may be null if no additional states derivatives are available)
-     * @exception IllegalArgumentException if orbit and attitude dates
-     * or frames are not equal
-     * @since 14.0
-     */
-    public FieldSpacecraftState(final FieldOrbit<T> orbit, final FieldAttitude<T> attitude, final T mass, final T massRate,
-                                final FieldDataDictionary<T> additional,
-                                final FieldArrayDictionary<T> additionalDot)
-            throws IllegalArgumentException {
-        checkConsistency(orbit, attitude);
-        this.orbit      = orbit;
-        this.attitude   = attitude;
-        this.mass       = mass;
-        this.massRate  = massRate;
-        this.absPva     = null;
-        this.additional = additional == null ? new FieldDataDictionary<>(orbit.getDate().getField()) : new FieldDataDictionary<>(additional);
-        this.additionalDot = additionalDot == null ? new FieldArrayDictionary<>(orbit.getDate().getField()) : new FieldArrayDictionary<>(additionalDot);
-        checkConsistency(orbit, attitude);
-    }
-
-    /** Build a spacecraft state from orbit, attitude, mass, additional states and derivatives.
-     * @param orbit the orbit
-     * @param attitude attitude
-     * @param mass the mass (kg)
      * @param additional additional states (may be null if no additional states are available)
      * @param additionalDot additional states derivatives(may be null if no additional states derivative sare available)
      * @exception IllegalArgumentException if orbit and attitude dates
@@ -298,6 +272,7 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
      * @param absPva absolute position-velocity
      * @param attitude attitude
      * @param mass the mass (kg)
+     * @param massRate the mass rate (kg/s)
      * @param additional additional data (may be null if no additional states are available)
      * @param additionalDot additional states derivatives (may be null if no additional states derivatives are available)
      * @param deepCopy flag to copy dictionaries (additional data and derivatives)
@@ -341,11 +316,7 @@ public class FieldSpacecraftState <T extends CalculusFieldElement<T>>
      * @since 14.0
      */
     public FieldSpacecraftState<T> withMassRate(final T newMassRate) {
-        if (isOrbitDefined()) {
-            return new FieldSpacecraftState<>(orbit, attitude, mass, newMassRate, additional, additionalDot);
-        } else {
-            return new FieldSpacecraftState<>(absPva, attitude, mass, newMassRate, additional, additionalDot);
-        }
+        return new FieldSpacecraftState<>(orbit, absPva, attitude, mass, newMassRate, additional, additionalDot, false);
     }
 
     /**

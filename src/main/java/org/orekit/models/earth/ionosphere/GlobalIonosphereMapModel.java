@@ -515,25 +515,20 @@ public class GlobalIonosphereMapModel implements IonosphericModel, IonosphericDe
     private GeodeticPoint piercePoint(final AbsoluteDate date,
                                       final Vector3D recPoint, final Vector3D los,
                                       final BodyShape bodyShape) {
+        if (bodyShape instanceof OneAxisEllipsoid) {
 
-        final TECMapPair pair = getPairAtDate(date);
-        final double     r    = pair.r0 + pair.h;
-        final double     r2   = r * r;
-        final double     p2   = recPoint.getNorm2Sq();
-        if (p2 >= r2) {
-            // we are above ionosphere single layer
-            return null;
+            // pierce point of ellipsoidal shape
+            final OneAxisEllipsoid ellipsoid = (OneAxisEllipsoid) bodyShape;
+            final Line line = new Line(recPoint, new Vector3D(1.0, recPoint, 1.0e6, los), 1.0e-12);
+            final double h = getPairAtDate(date).h;
+            final Vector3D ipp = ellipsoid.pointAtAltitude(line, h, recPoint, bodyShape.getBodyFrame(), date);
+
+            // convert to geocentric (NOT geodetic) coordinates
+            return new GeodeticPoint(ipp.getDelta(), ipp.getAlpha(), h);
+
+        } else {
+            throw new OrekitException(OrekitMessages.BODY_SHAPE_MUST_BE_A_ONE_AXIS_ELLIPSOID);
         }
-
-        // compute positive k such that recPoint + k los is on the spherical shell at radius r
-        final double dot = Vector3D.dotProduct(recPoint, los);
-        final double k   = FastMath.sqrt(dot * dot + r2 - p2) - dot;
-
-        // Ionosphere Pierce Point in body frame
-        final Vector3D ipp = new Vector3D(1, recPoint, k, los);
-
-        return bodyShape.transform(ipp, bodyShape.getBodyFrame(), null);
-
     }
 
     /** Compute Ionospheric Pierce Point.

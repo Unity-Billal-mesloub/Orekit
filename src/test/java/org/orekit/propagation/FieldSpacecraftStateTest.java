@@ -1396,23 +1396,6 @@ class FieldSpacecraftStateTest {
 
     }
 
-    @Deprecated
-    @Test
-    void testDeprecated() {
-        final Binary64 mass = Binary64.ONE;
-        final Orbit orbit = TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH);
-        final Binary64Field field = Binary64Field.getInstance();
-        final FieldOrbit<Binary64> fieldOrbit = new FieldCartesianOrbit<>(field, orbit);
-        final FieldAbsolutePVCoordinates<Binary64> fieldPV = new FieldAbsolutePVCoordinates<>(orbit.getFrame(), fieldOrbit.getDate(),
-                fieldOrbit.getPVCoordinates());
-        final FieldAttitude<Binary64> fieldAttitude = new FrameAlignedProvider(orbit.getFrame()).getAttitude(fieldOrbit,
-                fieldOrbit.getDate(), fieldPV.getFrame());
-        Assertions.assertEquals(mass, new FieldSpacecraftState<>(fieldOrbit, mass).getMass());
-        Assertions.assertEquals(mass, new FieldSpacecraftState<>(fieldPV, mass).getMass());
-        Assertions.assertEquals(mass, new FieldSpacecraftState<>(fieldPV, fieldAttitude, mass).getMass());
-        Assertions.assertEquals(mass, new FieldSpacecraftState<>(fieldOrbit, fieldAttitude, mass).getMass());
-    }
-
     @BeforeEach
     public void setUp(){
         try {

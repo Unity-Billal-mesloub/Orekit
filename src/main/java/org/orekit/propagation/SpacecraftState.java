@@ -137,32 +137,8 @@ public class SpacecraftState implements TimeStamped, TimeShiftable<SpacecraftSta
     public SpacecraftState(final Orbit orbit, final Attitude attitude, final double mass,
                            final DataDictionary additional, final DoubleArrayDictionary additionalDot)
         throws IllegalArgumentException {
-        this(orbit, attitude, mass, 0., additional, additionalDot);
+        this(orbit, null, attitude, mass, 0., additional, additionalDot, true);
         checkConsistency(orbit, attitude);
-    }
-
-    /** Build a spacecraft state from orbit, attitude, mass (with rate), additional states and derivatives.
-     * @param orbit the orbit
-     * @param attitude attitude
-     * @param mass the mass (kg)
-     * @param massRate mass first-order time derivative (kg/s)
-     * @param additional additional data (may be null if no additional states are available)
-     * @param additionalDot additional states derivatives (may be null if no additional states derivatives are available)
-     * @exception IllegalArgumentException if orbit and attitude dates
-     * or frames are not equal
-     * @since 14.0
-     */
-    public SpacecraftState(final Orbit orbit, final Attitude attitude, final double mass, final double massRate,
-                           final DataDictionary additional, final DoubleArrayDictionary additionalDot)
-            throws IllegalArgumentException {
-        checkConsistency(orbit, attitude);
-        this.orbit      = orbit;
-        this.absPva     = null;
-        this.attitude   = attitude;
-        this.mass       = mass;
-        this.massRate   = massRate;
-        this.additional = additional == null ? new DataDictionary() : additional;
-        this.additionalDot = additionalDot == null ? new DoubleArrayDictionary() : new DoubleArrayDictionary(additionalDot);
     }
 
     /** Build a spacecraft state from position-velocity-acceleration only.
@@ -210,6 +186,7 @@ public class SpacecraftState implements TimeStamped, TimeShiftable<SpacecraftSta
      * @param absPva absolute position-velocity
      * @param attitude attitude
      * @param mass the mass (kg)
+     * @param massRate the mass rate (kg/s)
      * @param additional additional data (may be null if no additional states are available)
      * @param additionalDot additional states derivatives (may be null if no additional states derivatives are available)
      * @param deepCopy flag to copy dictionaries (additional data and derivatives)
@@ -250,7 +227,7 @@ public class SpacecraftState implements TimeStamped, TimeShiftable<SpacecraftSta
      * Create a new instance with input mass rate.
      * @param newMassRate mass rate
      * @return new state
-     * @since 14.1
+     * @since 14.0
      */
     public SpacecraftState withMassRate(final double newMassRate) {
         return new SpacecraftState(orbit, absPva, attitude, mass, newMassRate, additional, additionalDot, false);
@@ -496,11 +473,11 @@ public class SpacecraftState implements TimeStamped, TimeShiftable<SpacecraftSta
     public SpacecraftState shiftedBy(final TimeOffset dt) {
         final double dtDouble = dt.toDouble();
         if (isOrbitDefined()) {
-            return new SpacecraftState(orbit.shiftedBy(dt), attitude.shiftedBy(dt), mass + dtDouble * massRate,
-                                       massRate, shiftAdditional(dtDouble), additionalDot);
+            return new SpacecraftState(orbit.shiftedBy(dt), null, attitude.shiftedBy(dt), mass + dtDouble * massRate,
+                                       massRate, shiftAdditional(dtDouble), new DoubleArrayDictionary(additionalDot), false);
         } else {
-            return new SpacecraftState(absPva.shiftedBy(dt), attitude.shiftedBy(dt), mass + dtDouble * massRate,
-                                       massRate, shiftAdditional(dtDouble), additionalDot);
+            return new SpacecraftState(null, absPva.shiftedBy(dt), attitude.shiftedBy(dt), mass + dtDouble * massRate,
+                                       massRate, shiftAdditional(dtDouble), new DoubleArrayDictionary(additionalDot), false);
         }
     }
 

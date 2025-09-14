@@ -125,7 +125,7 @@ public class FieldNumericalPropagatorTest {
         final FieldAbsoluteDate<Binary64> maneuverEnd = maneuverStart.shiftedBy(720.0);
 
         // Initialize propagator
-        final FieldNumericalPropagator<Binary64> numerical = new FieldNumericalPropagator<>(field, new ClassicalRungeKuttaFieldIntegrator<>(field, zero.add(60.0)));
+        final FieldNumericalPropagator<Binary64> numerical = new FieldNumericalPropagator<>(new ClassicalRungeKuttaFieldIntegrator<>(field, zero.add(60.0)));
         numerical.addForceModel(new Maneuver(null,
                                              TimeIntervalsManeuverTrigger.of(TimeInterval.of(maneuverStart.toAbsoluteDate(), maneuverEnd.toAbsoluteDate())),
                                              new BasicConstantThrustPropulsionModel(0.02, 1160, Vector3D.PLUS_I, "tangential")));
@@ -1748,7 +1748,7 @@ public class FieldNumericalPropagatorTest {
         // GIVEN
         final Binary64Field field = Binary64Field.getInstance();
         final FieldODEIntegrator<Binary64> fieldODEIntegrator = new ClassicalRungeKuttaFieldIntegrator<>(field, Binary64.ONE);
-        final FieldNumericalPropagator<Binary64> fieldNumericalPropagator = new FieldNumericalPropagator<>(field, fieldODEIntegrator);
+        final FieldNumericalPropagator<Binary64> fieldNumericalPropagator = new FieldNumericalPropagator<>(fieldODEIntegrator);
         final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(field,
                 new SpacecraftState(TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH))).withMass(Binary64.ONE.negate());
         fieldNumericalPropagator.setInitialState(fieldState);
@@ -1762,7 +1762,7 @@ public class FieldNumericalPropagatorTest {
         // GIVEN
         final Binary64Field field = Binary64Field.getInstance();
         final FieldODEIntegrator<Binary64> fieldODEIntegrator = new ClassicalRungeKuttaFieldIntegrator<>(field, Binary64.ONE);
-        final FieldNumericalPropagator<Binary64> fieldNumericalPropagator = new FieldNumericalPropagator<>(field, fieldODEIntegrator);
+        final FieldNumericalPropagator<Binary64> fieldNumericalPropagator = new FieldNumericalPropagator<>(fieldODEIntegrator);
         fieldNumericalPropagator.addForceModel(new TestNegativeMassRateForce());
         final FieldAbstractIntegratedPropagator.MainStateEquations<Binary64> main = fieldNumericalPropagator.getMainStateEquations(fieldODEIntegrator);
         final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(field,

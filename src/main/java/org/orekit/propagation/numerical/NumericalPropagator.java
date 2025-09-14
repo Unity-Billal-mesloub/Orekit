@@ -948,13 +948,13 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
                 }
 
                 final Attitude attitude = getAttitudeProvider().getAttitude(absPva, date, getFrame());
-                return new SpacecraftState(absPva, attitude, mass, massRate, null, null);
+                return new SpacecraftState(absPva, attitude).withMassRate(massRate).withMass(mass);
             } else {
                 // propagation uses regular orbits
                 final Orbit orbit       = super.getOrbitType().mapArrayToOrbit(y, yDot, super.getPositionAngleType(), date, getMu(), getFrame());
                 final Attitude attitude = getAttitudeProvider().getAttitude(orbit, date, getFrame());
 
-                return new SpacecraftState(orbit, attitude, mass, massRate, null, null);
+                return new SpacecraftState(orbit, attitude).withMassRate(massRate).withMass(mass);
             }
 
         }
