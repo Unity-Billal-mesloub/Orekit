@@ -49,12 +49,10 @@ import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
 import org.orekit.propagation.AbstractMatricesHarvester;
 import org.orekit.propagation.AdditionalDataProvider;
-import org.orekit.propagation.CartesianToleranceProvider;
 import org.orekit.propagation.MatricesHarvester;
 import org.orekit.propagation.PropagationType;
 import org.orekit.propagation.Propagator;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.ToleranceProvider;
 import org.orekit.propagation.events.DetectorModifier;
 import org.orekit.propagation.events.EventDetector;
 import org.orekit.propagation.events.ParameterDrivenDateIntervalDetector;
@@ -1081,78 +1079,6 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
 
         }
 
-    }
-
-    /** Estimate tolerance vectors for integrators when propagating in absolute position-velocity-acceleration.
-     * @param dP user specified position error
-     * @param absPva reference absolute position-velocity-acceleration
-     * @return a two rows array, row 0 being the absolute tolerance error and row 1
-     * being the relative tolerance error
-     * @deprecated since 13.0. Use {@link ToleranceProvider} for default and custom tolerances.
-     */
-    @Deprecated
-    public static double[][] tolerances(final double dP, final AbsolutePVCoordinates absPva) {
-        return ToleranceProvider.of(CartesianToleranceProvider.of(dP)).getTolerances(absPva);
-    }
-
-    /** Estimate tolerance vectors for integrators when propagating in orbits.
-     * <p>
-     * The errors are estimated from partial derivatives properties of orbits,
-     * starting from a scalar position error specified by the user.
-     * Considering the energy conservation equation V = sqrt(mu (2/r - 1/a)),
-     * we get at constant energy (i.e. on a Keplerian trajectory):
-     * <pre>
-     * V r² |dV| = mu |dr|
-     * </pre>
-     * <p> So we deduce a scalar velocity error consistent with the position error.
-     * From here, we apply orbits Jacobians matrices to get consistent errors
-     * on orbital parameters.
-     *
-     * <p>
-     * The tolerances are only <em>orders of magnitude</em>, and integrator tolerances
-     * are only local estimates, not global ones. So some care must be taken when using
-     * these tolerances. Setting 1mm as a position error does NOT mean the tolerances
-     * will guarantee a 1mm error position after several orbits integration.
-     * </p>
-     * @param dP user specified position error
-     * @param orbit reference orbit
-     * @param type propagation type for the meaning of the tolerance vectors elements
-     * (it may be different from {@code orbit.getType()})
-     * @return a two rows array, row 0 being the absolute tolerance error and row 1
-     * being the relative tolerance error
-     * @deprecated since 13.0. Use {@link ToleranceProvider} for default and custom tolerances.
-     */
-    @Deprecated
-    public static double[][] tolerances(final double dP, final Orbit orbit, final OrbitType type) {
-        return ToleranceProvider.getDefaultToleranceProvider(dP).getTolerances(orbit, type, PositionAngleType.TRUE);
-    }
-
-    /** Estimate tolerance vectors for integrators when propagating in orbits.
-     * <p>
-     * The errors are estimated from partial derivatives properties of orbits,
-     * starting from scalar position and velocity errors specified by the user.
-     * <p>
-     * The tolerances are only <em>orders of magnitude</em>, and integrator tolerances
-     * are only local estimates, not global ones. So some care must be taken when using
-     * these tolerances. Setting 1mm as a position error does NOT mean the tolerances
-     * will guarantee a 1mm error position after several orbits integration.
-     * </p>
-     * @param dP user specified position error
-     * @param dV user specified velocity error
-     * @param orbit reference orbit
-     * @param type propagation type for the meaning of the tolerance vectors elements
-     * (it may be different from {@code orbit.getType()})
-     * @return a two rows array, row 0 being the absolute tolerance error and row 1
-     * being the relative tolerance error
-     * @since 10.3
-     * @deprecated since 13.0. Use {@link ToleranceProvider} for default and custom tolerances.
-     */
-    @Deprecated
-    public static double[][] tolerances(final double dP, final double dV,
-                                        final Orbit orbit, final OrbitType type) {
-
-        return ToleranceProvider.of(CartesianToleranceProvider.of(dP, dV, CartesianToleranceProvider.DEFAULT_ABSOLUTE_MASS_TOLERANCE))
-                .getTolerances(orbit, type, PositionAngleType.TRUE);
     }
 
     /** {@inheritDoc} */

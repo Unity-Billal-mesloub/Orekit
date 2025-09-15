@@ -39,20 +39,6 @@ public class TimeStampedDoubleAndDerivative extends TimeStampedDouble {
         this.derivative = derivative;
     }
 
-    /**
-     * Constructor.
-     *
-     * @param value value
-     * @param derivative time derivative
-     * @param date date associated to value
-     */
-    @Deprecated
-    public TimeStampedDoubleAndDerivative(final double value, final double derivative,
-                                          final AbsoluteDate date) {
-        super(date, value);
-        this.derivative = derivative;
-    }
-
     /** Get time derivative.
      * @return time derivative
      */

@@ -40,12 +40,11 @@ import org.orekit.orbits.EquinoctialOrbit;
 import org.orekit.orbits.Orbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
-import org.orekit.propagation.CartesianToleranceProvider;
+import org.orekit.propagation.AbstractPropagator;
 import org.orekit.propagation.MatricesHarvester;
 import org.orekit.propagation.PropagationType;
 import org.orekit.propagation.Propagator;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.ToleranceProvider;
 import org.orekit.propagation.conversion.osc2mean.DSSTTheory;
 import org.orekit.propagation.conversion.osc2mean.FixedPointConverter;
 import org.orekit.propagation.conversion.osc2mean.MeanTheory;
@@ -63,7 +62,6 @@ import org.orekit.propagation.semianalytical.dsst.utilities.MaxGapInterpolationG
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.DataDictionary;
 import org.orekit.utils.DoubleArrayDictionary;
-import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.ParameterDriversList;
 import org.orekit.utils.ParameterDriversList.DelegatingDriver;
@@ -167,7 +165,7 @@ public class DSSTPropagator extends AbstractIntegratedPropagator {
     private InterpolationGrid interpolationgrid;
 
     /**
-     * Same as {@link org.orekit.propagation.AbstractPropagator#harvester} but with the
+     * Same as {@link AbstractPropagator#getHarvester()} but with the
      * more specific type. Saved to avoid a cast.
      */
     private DSSTHarvester harvester;
@@ -1169,71 +1167,6 @@ public class DSSTPropagator extends AbstractIntegratedPropagator {
             return forceModel.getMeanElementRate(state, auxiliaryElements, parameters);
         }
 
-    }
-
-    /** Estimate tolerance vectors for an AdaptativeStepsizeIntegrator.
-     *  <p>
-     *  The errors are estimated from partial derivatives properties of orbits,
-     *  starting from a scalar position error specified by the user.
-     *  Considering the energy conservation equation V = sqrt(mu (2/r - 1/a)),
-     *  we get at constant energy (i.e. on a Keplerian trajectory):
-     *
-     *  <pre>
-     *  V r² |dV| = mu |dr|
-     *  </pre>
-     *
-     *  <p> So we deduce a scalar velocity error consistent with the position error. From here, we apply
-     *  orbits Jacobians matrices to get consistent errors on orbital parameters.
-     *
-     *  <p>
-     *  The tolerances are only <em>orders of magnitude</em>, and integrator tolerances are only
-     *  local estimates, not global ones. So some care must be taken when using these tolerances.
-     *  Setting 1mm as a position error does NOT mean the tolerances will guarantee a 1mm error
-     *  position after several orbits integration.
-     *  </p>
-     *
-     * @param dP user specified position error (m)
-     * @param orbit reference orbit
-     * @return a two rows array, row 0 being the absolute tolerance error
-     *                       and row 1 being the relative tolerance error
-     * @deprecated since 13.0. Use {@link ToleranceProvider} for default and custom tolerances.
-     */
-    @Deprecated
-    public static double[][] tolerances(final double dP, final Orbit orbit) {
-        // estimate the scalar velocity error
-        final PVCoordinates pv = orbit.getPVCoordinates();
-        final double r2 = pv.getPosition().getNorm2Sq();
-        final double v  = pv.getVelocity().getNorm();
-        final double dV = orbit.getMu() * dP / (v * r2);
-
-        return DSSTPropagator.tolerances(dP, dV, orbit);
-
-    }
-
-    /** Estimate tolerance vectors for an AdaptativeStepsizeIntegrator.
-     *  <p>
-     *  The errors are estimated from partial derivatives properties of orbits,
-     *  starting from scalar position and velocity errors specified by the user.
-     *  <p>
-     *  The tolerances are only <em>orders of magnitude</em>, and integrator tolerances are only
-     *  local estimates, not global ones. So some care must be taken when using these tolerances.
-     *  Setting 1mm as a position error does NOT mean the tolerances will guarantee a 1mm error
-     *  position after several orbits integration.
-     *  </p>
-     *
-     * @param dP user specified position error (m)
-     * @param dV user specified velocity error (m/s)
-     * @param orbit reference orbit
-     * @return a two rows array, row 0 being the absolute tolerance error
-     *                       and row 1 being the relative tolerance error
-     * @since 10.3
-     * @deprecated since 13.0. Use {@link ToleranceProvider} for default and custom tolerances.
-     */
-    @Deprecated
-    public static double[][] tolerances(final double dP, final double dV, final Orbit orbit) {
-
-        return ToleranceProvider.of(CartesianToleranceProvider.of(dP, dV, CartesianToleranceProvider.DEFAULT_ABSOLUTE_MASS_TOLERANCE))
-            .getTolerances(orbit, OrbitType.EQUINOCTIAL, PositionAngleType.MEAN);
     }
 
     /** Step handler used to compute the parameters for the short periodic contributions.

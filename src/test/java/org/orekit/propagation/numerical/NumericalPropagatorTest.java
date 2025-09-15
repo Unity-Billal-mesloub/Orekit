@@ -37,7 +37,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.orekit.OrekitMatchers;
@@ -257,62 +256,6 @@ class NumericalPropagatorTest {
                 CoreMatchers.is(0.0));
         MatcherAssert.assertThat(actualState[0].getPVCoordinates(),
                 OrekitMatchers.pvIs(initialState.getPVCoordinates()));
-    }
-
-    @Test
-    @Deprecated
-    void testTolerancesOrbitdV() {
-        // GIVEN
-        final double dP = 1e-3;
-        final Vector3D position = new Vector3D(7.0e6, 1.0e6, 4.0e6);
-        final Vector3D velocity = new Vector3D(-500.0, 8000.0, 1000.0);
-        final Orbit orbit = new CartesianOrbit(new TimeStampedPVCoordinates(AbsoluteDate.ARBITRARY_EPOCH, position,
-                velocity, Vector3D.ZERO), FramesFactory.getGCRF(), Constants.EGM96_EARTH_MU);
-        // WHEN
-        final double[][] tolerancesWithDv = NumericalPropagator.tolerances(dP, 1e-6, orbit, OrbitType.CARTESIAN);
-        // THEN
-        final double[][] tolerances = ToleranceProvider.getDefaultToleranceProvider(dP).getTolerances(orbit, OrbitType.CARTESIAN);
-        for (int i = 0; i < 3; i++) {
-            Assertions.assertEquals(tolerances[0][i], tolerancesWithDv[0][i]);
-        }
-    }
-
-    @Deprecated
-    @ParameterizedTest
-    @EnumSource(OrbitType.class)
-    void testTolerancesOrbit(final OrbitType orbitType) {
-        // GIVEN
-        final double dP = 1e-3;
-        final Vector3D position = new Vector3D(7.0e6, 1.0e6, 4.0e6);
-        final Vector3D velocity = new Vector3D(-500.0, 8000.0, 1000.0);
-        final Orbit orbit = new CartesianOrbit(new TimeStampedPVCoordinates(AbsoluteDate.ARBITRARY_EPOCH, position,
-                velocity, Vector3D.ZERO), FramesFactory.getGCRF(), Constants.EGM96_EARTH_MU);
-        // WHEN
-        final double[][] actualTolerances = NumericalPropagator.tolerances(dP, orbit, orbitType);
-        // THEN
-        final double[][] expectedTolerances = ToleranceProvider.getDefaultToleranceProvider(dP).getTolerances(orbit, orbitType);
-        Assertions.assertArrayEquals(expectedTolerances[0], actualTolerances[0]);
-        Assertions.assertArrayEquals(expectedTolerances[1], actualTolerances[1]);
-    }
-
-    @Deprecated
-    @Test
-    void testTolerances() {
-        // GIVEN
-        final double dP = 1e-3;
-        final Vector3D position = new Vector3D(7.0e6, 1.0e6, 4.0e6);
-        final Vector3D velocity = new Vector3D(-500.0, 8000.0, 1000.0);
-        final Orbit orbit = new CartesianOrbit(new TimeStampedPVCoordinates(AbsoluteDate.ARBITRARY_EPOCH, position,
-                velocity, Vector3D.ZERO), FramesFactory.getGCRF(), Constants.EGM96_EARTH_MU);
-        // WHEN
-        final double[][] orbitTolerances = NumericalPropagator.tolerances(dP, orbit, OrbitType.CARTESIAN);
-        // THEN
-        final double[][] pvTolerances = ToleranceProvider.getDefaultToleranceProvider(dP).getTolerances(new AbsolutePVCoordinates(orbit.getFrame(),
-                new TimeStampedPVCoordinates(orbit.getDate(), position, velocity)));
-        for (int i = 0; i < 3; i++) {
-            Assertions.assertEquals(pvTolerances[0][i], orbitTolerances[0][i]);
-            Assertions.assertEquals(pvTolerances[1][i], orbitTolerances[1][i]);
-        }
     }
 
     @Test
@@ -729,6 +672,8 @@ class NumericalPropagatorTest {
             propagator.setStepHandler(new OrekitStepHandler() {
                 private int countDown = 3;
                 private AbsoluteDate previousCall = null;
+
+                @Override
                 public void init(SpacecraftState s0, AbsoluteDate t) {
                 }
                 public void handleStep(OrekitStepInterpolator interpolator) {
@@ -950,6 +895,7 @@ class NumericalPropagatorTest {
         propagator.setInitialState(propagator.getInitialState().addAdditionalData("linear", 1.5));
 
         CheckingHandler checking = new CheckingHandler(Action.RESET_STATE) {
+            @Override
             public SpacecraftState resetState(EventDetector detector, SpacecraftState oldState)
                 {
                 return oldState.addAdditionalData("linear", oldState.getAdditionalState("linear")[0] * 2);
@@ -2050,7 +1996,7 @@ class NumericalPropagatorTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         Utils.setDataRoot("regular-data:potential/shm-format");
         GravityFieldFactory.addPotentialCoefficientsReader(new SHMFormatReader("^eigen_cg03c_coef$", false));
         mu  = GravityFieldFactory.getUnnormalizedProvider(0, 0).getMu();
@@ -2070,7 +2016,7 @@ class NumericalPropagatorTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         initDate = null;
         initialState = null;
         propagator = null;

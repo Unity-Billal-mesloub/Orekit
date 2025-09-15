@@ -43,12 +43,10 @@ import org.orekit.orbits.FieldEquinoctialOrbit;
 import org.orekit.orbits.FieldOrbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
-import org.orekit.propagation.CartesianToleranceProvider;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.PropagationType;
 import org.orekit.propagation.Propagator;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.ToleranceProvider;
 import org.orekit.propagation.conversion.osc2mean.DSSTTheory;
 import org.orekit.propagation.conversion.osc2mean.FixedPointConverter;
 import org.orekit.propagation.conversion.osc2mean.MeanTheory;
@@ -65,7 +63,6 @@ import org.orekit.propagation.semianalytical.dsst.utilities.MaxGapInterpolationG
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.FieldDataDictionary;
-import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.ParameterObserver;
 import org.orekit.utils.TimeSpanMap;
@@ -1004,72 +1001,6 @@ public class FieldDSSTPropagator<T extends CalculusFieldElement<T>> extends Fiel
             return forceModel.getMeanElementRate(state, auxiliaryElements, parameters);
         }
 
-    }
-
-    /** Estimate tolerance vectors for an AdaptativeStepsizeIntegrator.
-     *  <p>
-     *  The errors are estimated from partial derivatives properties of orbits,
-     *  starting from a scalar position error specified by the user.
-     *  Considering the energy conservation equation V = sqrt(mu (2/r - 1/a)),
-     *  we get at constant energy (i.e. on a Keplerian trajectory):
-     *
-     *  <pre>
-     *  V r² |dV| = mu |dr|
-     *  </pre>
-     *
-     *  <p> So we deduce a scalar velocity error consistent with the position error. From here, we apply
-     *  orbits Jacobians matrices to get consistent errors on orbital parameters.
-     *
-     *  <p>
-     *  The tolerances are only <em>orders of magnitude</em>, and integrator tolerances are only
-     *  local estimates, not global ones. So some care must be taken when using these tolerances.
-     *  Setting 1mm as a position error does NOT mean the tolerances will guarantee a 1mm error
-     *  position after several orbits integration.
-     *  </p>
-     * @param <T> elements type
-     * @param dP user specified position error (m)
-     * @param orbit reference orbit
-     * @return a two rows array, row 0 being the absolute tolerance error
-     *                       and row 1 being the relative tolerance error
-     * @deprecated since 13.0. Use {@link ToleranceProvider} for default and custom tolerances.
-     */
-    @Deprecated
-    public static <T extends CalculusFieldElement<T>> double[][] tolerances(final T dP, final FieldOrbit<T> orbit) {
-        // estimate the scalar velocity error
-        final FieldPVCoordinates<T> pv = orbit.getPVCoordinates();
-        final T r2 = pv.getPosition().getNorm2Sq();
-        final T v  = pv.getVelocity().getNorm();
-        final T dV = orbit.getMu().multiply(dP).divide(v.multiply(r2));
-
-        return tolerances(dP, dV, orbit);
-    }
-
-    /** Estimate tolerance vectors for an AdaptativeStepsizeIntegrator.
-     *  <p>
-     *  The errors are estimated from partial derivatives properties of orbits,
-     *  starting from scalar position and velocity errors specified by the user.
-     *  <p>
-     *  The tolerances are only <em>orders of magnitude</em>, and integrator tolerances are only
-     *  local estimates, not global ones. So some care must be taken when using these tolerances.
-     *  Setting 1mm as a position error does NOT mean the tolerances will guarantee a 1mm error
-     *  position after several orbits integration.
-     *  </p>
-     *
-     * @param <T> elements type
-     * @param dP user specified position error (m)
-     * @param dV user specified velocity error (m/s)
-     * @param orbit reference orbit
-     * @return a two rows array, row 0 being the absolute tolerance error
-     *                       and row 1 being the relative tolerance error
-     * @since 10.3
-     * @deprecated since 13.0. Use {@link ToleranceProvider} for default and custom tolerances.
-     */
-    @Deprecated
-    public static <T extends CalculusFieldElement<T>> double[][] tolerances(final T dP, final T dV,
-                                                                            final FieldOrbit<T> orbit) {
-        return ToleranceProvider.of(CartesianToleranceProvider.of(dP.getReal(), dV.getReal(),
-                        CartesianToleranceProvider.DEFAULT_ABSOLUTE_MASS_TOLERANCE))
-                .getTolerances(orbit, OrbitType.EQUINOCTIAL, PositionAngleType.MEAN);
     }
 
     /** Step handler used to compute the parameters for the short periodic contributions.

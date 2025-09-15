@@ -112,7 +112,7 @@ import org.orekit.utils.IERSConventions;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 
-public class FieldDSSTPropagatorTest {
+class FieldDSSTPropagatorTest {
  
     /**
      * Test issue #1029 about DSST short period terms computation.
@@ -1171,36 +1171,6 @@ public class FieldDSSTPropagatorTest {
         Assertions.assertEquals(finalState.getOrbit().getMu().getReal(), 3.986004415E14, Double.MIN_VALUE);
     }
 
-    @Deprecated
-    @Test
-    void testIssue704() {
-        doTestIssue704(Binary64Field.getInstance());
-    }
-
-    private <T extends CalculusFieldElement<T>> void doTestIssue704(final Field<T> field) {
-
-        // Coordinates
-        final FieldOrbit<T>         orbit = getLEOState(field).getOrbit();
-        final FieldPVCoordinates<T> pv    = orbit.getPVCoordinates();
-
-        // dP
-        final T dP = field.getZero().add(10.0);
-
-        // Computes dV
-        final T r2 = pv.getPosition().getNorm2Sq();
-        final T v  = pv.getVelocity().getNorm();
-        final T dV = dP.multiply(orbit.getMu()).divide(v.multiply(r2));
-
-        // Verify
-        final double[][] tol1 = FieldDSSTPropagator.tolerances(dP, orbit);
-        final double[][] tol2 = FieldDSSTPropagator.tolerances(dP, dV, orbit);
-        for (int i = 0; i < tol1.length; i++) {
-            Assertions.assertArrayEquals(tol1[i], tol2[i], Double.MIN_VALUE);
-        }
-
-    }
-
-    /** This test is based on the example given by Orekit user kris06 in https://gitlab.orekit.org/orekit/orekit/-/issues/670. */
     @Test
     void testIssue670() {
         doTestIssue670(Binary64Field.getInstance());
@@ -1502,7 +1472,7 @@ public class FieldDSSTPropagatorTest {
     }
 
     @BeforeEach
-    public void setUp() throws IOException, ParseException {
+    void setUp() throws IOException, ParseException {
         Utils.setDataRoot("regular-data:potential/shm-format");
     }
 
