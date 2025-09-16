@@ -30,11 +30,6 @@ import org.orekit.utils.DoubleArrayDictionary;
  */
 public abstract class AbstractMatricesHarvester implements MatricesHarvester {
 
-    /** State dimension, fixed to 6.
-     * @deprecated as of 13.1, use DEFAULT_STATE_DIMENSION */
-    @Deprecated
-    public static final int STATE_DIMENSION = 6;
-
     /** Default state dimension, equivalent to position and velocity vectors. */
     public static final int DEFAULT_STATE_DIMENSION = 6;
 

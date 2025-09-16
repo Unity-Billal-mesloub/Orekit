@@ -48,8 +48,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.orekit.OrekitMatchers;
 import org.orekit.TestUtils;
@@ -101,7 +99,7 @@ import org.orekit.time.TimeScalesFactory;
 import org.orekit.time.UTCScale;
 import org.orekit.utils.*;
 
-public class FieldNumericalPropagatorTest {
+class FieldNumericalPropagatorTest {
 
     private double               mu;
 
@@ -486,52 +484,6 @@ public class FieldNumericalPropagatorTest {
         Assertions.assertEquals(initialVelocity.getY().getReal(), finalVelocity.getY().getReal(), 1.0e-10);
         Assertions.assertEquals(initialVelocity.getZ().getReal(), finalVelocity.getZ().getReal(), 1.0e-10);
 
-    }
-
-    @Deprecated
-    @ParameterizedTest
-    @EnumSource(OrbitType.class)
-    void testTolerancesOrbit(final OrbitType orbitType) {
-        // GIVEN
-        final Binary64 zero = Binary64.ZERO;
-        final double dP = 1e-3;
-        final double dV = 1e-6;
-        final FieldVector3D<Binary64> position = new FieldVector3D<>(zero.add(7.0e6), zero.add(1.0e6), zero.add(4.0e6));
-        final FieldVector3D<Binary64> velocity = new FieldVector3D<>(zero.add(-500.0), zero.add(8000.0), zero.add(1000.0));
-        final Orbit orbit = new CartesianOrbit(new TimeStampedPVCoordinates(AbsoluteDate.ARBITRARY_EPOCH, position.toVector3D(),
-                velocity.toVector3D(), Vector3D.ZERO), FramesFactory.getGCRF(), Constants.EGM96_EARTH_MU);
-        final FieldOrbit<Binary64> fieldOrbit = new FieldCartesianOrbit<>(Binary64Field.getInstance(), orbit);
-        // WHEN
-        final double[][] actualTolerances = FieldNumericalPropagator.tolerances(zero.add(dP), zero.add(dV), fieldOrbit, orbitType);
-        // THEN
-        final double[][] expectedTolerances = ToleranceProvider.of(CartesianToleranceProvider.of(dP, dV, CartesianToleranceProvider.DEFAULT_ABSOLUTE_MASS_TOLERANCE))
-                .getTolerances(orbit, orbitType, PositionAngleType.TRUE);
-        Assertions.assertArrayEquals(expectedTolerances[0], actualTolerances[0]);
-        Assertions.assertArrayEquals(expectedTolerances[1], actualTolerances[1]);
-    }
-
-    @Deprecated
-    @Test
-    void testTolerances() {
-        // GIVEN
-        final Binary64 zero = Binary64.ZERO;
-        final double dP = 1e-3;
-        final double dV = 1e-6;
-        final FieldVector3D<Binary64> position = new FieldVector3D<>(zero.add(7.0e6), zero.add(1.0e6), zero.add(4.0e6));
-        final FieldVector3D<Binary64> velocity = new FieldVector3D<>(zero.add(-500.0), zero.add(8000.0), zero.add(1000.0));
-        final Orbit orbit = new CartesianOrbit(new TimeStampedPVCoordinates(AbsoluteDate.ARBITRARY_EPOCH, position.toVector3D(),
-                velocity.toVector3D(), Vector3D.ZERO), FramesFactory.getGCRF(), Constants.EGM96_EARTH_MU);
-        final FieldOrbit<Binary64> fieldOrbit = new FieldCartesianOrbit<>(Binary64Field.getInstance(), orbit);
-        // WHEN
-        final double[][] orbitTolerances = FieldNumericalPropagator.tolerances(zero.add(dP), zero.add(dV), fieldOrbit,
-                OrbitType.CARTESIAN);
-        // THEN
-        final double[][] pvTolerances = ToleranceProvider.getDefaultToleranceProvider(dP).getTolerances(new AbsolutePVCoordinates(orbit.getFrame(),
-                new TimeStampedPVCoordinates(orbit.getDate(), position.toVector3D(), velocity.toVector3D())));
-        for (int i = 0; i < 3; i++) {
-            Assertions.assertEquals(pvTolerances[0][i], orbitTolerances[0][i]);
-            Assertions.assertEquals(pvTolerances[1][i], orbitTolerances[1][i]);
-        }
     }
 
     @Test
@@ -2303,7 +2255,7 @@ public class FieldNumericalPropagatorTest {
 
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         Utils.setDataRoot("regular-data:potential/shm-format");
         GravityFieldFactory.addPotentialCoefficientsReader(new SHMFormatReader("^eigen_cg03c_coef$", false));
         mu  = GravityFieldFactory.getUnnormalizedProvider(0, 0).getMu();

@@ -33,18 +33,6 @@ public class TimeStampedDouble implements TimeStamped {
     /**
      * Constructor.
      *
-     * @param value value
-     * @param date  date associated to value
-     */
-    @Deprecated
-    public TimeStampedDouble(final double value, final AbsoluteDate date) {
-        this.date  = date;
-        this.value = value;
-    }
-
-    /**
-     * Constructor.
-     *
      * @param date date associated to value
      * @param value value
      */
