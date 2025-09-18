@@ -23,6 +23,9 @@
         <action dev="serrof" type="fix" issue="1826">
             Fixed failing propagation after clearing matrices harvester.
         </action>
+        <action dev="serrof" type="fix" issue="1824">
+            Override getVelocity for performance wherever possible.
+        </action>
         <action dev="serrof" type="fix" issue="873">
             Fixed NaN with automatic differentiation in OneAxisEllipsoid.
         </action>

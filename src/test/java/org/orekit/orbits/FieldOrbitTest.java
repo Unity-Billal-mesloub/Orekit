@@ -27,9 +27,12 @@ import org.hipparchus.util.Binary64;
 import org.hipparchus.util.MathUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.orekit.TestUtils;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
+import org.orekit.frames.Predefined;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.Constants;
 import org.orekit.utils.FieldPVCoordinates;
@@ -50,6 +53,20 @@ class FieldOrbitTest {
         // THEN
         final FieldVector3D<Complex> expectedPosition = testFieldOrbit.getPVCoordinates(date, frame).getPosition();
         Assertions.assertEquals(expectedPosition, actualPosition);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Predefined.class, names = {"EME2000", "GCRF"})
+    void testGetVelocity(final Predefined predefined) {
+        // GIVEN
+        final TestFieldOrbit testFieldOrbit = new TestFieldOrbit(1.);
+        final FieldAbsoluteDate<Complex> date = testFieldOrbit.getDate().shiftedBy(0.);
+        final Frame frame = FramesFactory.getFrame(predefined);
+        // WHEN
+        final FieldVector3D<Complex> actualVelocity = testFieldOrbit.getVelocity(date, frame);
+        // THEN
+        final FieldVector3D<Complex> expectedVelocity = testFieldOrbit.getPVCoordinates(date, frame).getVelocity();
+        Assertions.assertEquals(expectedVelocity, actualVelocity);
     }
 
     @Test

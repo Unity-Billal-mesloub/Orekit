@@ -29,6 +29,7 @@ import org.orekit.propagation.Propagator;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.analytical.AbstractAnalyticalPropagator;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.SortedListTrimmer;
 import org.orekit.utils.TimeStampedPVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinatesHermiteInterpolator;
@@ -97,6 +98,13 @@ public class EphemerisSegmentPropagator<C extends TimeStampedPVCoordinates> exte
     public TimeStampedPVCoordinates getPVCoordinates(final AbsoluteDate date, final Frame frame) {
         final TimeStampedPVCoordinates interpolatedPVCoordinates = interpolate(date);
         return ephemerisFrame.getTransformTo(frame, date).transformPVCoordinates(interpolatedPVCoordinates);
+    }
+
+    @Override
+    public Vector3D getVelocity(final AbsoluteDate date, final Frame frame) {
+        final TimeStampedPVCoordinates interpolatedPVCoordinates = interpolate(date);
+        final PVCoordinates transformedPV = ephemerisFrame.getKinematicTransformTo(frame, date).transformOnlyPV(interpolatedPVCoordinates);
+        return transformedPV.getVelocity();
     }
 
     @Override
