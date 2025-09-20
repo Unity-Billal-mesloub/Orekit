@@ -206,6 +206,19 @@ class NumericalPropagatorTest {
     }
 
     @Test
+    void testIssue1826() {
+        // GIVEN
+        propagator.setupMatricesComputation("stm", null, null);
+        propagator.setResetAtEnd(false);
+        final AbsoluteDate targetDate = initDate.shiftedBy(1);
+        propagator.propagate(targetDate);
+        // WHEN
+        propagator.clearMatricesComputation();
+        // THEN
+        Assertions.assertDoesNotThrow(() -> propagator.propagate(targetDate));
+    }
+
+    @Test
     void testEventsWithTimeRangePropagation() {
         final AtomicInteger counter = new AtomicInteger(0);
         final double dt = 60.0;
