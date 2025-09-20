@@ -503,6 +503,12 @@ public abstract class AbstractIntegratedPropagator extends AbstractPropagator {
         // nothing to do by default
     }
 
+    @Override
+    public void clearMatricesComputation() {
+        secondaryOffsets.clear();
+        super.clearMatricesComputation();
+    }
+
     /** Propagation with or without event detection.
      * @param tEnd target date to which orbit should be propagated
      * @param forceResetAtEnd flag to force resetting state and date after integration

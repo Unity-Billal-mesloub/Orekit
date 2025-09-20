@@ -20,9 +20,12 @@
   </properties>
   <body>
     <release version="13.1.2" date="TBD" description="TBD">
-      <action dev="serrof" type="fix" issue="873">
-          Fixed NaN with automatic differentiation in OneAxisEllipsoid.
-      </action>
+        <action dev="serrof" type="fix" issue="1826">
+            Fixed failing propagation after clearing matrices harvester.
+        </action>
+        <action dev="serrof" type="fix" issue="873">
+            Fixed NaN with automatic differentiation in OneAxisEllipsoid.
+        </action>
     </release>
     <release version="13.1.1" date="2025-09-14" description="Orekit 13.1 is a patch release. It fixes documentation issues and various bugs, including some related to performance.">
         <action dev="luc" type="fix" issue="1817">
