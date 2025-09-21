@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="13.1.2" date="TBD" description="TBD">
+        <action dev="serrof" type="fix" issue="1827">
+            Fixed wrong model parameters derivatives in non-Cartesian propagation with events and mass as state variable.
+        </action>
         <action dev="serrof" type="fix" issue="1826">
             Fixed failing propagation after clearing matrices harvester.
         </action>
