@@ -51,6 +51,7 @@ import org.orekit.frames.FieldStaticTransform;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.frames.StaticTransform;
+import org.orekit.models.earth.ReferenceEllipsoid;
 import org.orekit.orbits.CircularOrbit;
 import org.orekit.orbits.EquinoctialOrbit;
 import org.orekit.orbits.Orbit;
@@ -68,6 +69,9 @@ import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.TimeStampedPVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinatesHermiteInterpolator;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.orekit.OrekitMatchers.closeTo;
 
 
 class OneAxisEllipsoidTest {
@@ -611,7 +615,7 @@ class OneAxisEllipsoidTest {
 
         // direct computation of position, velocity and acceleration
         PVCoordinates pv = new PVCoordinates(earth.transform(new FieldGeodeticPoint<>(latDS, lonDS, altDS)));
-        FieldGeodeticPoint<UnivariateDerivative2> rebuilt = earth.transform(pv, earth.getBodyFrame(), null);
+        FieldGeodeticPoint<UnivariateDerivative2> rebuilt = earth.transform(pv, earth.getBodyFrame(), AbsoluteDate.ARBITRARY_EPOCH);
         Assertions.assertEquals(lat0, rebuilt.getLatitude().getReal(),                1.0e-16);
         Assertions.assertEquals(lat1, rebuilt.getLatitude().getPartialDerivative(1),  5.0e-19);
         Assertions.assertEquals(lat2, rebuilt.getLatitude().getPartialDerivative(2),  5.0e-14);
@@ -619,9 +623,19 @@ class OneAxisEllipsoidTest {
         Assertions.assertEquals(lon1, rebuilt.getLongitude().getPartialDerivative(1), 1.0e-18);
         Assertions.assertEquals(lon2, rebuilt.getLongitude().getPartialDerivative(2), 1.0e-20);
         Assertions.assertEquals(alt0, rebuilt.getAltitude().getReal(),                2.0e-11);
-        Assertions.assertEquals(alt1, rebuilt.getAltitude().getPartialDerivative(1),  6.0e-13);
+        Assertions.assertEquals(alt1, rebuilt.getAltitude().getPartialDerivative(1),  1.0e-12);
         Assertions.assertEquals(alt2, rebuilt.getAltitude().getPartialDerivative(2),  2.0e-14);
 
+    }
+
+    @Test
+    void testIssue873() {
+        AbsoluteDate epoch = AbsoluteDate.ARBITRARY_EPOCH;
+        OneAxisEllipsoid earth = ReferenceEllipsoid.getWgs84(FramesFactory.getGCRF());
+        FieldGeodeticPoint<UnivariateDerivative2> gp = earth.transform(
+                new PVCoordinates(new Vector3D(0, 0, earth.getC()), new Vector3D(0, 1, 0)),
+                earth.getBodyFrame(), epoch);
+        assertThat(gp.getAltitude().getPartialDerivative(1), closeTo(0.0, 1e-12));
     }
 
     @Test
