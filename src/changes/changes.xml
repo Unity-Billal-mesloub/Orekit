@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="13.1.2" date="TBD" description="TBD">
+        <action dev="luc" type="fix" issue="1831">
+            Fixed epoch flag in Rinex observation writer.
+        </action>
         <action dev="afossa" type="fix" issue="1829">
             Overridden getPosition(frame, date) in (Field)AbsolutePVCoordinates and used it for signal time of flight computation.
         </action>
