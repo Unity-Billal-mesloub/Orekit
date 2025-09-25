@@ -542,7 +542,7 @@
             <arg>-Xlint:unchecked</arg>
             <arg>-Xplugin:dataContextPlugin</arg>
           </compilerArgs>
-          <release>17</release>
+          <release>21</release>
         </configuration>
         <executions>
           <execution>
