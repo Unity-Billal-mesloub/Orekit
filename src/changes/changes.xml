@@ -83,6 +83,9 @@
         <action dev="afossa" type="fix" issue="1642">
             Change algorithm in KeplerianMotionCartesianUtility.predictPVHyperbolic().
         </action>
+        <action dev="vcucchie" type="fix" issue="1521">
+            Fixed state covariance interpolator getSubInterpolators method.
+        </action>
         <action dev="serrof" type="add" issue="1517">
             Add analytical ephemerides for the Moon.
         </action>
