@@ -141,7 +141,7 @@ public class SemiAnalyticalUnscentedKalmanEstimatorTest {
                         DSSTEstimationTestUtils.createMeasurements(propagator,
                                                                    new TwoWayRangeMeasurementCreator(context),
                                                                    0.0, 6.0, 60.0);
-        final AbsoluteDate lastMeasurementEpoch = measurements.get(measurements.size() - 1).getDate();
+        final AbsoluteDate lastMeasurementEpoch = measurements.getLast().getDate();
 
         // DSST propagator builder (used for orbit determination)
         final DSSTPropagatorBuilder propagatorBuilder = context.createBuilder(perfectStart, minStep, maxStep, dP);
@@ -151,7 +151,7 @@ public class SemiAnalyticalUnscentedKalmanEstimatorTest {
         
         // Reference position/velocity at last measurement date
         final Orbit refOrbit = referencePropagator.
-                        propagate(measurements.get(measurements.size()-1).getDate()).getOrbit();
+                        propagate(measurements.getLast().getDate()).getOrbit();
 
         // Equinictial covariance matrix initialization
         final RealMatrix equinoctialP = MatrixUtils.createRealDiagonalMatrix(new double [] {
@@ -224,7 +224,7 @@ public class SemiAnalyticalUnscentedKalmanEstimatorTest {
                         DSSTEstimationTestUtils.createMeasurements(propagator,
                                                                    new TwoWayRangeMeasurementCreator(context),
                                                                    0.0, 6.0, 60.0);
-        final AbsoluteDate lastMeasurementEpoch = measurements.get(measurements.size() - 1).getDate();
+        final AbsoluteDate lastMeasurementEpoch = measurements.getLast().getDate();
 
         // DSST propagator builder (used for orbit determination)
         final DSSTPropagatorBuilder propagatorBuilder = context.createBuilder(perfectStart, minStep, maxStep, dP);
@@ -235,7 +235,7 @@ public class SemiAnalyticalUnscentedKalmanEstimatorTest {
         
         // Reference position/velocity at last measurement date
         final Orbit refOrbit = referencePropagator.
-                        propagate(measurements.get(measurements.size()-1).getDate()).getOrbit();
+                        propagate(measurements.getLast().getDate()).getOrbit();
 
         // Equinictial covariance matrix initialization
         final RealMatrix equinoctialP = MatrixUtils.createRealDiagonalMatrix(new double [] {
@@ -313,7 +313,7 @@ public class SemiAnalyticalUnscentedKalmanEstimatorTest {
                         DSSTEstimationTestUtils.createMeasurements(propagator,
                                                                    new TwoWayRangeMeasurementCreator(context),
                                                                    0.0, 6.0, 60.0);
-        final AbsoluteDate lastMeasurementEpoch = measurements.get(measurements.size() - 1).getDate();
+        final AbsoluteDate lastMeasurementEpoch = measurements.getLast().getDate();
         // DSST propagator builder (used for orbit determination)
         final DSSTPropagatorBuilder propagatorBuilder = context.createBuilder(perfectStart, minStep, maxStep, dP);
         propagatorBuilder.addForceModel(new DSSTZonal(gravityField));
@@ -327,7 +327,7 @@ public class SemiAnalyticalUnscentedKalmanEstimatorTest {
         
         // Reference position/velocity at last measurement date
         final Orbit refOrbit = referencePropagator.
-                        propagate(measurements.get(measurements.size()-1).getDate()).getOrbit();
+                        propagate(measurements.getLast().getDate()).getOrbit();
 
         // Equinictial covariance matrix initialization
         final RealMatrix equinoctialP = MatrixUtils.createRealDiagonalMatrix(new double [] {

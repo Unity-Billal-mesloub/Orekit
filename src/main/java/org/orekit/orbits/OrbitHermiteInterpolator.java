@@ -159,7 +159,7 @@ public class OrbitHermiteInterpolator extends AbstractOrbitInterpolator {
         final List<Orbit> sample = interpolationData.getNeighborList();
 
         // Get orbit type for interpolation
-        final OrbitType orbitType = sample.get(0).getType();
+        final OrbitType orbitType = sample.getFirst().getType();
 
         if (orbitType == OrbitType.CARTESIAN) {
             return interpolateCartesian(interpolationData.getInterpolationDate(), sample);
@@ -195,7 +195,7 @@ public class OrbitHermiteInterpolator extends AbstractOrbitInterpolator {
         final TimeStampedPVCoordinates interpolated = interpolator.interpolate(interpolationDate, sampleTimeStampedPV);
 
         // Use first entry gravitational parameter
-        final double mu = sample.get(0).getMu();
+        final double mu = sample.getFirst().getMu();
 
         return new CartesianOrbit(interpolated, getOutputInertialFrame(), interpolationDate, mu);
     }
@@ -219,7 +219,7 @@ public class OrbitHermiteInterpolator extends AbstractOrbitInterpolator {
         }
 
         // Use first entry gravitational parameter
-        final double mu = orbits.get(0).getMu();
+        final double mu = orbits.getFirst().getMu();
 
         // Interpolate and build a new instance
         final double[][] interpolated;

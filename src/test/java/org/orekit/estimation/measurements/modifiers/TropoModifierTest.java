@@ -151,7 +151,7 @@ public class TropoModifierTest {
             final EstimatedModel                 tropoModel       = new EstimatedModel(mappingFunction, 5.0);
             final RangeTroposphericDelayModifier modifier         = new RangeTroposphericDelayModifier(tropoModel);
 
-            final ParameterDriver parameterDriver = modifier.getParametersDrivers().get(0);
+            final ParameterDriver parameterDriver = modifier.getParametersDrivers().getFirst();
             parameterDriver.setSelected(true);
             parameterDriver.setName(baseFrame.getName() + EstimatedModel.TOTAL_ZENITH_DELAY);
             range.addModifier(modifier);
@@ -264,7 +264,7 @@ public class TropoModifierTest {
             final EstimatedModel                 tropoModel       = new EstimatedModel(mappingFunction, 5.0);
             final PhaseTroposphericDelayModifier modifier         = new PhaseTroposphericDelayModifier(tropoModel);
 
-            final ParameterDriver parameterDriver = modifier.getParametersDrivers().get(0);
+            final ParameterDriver parameterDriver = modifier.getParametersDrivers().getFirst();
             parameterDriver.setSelected(true);
             parameterDriver.setName(baseFrame.getName() + EstimatedModel.TOTAL_ZENITH_DELAY);
             phase.addModifier(modifier);
@@ -472,7 +472,7 @@ public class TropoModifierTest {
                             new BistaticRangeRateTroposphericDelayModifier(tropoModel);
 
             final TopocentricFrame baseFrame = biRangeRate.getReceiverStation().getBaseFrame();
-            final ParameterDriver parameterDriver = modifier.getParametersDrivers().get(0);
+            final ParameterDriver parameterDriver = modifier.getParametersDrivers().getFirst();
             parameterDriver.setSelected(true);
             parameterDriver.setName(baseFrame.getName() + EstimatedModel.TOTAL_ZENITH_DELAY);
 
@@ -580,7 +580,7 @@ public class TropoModifierTest {
             final TDOATroposphericDelayModifier modifier     = new TDOATroposphericDelayModifier(tropoModel);
 
             final TopocentricFrame baseFrame      = tdoa.getPrimeStation().getBaseFrame();
-            final ParameterDriver parameterDriver = modifier.getParametersDrivers().get(0);
+            final ParameterDriver parameterDriver = modifier.getParametersDrivers().getFirst();
             parameterDriver.setSelected(true);
             parameterDriver.setName(baseFrame.getName() + EstimatedModel.TOTAL_ZENITH_DELAY);
 
@@ -680,7 +680,7 @@ public class TropoModifierTest {
             final EstimatedModel                     tropoModel       = new EstimatedModel(mappingFunction, 5.0);
             final RangeRateTroposphericDelayModifier modifier         = new RangeRateTroposphericDelayModifier(tropoModel, false);
 
-            final ParameterDriver parameterDriver = modifier.getParametersDrivers().get(0);
+            final ParameterDriver parameterDriver = modifier.getParametersDrivers().getFirst();
             parameterDriver.setSelected(true);
             parameterDriver.setName(baseFrame.getName() + EstimatedModel.TOTAL_ZENITH_DELAY);
             rangeRate.addModifier(modifier);

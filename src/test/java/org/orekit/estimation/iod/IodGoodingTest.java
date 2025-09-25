@@ -108,7 +108,7 @@ public class IodGoodingTest extends AbstractIodTest {
         final List<ObservedMeasurement<?>> measurements = EstimationTestUtils.createMeasurements(propagator,
                                                                                                  new AngularAzElMeasurementCreator(context),
                                                                                                  0.0, 1.0, 60.0);
-        final AngularAzEl azEl1 = (AngularAzEl) measurements.get(0);
+        final AngularAzEl azEl1 = (AngularAzEl) measurements.getFirst();
         final AngularAzEl azEl2 = (AngularAzEl) measurements.get(20);
         final AngularAzEl azEl3 = (AngularAzEl) measurements.get(40);
 
@@ -227,7 +227,7 @@ public class IodGoodingTest extends AbstractIodTest {
                                                        0.0, 1.0, 60.0);
 
         // Angular measurements
-        final AngularRaDec raDec1 = (AngularRaDec) measurements.get(0);
+        final AngularRaDec raDec1 = (AngularRaDec) measurements.getFirst();
         final AngularRaDec raDec2 = (AngularRaDec) measurements.get(20);
         final AngularRaDec raDec3 = (AngularRaDec) measurements.get(40);
 
@@ -278,7 +278,7 @@ public class IodGoodingTest extends AbstractIodTest {
                 0.0, 1.0, 60.0);
 
         // Angular measurements
-        final AngularAzEl azEl1 = (AngularAzEl) measurements.get(0);
+        final AngularAzEl azEl1 = (AngularAzEl) measurements.getFirst();
         final AngularAzEl azEl2 = (AngularAzEl) measurements.get(20);
         final AngularAzEl azEl3 = (AngularAzEl) measurements.get(40);
 

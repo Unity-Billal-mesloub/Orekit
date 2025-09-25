@@ -80,7 +80,7 @@ public class FDOATest {
         Assertions.assertEquals(0.0, diffStat.getStandardDeviation(), 1e-3);
 
         // Test measurement type
-        Assertions.assertEquals(FDOA.MEASUREMENT_TYPE, measurements.get(0).getMeasurementType());
+        Assertions.assertEquals(FDOA.MEASUREMENT_TYPE, measurements.getFirst().getMeasurementType());
     }
 
     /**

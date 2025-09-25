@@ -1328,7 +1328,7 @@ class DSSTPropagatorTest {
         dsst = new DSSTPropagator(integrator, PropagationType.MEAN);
         dsst.setInitialState(initialState, PropagationType.MEAN);
         MDot mDot = new MDot();
-        mDot.getParametersDrivers().get(0).setSelected(true);
+        mDot.getParametersDrivers().getFirst().setSelected(true);
         dsst.addForceModel(mDot);
         // an intentionally negligible force model, but with a different parameter
         dsst.addForceModel(new DSSTThirdBody(CelestialBodyFactory.getPluto(), mu));
@@ -1354,7 +1354,7 @@ class DSSTPropagatorTest {
         dsst = new DSSTPropagator(integrator, PropagationType.MEAN);
         dsst.setInitialState(initialState, PropagationType.MEAN);
         mDot = new MDot();
-        mDot.getParametersDrivers().get(0).setSelected(true);
+        mDot.getParametersDrivers().getFirst().setSelected(true);
         dsst.addForceModel(mDot);
         // an intentionally negligible force model, but with a different parameter
         DSSTThirdBody third = new DSSTThirdBody(CelestialBodyFactory.getPluto(), mu);
@@ -1408,7 +1408,7 @@ class DSSTPropagatorTest {
         dsst = new DSSTPropagator(integrator, PropagationType.OSCULATING);
         dsst.setInitialState(initialState, PropagationType.MEAN);
         mDot = new MDot();
-        mDot.getParametersDrivers().get(0).setSelected(true);
+        mDot.getParametersDrivers().getFirst().setSelected(true);
         dsst.addForceModel(mDot);
         // an intentionally negligible force model, but with a different parameter
         dsst.addForceModel(new DSSTThirdBody(CelestialBodyFactory.getPluto(), mu));
@@ -1436,7 +1436,7 @@ class DSSTPropagatorTest {
         dsst = new DSSTPropagator(integrator, PropagationType.OSCULATING);
         dsst.setInitialState(initialState, PropagationType.MEAN);
         mDot = new MDot();
-        mDot.getParametersDrivers().get(0).setSelected(true);
+        mDot.getParametersDrivers().getFirst().setSelected(true);
         dsst.addForceModel(mDot);
         // an intentionally negligible force model, but with a different parameter
         third = new DSSTThirdBody(CelestialBodyFactory.getPluto(), mu);

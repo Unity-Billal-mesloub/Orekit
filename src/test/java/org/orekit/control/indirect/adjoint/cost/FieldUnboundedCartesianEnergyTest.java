@@ -108,9 +108,9 @@ class FieldUnboundedCartesianEnergyTest {
         // THEN
         final List<FieldEventDetector<Complex>> eventDetectors = eventDetectorStream.collect(Collectors.toList());
         Assertions.assertEquals(1, eventDetectors.size());
-        Assertions.assertInstanceOf(FieldCartesianEnergyConsideringMass.FieldSingularityDetector.class, eventDetectors.get(0));
+        Assertions.assertInstanceOf(FieldCartesianEnergyConsideringMass.FieldSingularityDetector.class, eventDetectors.getFirst());
         final FieldCartesianEnergyConsideringMass<Complex>.FieldSingularityDetector singularityDetector =
-                (FieldCartesianEnergyConsideringMass<Complex>.FieldSingularityDetector) eventDetectors.get(0);
+                (FieldCartesianEnergyConsideringMass<Complex>.FieldSingularityDetector) eventDetectors.getFirst();
         Assertions.assertEquals(Action.RESET_DERIVATIVES, singularityDetector.getHandler().eventOccurred(null, null, false));
     }
 
@@ -129,13 +129,13 @@ class FieldUnboundedCartesianEnergyTest {
         // THEN
         final List<FieldEventDetector<Complex>> fieldEventDetectors = fieldEventDetectorStream.collect(Collectors.toList());
         Assertions.assertEquals(1, fieldEventDetectors.size());
-        Assertions.assertInstanceOf(FieldCartesianEnergyConsideringMass.FieldSingularityDetector.class, fieldEventDetectors.get(0));
+        Assertions.assertInstanceOf(FieldCartesianEnergyConsideringMass.FieldSingularityDetector.class, fieldEventDetectors.getFirst());
         final FieldCartesianEnergyConsideringMass<Complex>.FieldSingularityDetector fieldSingularityDetector =
-                (FieldCartesianEnergyConsideringMass<Complex>.FieldSingularityDetector) fieldEventDetectors.get(0);
+                (FieldCartesianEnergyConsideringMass<Complex>.FieldSingularityDetector) fieldEventDetectors.getFirst();
         final Complex gValue = fieldSingularityDetector.g(new FieldSpacecraftState<>(field, state));
         final List<EventDetector> eventDetectors = unboundedCartesianEnergy.toCartesianCost().getEventDetectors().collect(Collectors.toList());
         final CartesianEnergyConsideringMass.SingularityDetector singularityDetector =
-                (CartesianEnergyConsideringMass.SingularityDetector) eventDetectors.get(0);
+                (CartesianEnergyConsideringMass.SingularityDetector) eventDetectors.getFirst();
         final double expectedG = singularityDetector.g(state);
         Assertions.assertEquals(expectedG, gValue.getReal());
     }

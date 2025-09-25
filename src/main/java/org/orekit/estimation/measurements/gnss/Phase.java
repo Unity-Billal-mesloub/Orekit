@@ -116,7 +116,7 @@ public class Phase extends GroundReceiverMeasurement<Phase> {
                                                        });
 
         // Clock offsets
-        final ObservableSatellite satellite = getSatellites().get(0);
+        final ObservableSatellite satellite = getSatellites().getFirst();
         final double              dts       = satellite.getClockOffsetDriver().getValue(common.getState().getDate());
         final double              dtg       = getStation().getClockOffsetDriver().getValue(getDate());
 
@@ -161,7 +161,7 @@ public class Phase extends GroundReceiverMeasurement<Phase> {
                                                    });
 
         // Clock offsets
-        final ObservableSatellite satellite = getSatellites().get(0);
+        final ObservableSatellite satellite = getSatellites().getFirst();
         final Gradient            dts       = satellite.getClockOffsetDriver().getValue(nbParams, common.getIndices(), state.getDate());
         final Gradient            dtg       = getStation().getClockOffsetDriver().getValue(nbParams, common.getIndices(), getDate());
 

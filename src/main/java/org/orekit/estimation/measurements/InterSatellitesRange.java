@@ -131,7 +131,7 @@ public class InterSatellitesRange extends AbstractMeasurement<InterSatellitesRan
         //  we will have delta == tauD and transitState will be the same as state)
 
         // downlink delay
-        final double dtl = getSatellites().get(0).getClockOffsetDriver().getValue(local.getDate());
+        final double dtl = getSatellites().getFirst().getClockOffsetDriver().getValue(local.getDate());
         final AbsoluteDate arrivalDate = getDate().shiftedBy(-dtl);
 
         final TimeStampedPVCoordinates s1Downlink =
@@ -236,7 +236,7 @@ public class InterSatellitesRange extends AbstractMeasurement<InterSatellitesRan
         //  we will have delta == tauD and transitState will be the same as state)
 
         // downlink delay
-        final Gradient dtl = getSatellites().get(0).getClockOffsetDriver().getValue(nbParams, indices, local.getDate());
+        final Gradient dtl = getSatellites().getFirst().getClockOffsetDriver().getValue(nbParams, indices, local.getDate());
         final FieldAbsoluteDate<Gradient> arrivalDate =
                         new FieldAbsoluteDate<>(getDate(), dtl.negate());
 

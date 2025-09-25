@@ -113,7 +113,7 @@ public abstract class AbstractOnBoardMeasurement<T extends ObservedMeasurement<T
         final Frame                    frame            = states[0].getFrame();
         final TimeStampedPVCoordinates pvaLocal         = states[0].getPVCoordinates(frame);
         final ClockOffset              localClock       = getSatellites().
-                                                          get(0).
+                                                          getFirst().
                                                           getQuadraticClockModel().
             getOffset(getDate());
         final double                   localClockOffset = localClock.getOffset();
@@ -173,7 +173,7 @@ public abstract class AbstractOnBoardMeasurement<T extends ObservedMeasurement<T
 
         // local and remote satellites
         final TimeStampedFieldPVCoordinates<Gradient> pvaLocal         = getCoordinates(states[0], 0, nbEstimatedParams);
-        final QuadraticFieldClockModel<Gradient>      localClock       = getSatellites().get(0).getQuadraticClockModel().
+        final QuadraticFieldClockModel<Gradient>      localClock       = getSatellites().getFirst().getQuadraticClockModel().
                                                                          toGradientModel(nbEstimatedParams, parameterIndices, getDate());
         final FieldClockOffset<Gradient>              localClockOffset = localClock.getOffset(gDate);
         final FieldPVCoordinatesProvider<Gradient>    remotePV         = getRemotePV(states, nbEstimatedParams);

@@ -142,7 +142,7 @@ public class TLEPVTest {
             final PV pv = pvs[k];
 
             // Propagator numbers
-            Assertions.assertEquals(sats[k].getPropagatorIndex(), pv.getSatellites().get(0).getPropagatorIndex(), eps);
+            Assertions.assertEquals(sats[k].getPropagatorIndex(), pv.getSatellites().getFirst().getPropagatorIndex(), eps);
 
             // Weights
             for (int i = 0; i < 6; i++) {
@@ -218,7 +218,7 @@ public class TLEPVTest {
             final PV pv = pvs[k];
 
             // Propagator numbers
-            Assertions.assertEquals(sats[k].getPropagatorIndex(), pv.getSatellites().get(0).getPropagatorIndex(), eps);
+            Assertions.assertEquals(sats[k].getPropagatorIndex(), pv.getSatellites().getFirst().getPropagatorIndex(), eps);
 
             // Weights
             for (int i = 0; i < 6; i++) {
@@ -305,7 +305,7 @@ public class TLEPVTest {
             final PV pv = pvs[k];
 
             // Propagator numbers
-            Assertions.assertEquals(sats[k].getPropagatorIndex(), pv.getSatellites().get(0).getPropagatorIndex(), eps);
+            Assertions.assertEquals(sats[k].getPropagatorIndex(), pv.getSatellites().getFirst().getPropagatorIndex(), eps);
 
             // Weights
             for (int i = 0; i < 6; i++) {
@@ -385,7 +385,7 @@ public class TLEPVTest {
             final PV pv = pvs[k];
 
             // Propagator numbers
-            Assertions.assertEquals(sats[k].getPropagatorIndex(), pv.getSatellites().get(0).getPropagatorIndex(), eps);
+            Assertions.assertEquals(sats[k].getPropagatorIndex(), pv.getSatellites().getFirst().getPropagatorIndex(), eps);
 
             // Weights
             for (int i = 0; i < 6; i++) {

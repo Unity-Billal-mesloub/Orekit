@@ -94,7 +94,7 @@ class FieldEventsLoggerTest {
         Assertions.assertEquals(Action.CONTINUE, action);
         final List<FieldEventsLogger.FieldLoggedEvent<Binary64>> loggedEvents = eventsLogger.getLoggedEvents();
         Assertions.assertEquals(loggedEvents.size(), counterHandler.getCount());
-        final FieldEventsLogger.FieldLoggedEvent<Binary64> event = loggedEvents.get(0);
+        final FieldEventsLogger.FieldLoggedEvent<Binary64> event = loggedEvents.getFirst();
         Assertions.assertEquals(mockedState, event.getState());
         Assertions.assertEquals(mockedState, event.getResetState());
     }

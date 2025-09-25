@@ -208,7 +208,7 @@ public class DSSTBatchLSEstimatorTest {
             }
         });
 
-        ParameterDriver aDriver = estimator.getOrbitalParametersDrivers(true).getDrivers().get(0);
+        ParameterDriver aDriver = estimator.getOrbitalParametersDrivers(true).getDrivers().getFirst();
         Assertions.assertEquals("a", aDriver.getName());
         aDriver.setValue(aDriver.getValue() + 1.2);
         aDriver.setReferenceDate(AbsoluteDate.GALILEO_EPOCH);
@@ -310,7 +310,7 @@ public class DSSTBatchLSEstimatorTest {
             }
         });
 
-        ParameterDriver aDriver = estimator.getOrbitalParametersDrivers(true).getDrivers().get(0);
+        ParameterDriver aDriver = estimator.getOrbitalParametersDrivers(true).getDrivers().getFirst();
         Assertions.assertEquals("a", aDriver.getName());
         aDriver.setValue(aDriver.getValue() + 1.2);
         aDriver.setReferenceDate(AbsoluteDate.GALILEO_EPOCH);
@@ -498,7 +498,7 @@ public class DSSTBatchLSEstimatorTest {
 
         // Select the central attraction coefficient (here there is only the central attraction coefficient)
         // as estimated parameter
-        propagatorBuilder.getPropagationParametersDrivers().getDrivers().get(0).setSelected(true);
+        propagatorBuilder.getPropagationParametersDrivers().getDrivers().getFirst().setSelected(true);
         // create perfect PV measurements
         final DSSTPropagator propagator = (DSSTPropagator) DSSTEstimationTestUtils.createPropagator(context.initialOrbit,
                                                                            propagatorBuilder);
@@ -516,11 +516,11 @@ public class DSSTBatchLSEstimatorTest {
         ParameterDriversList estimatedParameters = estimator.getPropagatorParametersDrivers(true);
         // Verify that the propagator, the builder and the estimator know mu
         final String driverName = DSSTNewtonianAttraction.CENTRAL_ATTRACTION_COEFFICIENT;
-        Assertions.assertInstanceOf(DSSTNewtonianAttraction.class, propagator.getAllForceModels().get(0));
-        Assertions.assertInstanceOf(DSSTNewtonianAttraction.class, propagatorBuilder.getAllForceModels().get(0));
+        Assertions.assertInstanceOf(DSSTNewtonianAttraction.class, propagator.getAllForceModels().getFirst());
+        Assertions.assertInstanceOf(DSSTNewtonianAttraction.class, propagatorBuilder.getAllForceModels().getFirst());
         Assertions.assertNotNull(estimatedParameters.findByName(driverName));
-        Assertions.assertTrue(propagator.getAllForceModels().get(0).getParametersDrivers().get(0).isSelected());
-        Assertions.assertTrue(propagatorBuilder.getAllForceModels().get(0).getParametersDrivers().get(0).isSelected());
+        Assertions.assertTrue(propagator.getAllForceModels().getFirst().getParametersDrivers().getFirst().isSelected());
+        Assertions.assertTrue(propagatorBuilder.getAllForceModels().getFirst().getParametersDrivers().getFirst().isSelected());
     }
 
 }

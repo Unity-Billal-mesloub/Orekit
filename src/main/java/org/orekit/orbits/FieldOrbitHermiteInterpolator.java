@@ -175,7 +175,7 @@ public class FieldOrbitHermiteInterpolator<KK extends CalculusFieldElement<KK>> 
         final List<FieldOrbit<KK>> sample = interpolationData.getNeighborList();
 
         // Get first entry
-        final FieldOrbit<KK> firstEntry = sample.get(0);
+        final FieldOrbit<KK> firstEntry = sample.getFirst();
 
         // Get orbit type for interpolation
         final OrbitType orbitType = firstEntry.getType();
@@ -222,7 +222,7 @@ public class FieldOrbitHermiteInterpolator<KK extends CalculusFieldElement<KK>> 
                 interpolator.interpolate(interpolationDate, sampleTimeStampedPV);
 
         // Use first entry gravitational parameter
-        final KK mu = sample.get(0).getMu();
+        final KK mu = sample.getFirst().getMu();
 
         return new FieldCartesianOrbit<>(interpolated, getOutputInertialFrame(), interpolationDate, mu);
     }
@@ -247,7 +247,7 @@ public class FieldOrbitHermiteInterpolator<KK extends CalculusFieldElement<KK>> 
         }
 
         // Use first entry gravitational parameter
-        final KK mu = orbits.get(0).getMu();
+        final KK mu = orbits.getFirst().getMu();
 
         // Interpolate and build a new instance
         final KK[][] interpolated;

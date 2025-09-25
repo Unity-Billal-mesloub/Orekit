@@ -76,7 +76,7 @@ public class EphemerisSegmentPropagator<C extends TimeStampedPVCoordinates> exte
         this.ephemerisFrame = ephemeris.getFrame();
         this.inertialFrame  = ephemeris.getInertialFrame();
         // set the initial state so getFrame() works
-        final TimeStampedPVCoordinates ic = ephemeris.getCoordinates().get(0);
+        final TimeStampedPVCoordinates ic = ephemeris.getCoordinates().getFirst();
         final TimeStampedPVCoordinates icInertial = ephemerisFrame
                 .getTransformTo(inertialFrame, ic.getDate())
                 .transformPVCoordinates(ic);

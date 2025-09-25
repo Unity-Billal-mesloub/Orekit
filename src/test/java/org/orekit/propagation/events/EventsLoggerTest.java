@@ -86,7 +86,7 @@ class EventsLoggerTest {
         Assertions.assertEquals(Action.CONTINUE, action);
         final List<EventsLogger.LoggedEvent> loggedEvents = eventsLogger.getLoggedEvents();
         Assertions.assertEquals(loggedEvents.size(), counterHandler.getCount());
-        final EventsLogger.LoggedEvent event = loggedEvents.get(0);
+        final EventsLogger.LoggedEvent event = loggedEvents.getFirst();
         Assertions.assertEquals(mockedState, event.getState());
         Assertions.assertEquals(mockedState, event.getResetState());
     }

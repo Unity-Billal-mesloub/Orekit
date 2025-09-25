@@ -50,7 +50,7 @@ class IntervalEventTriggerTest extends AbstractManeuverTriggersTest<IntervalEven
             D convertIntervalDetector(Field<S> field, DateDetector detector) {
             final FieldAdaptableInterval<S> maxCheck  = (s, isForward) -> detector.getMaxCheckInterval().currentInterval(s.toSpacecraftState(), isForward);
             final S                    threshold = field.getZero().newInstance(detector.getThreshold());
-            final FieldAbsoluteDate<S> d0 = new FieldAbsoluteDate<>(field, detector.getDates().get(0).getDate());
+            final FieldAbsoluteDate<S> d0 = new FieldAbsoluteDate<>(field, detector.getDates().getFirst().getDate());
             final FieldAbsoluteDate<S> d1 = new FieldAbsoluteDate<>(field, detector.getDates().get(1).getDate());
             @SuppressWarnings("unchecked")
             final D converted =
@@ -79,7 +79,7 @@ class IntervalEventTriggerTest extends AbstractManeuverTriggersTest<IntervalEven
         Assertions.assertEquals(1,     trigger.getEventDetectors().count());
         Assertions.assertEquals(1,     trigger.getFieldEventDetectors(Binary64Field.getInstance()).count());
         Assertions.assertEquals(2,     dates.size());
-        Assertions.assertEquals(  0.0, dates.get(0).getDate().durationFrom(AbsoluteDate.J2000_EPOCH), 1.0e-10);
+        Assertions.assertEquals(  0.0, dates.getFirst().getDate().durationFrom(AbsoluteDate.J2000_EPOCH), 1.0e-10);
         Assertions.assertEquals(100.0, dates.get(1).getDate().durationFrom(AbsoluteDate.J2000_EPOCH), 1.0e-10);
     }
 

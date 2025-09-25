@@ -81,7 +81,7 @@ public class TDOATest {
         Assertions.assertEquals(0.0, diffStat.getStandardDeviation(), 2.0e-16);
 
         // Test measurement type
-        Assertions.assertEquals(TDOA.MEASUREMENT_TYPE, measurements.get(0).getMeasurementType());
+        Assertions.assertEquals(TDOA.MEASUREMENT_TYPE, measurements.getFirst().getMeasurementType());
     }
 
     /**

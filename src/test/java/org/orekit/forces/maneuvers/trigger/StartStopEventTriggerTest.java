@@ -52,7 +52,7 @@ public class StartStopEventTriggerTest extends AbstractManeuverTriggersTest<Star
         @Override
         protected <D extends FieldEventDetector<S>, S extends CalculusFieldElement<S>>
             D convertStartDetector(Field<S> field, DateDetector detector) {
-            final FieldAbsoluteDate<S> target = new FieldAbsoluteDate<>(field, detector.getDates().get(0).getDate());
+            final FieldAbsoluteDate<S> target = new FieldAbsoluteDate<>(field, detector.getDates().getFirst().getDate());
             @SuppressWarnings("unchecked")
             final D converted = (D) new FieldDateDetector<>(field, target);
             return converted;
@@ -61,7 +61,7 @@ public class StartStopEventTriggerTest extends AbstractManeuverTriggersTest<Star
         @Override
         protected <D extends FieldEventDetector<S>, S extends CalculusFieldElement<S>>
         D convertStopDetector(Field<S> field, DateDetector detector) {
-            final FieldAbsoluteDate<S> target = new FieldAbsoluteDate<>(field, detector.getDates().get(0).getDate());
+            final FieldAbsoluteDate<S> target = new FieldAbsoluteDate<>(field, detector.getDates().getFirst().getDate());
             @SuppressWarnings("unchecked")
             final D converted = (D) new FieldDateDetector<>(field, target);
             return converted;
@@ -87,10 +87,10 @@ public class StartStopEventTriggerTest extends AbstractManeuverTriggersTest<Star
         Assertions.assertEquals(2,     trigger.getEventDetectors().count());
         Assertions.assertEquals(2,     trigger.getFieldEventDetectors(Binary64Field.getInstance()).count());
         Assertions.assertEquals(2,     startDates.size());
-        Assertions.assertEquals(  0.0, startDates.get(0).getDate().durationFrom(AbsoluteDate.J2000_EPOCH), 1.0e-10);
+        Assertions.assertEquals(  0.0, startDates.getFirst().getDate().durationFrom(AbsoluteDate.J2000_EPOCH), 1.0e-10);
         Assertions.assertEquals(110.0, startDates.get(1).getDate().durationFrom(AbsoluteDate.J2000_EPOCH), 1.0e-10);
         Assertions.assertEquals(2,     stopDates.size());
-        Assertions.assertEquals(100.0, stopDates.get(0).getDate().durationFrom(AbsoluteDate.J2000_EPOCH), 1.0e-10);
+        Assertions.assertEquals(100.0, stopDates.getFirst().getDate().durationFrom(AbsoluteDate.J2000_EPOCH), 1.0e-10);
         Assertions.assertEquals(120.0, stopDates.get(1).getDate().durationFrom(AbsoluteDate.J2000_EPOCH), 1.0e-10);
     }
 

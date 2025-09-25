@@ -227,7 +227,7 @@ public class OneWayGNSSPhaseTest {
         measurements.sort(Comparator.naturalOrder());
 
         // Propagate to final measurement's date
-        propagator.propagate(measurements.get(measurements.size()-1).getDate());
+        propagator.propagate(measurements.getLast().getDate());
 
         // Convert lists to double array
         final double[] absErrors = absoluteErrors.stream().mapToDouble(Double::doubleValue).toArray();
@@ -257,7 +257,7 @@ public class OneWayGNSSPhaseTest {
         Assertions.assertEquals(0.0, relErrorsMax,    1.6e-10);
 
         // Test measurement type
-        Assertions.assertEquals(OneWayGNSSPhase.MEASUREMENT_TYPE, measurements.get(0).getMeasurementType());
+        Assertions.assertEquals(OneWayGNSSPhase.MEASUREMENT_TYPE, measurements.getFirst().getMeasurementType());
     }
 
     void genericTestStateDerivatives(final boolean printResults, final int index,
@@ -386,7 +386,7 @@ public class OneWayGNSSPhaseTest {
         measurements.sort(Comparator.naturalOrder());
 
         // Propagate to final measurement's date
-        propagator.propagate(measurements.get(measurements.size()-1).getDate());
+        propagator.propagate(measurements.getLast().getDate());
 
         // Convert lists to double[] and evaluate some statistics
         final double[] relErrorsP = errorsP.stream().mapToDouble(Double::doubleValue).toArray();
@@ -475,7 +475,7 @@ public class OneWayGNSSPhaseTest {
                         ephemeris.propagate(date)
                     };
                     final ParameterDriver[] drivers = new ParameterDriver[] {
-                        measurement.getSatellites().get(0).getClockOffsetDriver(),
+                        measurement.getSatellites().getFirst().getClockOffsetDriver(),
                     };
 
                     for (int i = 0; i < drivers.length; ++i) {
@@ -520,11 +520,11 @@ public class OneWayGNSSPhaseTest {
         measurements.sort(Comparator.naturalOrder());
 
         // Check number of parameter drivers attached to measurement
-        List<ParameterDriver> paramDrivers = measurements.get(0).getParametersDrivers();
+        List<ParameterDriver> paramDrivers = measurements.getFirst().getParametersDrivers();
         Assertions.assertEquals(4, paramDrivers.size());
 
         // Check the parameter names
-        Assertions.assertEquals("clock-offset-sat-0", paramDrivers.get(0).getName());
+        Assertions.assertEquals("clock-offset-sat-0", paramDrivers.getFirst().getName());
         Assertions.assertEquals("clock-drift-sat-0", paramDrivers.get(1).getName());
         Assertions.assertEquals("clock-acceleration-sat-0", paramDrivers.get(2).getName());
         Assertions.assertEquals("ambiguity-remote-sat-0-154.00", paramDrivers.get(3).getName());
@@ -542,7 +542,7 @@ public class OneWayGNSSPhaseTest {
          }
 
         // Propagate to final measurement's date
-        propagator.propagate(measurements.get(measurements.size()-1).getDate());
+        propagator.propagate(measurements.getLast().getDate());
 
         // Convert error list to double[]
         final double[] relErrors = relErrorList.stream().mapToDouble(Double::doubleValue).toArray();

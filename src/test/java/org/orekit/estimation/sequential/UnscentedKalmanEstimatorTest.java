@@ -71,7 +71,7 @@ public class UnscentedKalmanEstimatorTest {
         for (final ParameterDriver driver: propagatorBuilder.getOrbitalParametersDrivers().getDrivers()) {
             driver.setSelected(false);
         }
-        propagatorBuilder.getPropagationParametersDrivers().getDrivers().get(0).setSelected(true);
+        propagatorBuilder.getPropagationParametersDrivers().getDrivers().getFirst().setSelected(true);
         final UnscentedKalmanEstimatorBuilder builder = new UnscentedKalmanEstimatorBuilder();
         builder.addPropagationConfiguration(propagatorBuilder,
                 new ConstantProcessNoise(MatrixUtils.createRealMatrix(1, 1)));
@@ -365,7 +365,7 @@ public class UnscentedKalmanEstimatorTest {
         
         // Reference position/velocity at last measurement date
         final Orbit refOrbit = referencePropagator.
-                        propagate(measurements.get(measurements.size()-1).getDate()).getOrbit();
+                        propagate(measurements.getLast().getDate()).getOrbit();
         
         // Covariance matrix initialization
         final RealMatrix initialP = MatrixUtils.createRealMatrix(6, 6);
@@ -440,7 +440,7 @@ public class UnscentedKalmanEstimatorTest {
         
         // Reference position/velocity at last measurement date
         final Orbit refOrbit = referencePropagator.
-                        propagate(measurements.get(measurements.size()-1).getDate()).getOrbit();
+                        propagate(measurements.getLast().getDate()).getOrbit();
 
         // Initial covariance matrix
         final RealMatrix initialP = MatrixUtils.createRealDiagonalMatrix(new double[] {sigmaPos*sigmaPos, sigmaPos*sigmaPos, sigmaPos*sigmaPos, sigmaVel*sigmaVel, sigmaVel*sigmaVel, sigmaVel*sigmaVel}); 
@@ -513,7 +513,7 @@ public class UnscentedKalmanEstimatorTest {
         
         // Reference position/velocity at last measurement date
         final Orbit refOrbit = referencePropagator.
-                        propagate(measurements.get(measurements.size()-1).getDate()).getOrbit();
+                        propagate(measurements.getLast().getDate()).getOrbit();
         
         // Covariance matrix initialization
         final RealMatrix initialP = MatrixUtils.createRealMatrix(6, 6); 
@@ -585,7 +585,7 @@ public class UnscentedKalmanEstimatorTest {
         
         // Reference position/velocity at last measurement date
         final Orbit refOrbit = referencePropagator.
-                        propagate(measurements.get(measurements.size()-1).getDate()).getOrbit();
+                        propagate(measurements.getLast().getDate()).getOrbit();
 
         // Covariance matrix initialization
         final RealMatrix initialP = MatrixUtils.createRealMatrix(6, 6); 
@@ -661,7 +661,7 @@ public class UnscentedKalmanEstimatorTest {
         
         // Reference position/velocity at last measurement date
         final Orbit refOrbit = referencePropagator.
-                        propagate(measurements.get(measurements.size()-1).getDate()).getOrbit();
+                        propagate(measurements.getLast().getDate()).getOrbit();
         
         // Cartesian covariance matrix initialization
         // 100m on position / 1e-2m/s on velocity 
@@ -748,7 +748,7 @@ public class UnscentedKalmanEstimatorTest {
         
         // Reference position/velocity at last measurement date
         final Orbit refOrbit = referencePropagator.
-                        propagate(measurements.get(measurements.size()-1).getDate()).getOrbit();
+                        propagate(measurements.getLast().getDate()).getOrbit();
 
         // Cartesian covariance matrix initialization
         final RealMatrix cartesianP = MatrixUtils.createRealDiagonalMatrix(new double [] {
@@ -836,7 +836,7 @@ public class UnscentedKalmanEstimatorTest {
         
         // Reference position/velocity at last measurement date
         final Orbit refOrbit = referencePropagator.
-                        propagate(measurements.get(measurements.size()-1).getDate()).getOrbit();
+                        propagate(measurements.getLast().getDate()).getOrbit();
 
         // Cartesian covariance matrix initialization
         final RealMatrix cartesianP = MatrixUtils.createRealDiagonalMatrix(new double [] {
@@ -944,7 +944,7 @@ public class UnscentedKalmanEstimatorTest {
                         build();
 
         List<DelegatingDriver> parameters = kalman.getOrbitalParametersDrivers(true).getDrivers();
-        ParameterDriver a0Driver = parameters.get(0);
+        ParameterDriver a0Driver = parameters.getFirst();
         Assertions.assertEquals("a[0]", a0Driver.getName());
         a0Driver.setValue(a0Driver.getValue() + 1.2);
         a0Driver.setReferenceDate(AbsoluteDate.GALILEO_EPOCH);
@@ -974,8 +974,8 @@ public class UnscentedKalmanEstimatorTest {
                             1.0e-6);
 
         Orbit[] refOrbits = new Orbit[] {
-            propagatorBuilder1.buildPropagator().propagate(measurements.get(measurements.size()-1).getDate()).getOrbit(),
-            propagatorBuilder2.buildPropagator().propagate(measurements.get(measurements.size()-1).getDate()).getOrbit()
+            propagatorBuilder1.buildPropagator().propagate(measurements.getLast().getDate()).getOrbit(),
+            propagatorBuilder2.buildPropagator().propagate(measurements.getLast().getDate()).getOrbit()
         };
         UnscentedEstimationTestUtils.checkKalmanFit(context, kalman, measurements,
                                            refOrbits, new PositionAngleType[] { PositionAngleType.TRUE, PositionAngleType.TRUE },
@@ -1036,12 +1036,12 @@ public class UnscentedKalmanEstimatorTest {
         final Bias<Range> rangeBias = new Bias<>(new String[] {"rangeBias"}, new double[] {0.0},
         	                                     new double[] {1.0},
         	                                     new double[] {0.0}, new double[] {10000.0});
-        rangeBias.getParametersDrivers().get(0).setSelected(true);
+        rangeBias.getParametersDrivers().getFirst().setSelected(true);
 
 
         // List of estimated measurement parameters
         final ParameterDriversList drivers = new ParameterDriversList();
-        drivers.add(rangeBias.getParametersDrivers().get(0));
+        drivers.add(rangeBias.getParametersDrivers().getFirst());
 
         // Create perfect range measurements
         final Propagator propagator = UnscentedEstimationTestUtils.createPropagator(context.initialOrbit,
@@ -1171,7 +1171,7 @@ public class UnscentedKalmanEstimatorTest {
         kalman.estimationStep(measurements.get(10));
 
         // Make sure previous and current are not the same
-        Assertions.assertEquals(measurements.get(0).getDate(), processNoise.getPrevious().getDate());
+        Assertions.assertEquals(measurements.getFirst().getDate(), processNoise.getPrevious().getDate());
         Assertions.assertEquals(measurements.get(10).getDate(), processNoise.getCurrent().getDate());
         Assertions.assertNotEquals(processNoise.getPrevious().getPosition().getX(),
                                    processNoise.getCurrent().getPosition().getX());

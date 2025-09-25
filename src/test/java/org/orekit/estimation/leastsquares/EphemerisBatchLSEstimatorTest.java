@@ -120,7 +120,7 @@ public class EphemerisBatchLSEstimatorTest {
         final Bias<Range> rangeBias = new Bias<>(new String[]{"rangeBias"}, new double[]{0.0},
                 new double[]{1.0},
                 new double[]{0.0}, new double[]{10000.0});
-        rangeBias.getParametersDrivers().get(0).setSelected(true);
+        rangeBias.getParametersDrivers().getFirst().setSelected(true);
 
         // create orbit estimator
         final BatchLSEstimator estimator = new BatchLSEstimator(new LevenbergMarquardtOptimizer(),
@@ -137,7 +137,7 @@ public class EphemerisBatchLSEstimatorTest {
         estimator.estimate();
 
         // verify
-        Assertions.assertEquals(refBias, estimator.getMeasurementsParametersDrivers(true).getDrivers().get(0).getValue(), 5.0e-6);
+        Assertions.assertEquals(refBias, estimator.getMeasurementsParametersDrivers(true).getDrivers().getFirst().getValue(), 5.0e-6);
         Assertions.assertEquals(1, estimator.getMeasurementsParametersDrivers(true).getNbParams());
         Assertions.assertEquals(0, estimator.getOrbitalParametersDrivers(true).getNbParams());
         Assertions.assertEquals(0, estimator.getPropagatorParametersDrivers(true).getNbParams());
@@ -184,7 +184,7 @@ public class EphemerisBatchLSEstimatorTest {
         estimator.estimate();
 
         // verify
-        Assertions.assertEquals(refClockBias, estimator.getMeasurementsParametersDrivers(true).getDrivers().get(0).getValue(), 6.0e-16);
+        Assertions.assertEquals(refClockBias, estimator.getMeasurementsParametersDrivers(true).getDrivers().getFirst().getValue(), 6.0e-16);
         Assertions.assertEquals(1, estimator.getMeasurementsParametersDrivers(true).getNbParams());
         Assertions.assertEquals(0, estimator.getOrbitalParametersDrivers(true).getNbParams());
         Assertions.assertEquals(0, estimator.getPropagatorParametersDrivers(true).getNbParams());
@@ -219,7 +219,7 @@ public class EphemerisBatchLSEstimatorTest {
         final Bias<AngularAzEl> azElBias = new Bias<>(new String[] {"azBias", "elBias"}, new double[] {0.0, 0.0},
         	                                          new double[] {1.0, 1.0},
         	                                          new double[] {0.0, 0.0}, new double[] {2.0, 2.0});
-        azElBias.getParametersDrivers().get(0).setSelected(true);
+        azElBias.getParametersDrivers().getFirst().setSelected(true);
         azElBias.getParametersDrivers().get(1).setSelected(true);
 
         // create orbit estimator
@@ -237,7 +237,7 @@ public class EphemerisBatchLSEstimatorTest {
         estimator.estimate();
 
         // verify
-        Assertions.assertEquals(refAzBias, estimator.getMeasurementsParametersDrivers(true).getDrivers().get(0).getValue(), 1.0e-8);
+        Assertions.assertEquals(refAzBias, estimator.getMeasurementsParametersDrivers(true).getDrivers().getFirst().getValue(), 1.0e-8);
         Assertions.assertEquals(refElBias, estimator.getMeasurementsParametersDrivers(true).getDrivers().get(1).getValue(), 1.0e-7);
         Assertions.assertEquals(2, estimator.getMeasurementsParametersDrivers(true).getNbParams());
         Assertions.assertEquals(0, estimator.getOrbitalParametersDrivers(true).getNbParams());

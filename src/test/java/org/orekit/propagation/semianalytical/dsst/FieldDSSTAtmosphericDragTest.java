@@ -471,7 +471,7 @@ class FieldDSSTAtmosphericDragTest {
             }
         }
 
-        ParameterDriver selected = bound.getDrivers().get(0);
+        ParameterDriver selected = bound.getDrivers().getFirst();
         double p0 = selected.getReferenceValue();
         double h  = selected.getScale();
       

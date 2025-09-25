@@ -197,7 +197,7 @@ public class APMParserTest {
                             file.getHeader().getCreationDate());
         Assertions.assertEquals("JPL", file.getHeader().getOriginator());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
         Assertions.assertEquals("MARS SPIRIT", segment.getMetadata().getObjectName());
@@ -316,7 +316,7 @@ public class APMParserTest {
                             file.getHeader().getCreationDate());
         Assertions.assertEquals("GSFC", file.getHeader().getOriginator());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
         Assertions.assertEquals("TRMM",       segment.getMetadata().getObjectName());
@@ -393,7 +393,7 @@ public class APMParserTest {
                             file.getHeader().getCreationDate());
         Assertions.assertEquals("GSFC", file.getHeader().getOriginator());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
         Assertions.assertEquals("TRMM",       segment.getMetadata().getObjectName());
@@ -459,7 +459,7 @@ public class APMParserTest {
                             file.getHeader().getCreationDate());
         Assertions.assertEquals("GSFC", file.getHeader().getOriginator());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
         Assertions.assertEquals("TRMM",       segment.getMetadata().getObjectName());
@@ -531,7 +531,7 @@ public class APMParserTest {
                             file.getHeader().getCreationDate());
         Assertions.assertEquals("GSFC", file.getHeader().getOriginator());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
         Assertions.assertEquals("TRMM",       segment.getMetadata().getObjectName());
@@ -603,10 +603,10 @@ public class APMParserTest {
         Assertions.assertEquals("GSFC", file.getHeader().getOriginator());
         Assertions.assertEquals("A000001", file.getHeader().getMessageId());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
-        Assertions.assertEquals("SPINNING",   segment.getMetadata().getComments().get(0));
+        Assertions.assertEquals("SPINNING",   segment.getMetadata().getComments().getFirst());
         Assertions.assertEquals("MMS1",       segment.getMetadata().getObjectName());
         Assertions.assertEquals("2015-011A",  segment.getMetadata().getObjectID());
         Assertions.assertEquals(2015,         segment.getMetadata().getLaunchYear());
@@ -664,10 +664,10 @@ public class APMParserTest {
         Assertions.assertEquals("GSFC",    file.getHeader().getOriginator());
         Assertions.assertEquals("A000002", file.getHeader().getMessageId());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
-        Assertions.assertEquals("Rotation From Nadir", segment.getMetadata().getComments().get(0));
+        Assertions.assertEquals("Rotation From Nadir", segment.getMetadata().getComments().getFirst());
         Assertions.assertEquals("LRO",        segment.getMetadata().getObjectName());
         Assertions.assertEquals("2009-031A",  segment.getMetadata().getObjectID());
         Assertions.assertEquals(2009,         segment.getMetadata().getLaunchYear());
@@ -730,9 +730,9 @@ public class APMParserTest {
         Assertions.assertEquals("GSFC", file.getHeader().getOriginator());
         Assertions.assertEquals("A000003", file.getHeader().getMessageId());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
-        Assertions.assertEquals("SPINNING",   segment.getMetadata().getComments().get(0));
+        Assertions.assertEquals("SPINNING",   segment.getMetadata().getComments().getFirst());
         Assertions.assertEquals("MMS1",       segment.getMetadata().getObjectName());
         Assertions.assertEquals("2015-011A",  segment.getMetadata().getObjectID());
         Assertions.assertEquals(2015,         segment.getMetadata().getLaunchYear());
@@ -819,7 +819,7 @@ public class APMParserTest {
                             file.getHeader().getCreationDate());
         Assertions.assertEquals("CS GROUP", file.getHeader().getOriginator());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
         Assertions.assertEquals("DUMMY",      segment.getMetadata().getObjectName());
@@ -884,7 +884,7 @@ public class APMParserTest {
                             file.getHeader().getCreationDate());
         Assertions.assertEquals("CS GROUP", file.getHeader().getOriginator());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
         Assertions.assertEquals("DUMMY",      segment.getMetadata().getObjectName());
@@ -949,7 +949,7 @@ public class APMParserTest {
                             file.getHeader().getCreationDate());
         Assertions.assertEquals("CS GROUP", file.getHeader().getOriginator());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
         Assertions.assertEquals("DUMMY",      segment.getMetadata().getObjectName());
@@ -1013,7 +1013,7 @@ public class APMParserTest {
                             file.getHeader().getCreationDate());
         Assertions.assertEquals("CS GROUP", file.getHeader().getOriginator());
 
-        Segment<AdmMetadata, ApmData> segment = file.getSegments().get(0);
+        Segment<AdmMetadata, ApmData> segment = file.getSegments().getFirst();
 
         // Check Metadata Block
         Assertions.assertEquals("DUMMY",      segment.getMetadata().getObjectName());
