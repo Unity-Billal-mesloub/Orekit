@@ -706,11 +706,7 @@ public class RinexObservationWriter implements AutoCloseable {
 
         // event flag
         outputField("", 28, true);
-        if (first.getEventFlag() == 0) {
-            outputField("", 29, true);
-        } else {
-            outputField(ONE_DIGIT_INTEGER, first.getEventFlag(), 29);
-        }
+        outputField(ONE_DIGIT_INTEGER, first.getEventFlag(), 29);
 
         // list of satellites and receiver clock offset
         outputField(THREE_DIGITS_INTEGER, pending.size(), 32);
@@ -787,11 +783,7 @@ public class RinexObservationWriter implements AutoCloseable {
 
         // event flag
         outputField("", 31, true);
-        if (first.getEventFlag() == 0) {
-            outputField("", 32, true);
-        } else {
-            outputField(ONE_DIGIT_INTEGER, first.getEventFlag(), 32);
-        }
+        outputField(ONE_DIGIT_INTEGER, first.getEventFlag(), 32);
 
         // number of satellites and receiver clock offset
         outputField(THREE_DIGITS_INTEGER, pending.size(), 35);

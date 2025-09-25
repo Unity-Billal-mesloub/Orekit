@@ -31,6 +31,7 @@ import org.hipparchus.util.MathArrays;
 import org.orekit.errors.OrekitIllegalArgumentException;
 import org.orekit.errors.OrekitInternalError;
 import org.orekit.errors.OrekitMessages;
+import org.orekit.frames.FieldKinematicTransform;
 import org.orekit.frames.FieldStaticTransform;
 import org.orekit.frames.FieldTransform;
 import org.orekit.frames.Frame;
@@ -503,6 +504,17 @@ public abstract class FieldOrbit<T extends CalculusFieldElement<T>>
     /** {@inheritDoc} */
     public TimeStampedFieldPVCoordinates<T> getPVCoordinates(final FieldAbsoluteDate<T> otherDate, final Frame otherFrame) {
         return shiftedBy(otherDate.durationFrom(getDate())).getPVCoordinates(otherFrame);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public FieldVector3D<T> getVelocity(final FieldAbsoluteDate<T> otherDate, final Frame otherFrame) {
+        final FieldPVCoordinates<T> pv = getPVCoordinates(otherDate, otherFrame);
+        if (otherFrame == getFrame()) {
+            return pv.getVelocity();
+        }
+        final FieldKinematicTransform<T> kinematicTransform = getFrame().getKinematicTransformTo(otherFrame, date);
+        return kinematicTransform.transformOnlyPV(pv).getVelocity();
     }
 
     /** {@inheritDoc} */

@@ -21,6 +21,7 @@ import java.util.function.DoubleFunction;
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.hipparchus.analysis.differentiation.UnivariateDerivative2;
+import org.hipparchus.analysis.differentiation.UnivariateDerivative2Field;
 import org.hipparchus.analysis.solvers.BracketingNthOrderBrentSolver;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.geometry.euclidean.threed.FieldLine;
@@ -740,30 +741,10 @@ public class OneAxisEllipsoid extends Ellipsoid implements BodyShape {
      */
     public FieldGeodeticPoint<UnivariateDerivative2> transform(final PVCoordinates point,
                                                                final Frame frame, final AbsoluteDate date) {
-
-        // transform point to body frame
-        final Transform toBody = frame.getTransformTo(getFrame(), date);
-        final PVCoordinates pointInBodyFrame = toBody.transformPVCoordinates(point);
-        final FieldVector3D<UnivariateDerivative2> p = pointInBodyFrame.toUnivariateDerivative2Vector();
-        final UnivariateDerivative2   pr2 = p.getX().square().add(p.getY().square());
-        final UnivariateDerivative2   pr  = pr2.sqrt();
-        final UnivariateDerivative2   pz  = p.getZ();
-
-        // project point on the ellipsoid surface
-        final TimeStampedPVCoordinates groundPoint = projectToGround(new TimeStampedPVCoordinates(date, pointInBodyFrame),
-                                                                     getFrame());
-        final FieldVector3D<UnivariateDerivative2> gp = groundPoint.toUnivariateDerivative2Vector();
-        final UnivariateDerivative2   gpr2 = gp.getX().square().add(gp.getY().square());
-        final UnivariateDerivative2   gpr  = gpr2.sqrt();
-        final UnivariateDerivative2   gpz  = gp.getZ();
-
-        // relative position of test point with respect to its ellipse sub-point
-        final UnivariateDerivative2 dr  = pr.subtract(gpr);
-        final UnivariateDerivative2 dz  = pz.subtract(gpz);
-        final double insideIfNegative = g2 * (pr2.getReal() - ae2) + pz.getReal() * pz.getReal();
-
-        return new FieldGeodeticPoint<>(FastMath.atan2(gpz, gpr.multiply(g2)), FastMath.atan2(p.getY(), p.getX()),
-            FastMath.hypot(dr, dz).copySign(insideIfNegative));
+        final UnivariateDerivative2Field field = UnivariateDerivative2Field.getInstance();
+        final UnivariateDerivative2 dt = new UnivariateDerivative2(0., 1., 0.);
+        final FieldAbsoluteDate<UnivariateDerivative2> fieldDate = new FieldAbsoluteDate<>(field, date).shiftedBy(dt);
+        return transform(point.toUnivariateDerivative2Vector(), frame, fieldDate);
     }
 
     /** Compute the azimuth angle from local north between the two points.
