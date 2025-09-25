@@ -217,18 +217,13 @@ public class GenerateBaseSamples {
     }
 
     private static String mapUseCase(final String useCase) {
-        switch (useCase) {
-            case "β≪0" :
-                return "beta-large-negative";
-            case "β<0" :
-                return "beta-small-negative";
-            case "β>0" :
-                return "beta-small-positive";
-            case "β≫0" :
-                return "beta-large-positive";
-            default :
-                return "beta-crossing";
-        }
+        return switch (useCase) {
+            case "β≪0"  -> "beta-large-negative";
+            case "β<0"  -> "beta-small-negative";
+            case "β>0"  -> "beta-small-positive";
+            case "β≫0"  -> "beta-large-positive";
+            default  -> "beta-crossing";
+        };
     }
 
     private static String mapType(final String type) {
