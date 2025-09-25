@@ -515,10 +515,7 @@ public class GlobalIonosphereMapModel implements IonosphericModel, IonosphericDe
     private GeodeticPoint piercePoint(final AbsoluteDate date,
                                       final Vector3D recPoint, final Vector3D los,
                                       final BodyShape bodyShape) {
-        if (bodyShape instanceof OneAxisEllipsoid) {
-
-            // pierce point of ellipsoidal shape
-            final OneAxisEllipsoid ellipsoid = (OneAxisEllipsoid) bodyShape;
+        if (bodyShape instanceof OneAxisEllipsoid ellipsoid) {
             final Line line = new Line(recPoint, new Vector3D(1.0, recPoint, 1.0e6, los), 1.0e-12);
             final double h = getPairAtDate(date).h;
             final Vector3D ipp = ellipsoid.pointAtAltitude(line, h, recPoint, bodyShape.getBodyFrame(), date);
@@ -547,10 +544,7 @@ public class GlobalIonosphereMapModel implements IonosphericModel, IonosphericDe
                                                                                   final Vector3D recPoint,
                                                                                   final FieldVector3D<T> los,
                                                                                   final BodyShape bodyShape) {
-        if (bodyShape instanceof OneAxisEllipsoid) {
-
-            // pierce point of ellipsoidal shape
-            final OneAxisEllipsoid ellipsoid = (OneAxisEllipsoid) bodyShape;
+        if (bodyShape instanceof OneAxisEllipsoid ellipsoid) {
             final FieldVector3D<T> recPointF = new FieldVector3D<>(date.getField(), recPoint);
             final FieldLine<T> line = new FieldLine<>(recPointF,
                                                       new FieldVector3D<>(1.0, recPointF, 1.0e6, los),

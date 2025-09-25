@@ -16,6 +16,7 @@
  */
 package org.orekit.bodies;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +46,7 @@ import org.orekit.utils.Constants;
 abstract class PredefinedIAUPoles implements IAUPole {
 
     /** Serializable UID. */
+    @Serial
     private static final long serialVersionUID = 20200130L;
 
     /** Time scales. */
@@ -63,6 +65,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Sun extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the prime meridian. */
@@ -110,6 +113,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Mercury extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the right ascension of the pole. */
@@ -226,6 +230,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Venus extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the prime meridian. */
@@ -273,6 +278,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Earth extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the right ascension of the pole. */
@@ -348,6 +354,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Moon extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the right ascension of the pole. */
@@ -651,6 +658,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Mars extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the right ascension of the pole. */
@@ -710,6 +718,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Jupiter extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the right ascension of the pole. */
@@ -876,6 +885,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Saturn extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the right ascension of the pole. */
@@ -935,6 +945,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Uranus extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the prime meridian. */
@@ -982,6 +993,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Neptune extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the right ascension of the pole. */
@@ -1054,6 +1066,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class Pluto extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /** Constant term of the prime meridian. */
@@ -1107,6 +1120,7 @@ abstract class PredefinedIAUPoles implements IAUPole {
     private static class GcrfAligned extends PredefinedIAUPoles {
 
         /** Serializable UID. */
+        @Serial
         private static final long serialVersionUID = 20200130L;
 
         /**

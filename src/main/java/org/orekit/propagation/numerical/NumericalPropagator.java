@@ -464,8 +464,7 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
                 .forEach(provider -> removeAdditionalDerivativesProvider(provider.getName()));
         final List<AdditionalDataProvider<?>> copiedDataProviders = new ArrayList<>(getAdditionalDataProviders());
         for (final AdditionalDataProvider<?> additionalDataProvider: copiedDataProviders) {
-            if (additionalDataProvider instanceof TriggerDate) {
-                final TriggerDate triggerDate = (TriggerDate) additionalDataProvider;
+            if (additionalDataProvider instanceof TriggerDate triggerDate) {
                 if (triggerDate.getMassDepletionDelay() != null) {
                     removeAdditionalDerivativesProvider(triggerDate.getMassDepletionDelay().getName());
                 }
@@ -508,10 +507,10 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
         // add the STM generator corresponding to the current settings, and setup state accordingly
         AbstractStateTransitionMatrixGenerator stmGenerator = null;
         for (final AdditionalDerivativesProvider equations : getAdditionalDerivativesProviders()) {
-            if (equations instanceof AbstractStateTransitionMatrixGenerator &&
+            if (equations instanceof AbstractStateTransitionMatrixGenerator generator &&
                 equations.getName().equals(harvester.getStmName())) {
                 // the STM generator has already been set up in a previous propagation
-                stmGenerator = (AbstractStateTransitionMatrixGenerator) equations;
+                stmGenerator = generator;
                 break;
             }
         }
@@ -551,8 +550,7 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
         final boolean isMassInStm = stmGenerator instanceof ExtendedStateTransitionMatrixGenerator;
         final List<String> names = new ArrayList<>();
         for (final ForceModel forceModel : getAllForceModels()) {
-            if (forceModel instanceof Maneuver && ((Maneuver) forceModel).getManeuverTriggers() instanceof ResettableManeuverTriggers) {
-                final Maneuver maneuver = (Maneuver) forceModel;
+            if (forceModel instanceof Maneuver maneuver && ((Maneuver) forceModel).getManeuverTriggers() instanceof ResettableManeuverTriggers) {
                 final ResettableManeuverTriggers maneuverTriggers = (ResettableManeuverTriggers) maneuver.getManeuverTriggers();
 
                 final Collection<EventDetector> selectedDetectors = maneuverTriggers.getEventDetectors().
@@ -560,8 +558,7 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
                         map(triggerDetector -> ((ManeuverTriggerDetector<?>) triggerDetector).getDetector())
                         .collect(Collectors.toList());
                 for (final EventDetector detector: selectedDetectors) {
-                    if (detector instanceof ParameterDrivenDateIntervalDetector) {
-                        final ParameterDrivenDateIntervalDetector d = (ParameterDrivenDateIntervalDetector) detector;
+                    if (detector instanceof ParameterDrivenDateIntervalDetector d) {
                         TriggerDate start;
                         TriggerDate stop;
 
@@ -656,10 +653,10 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
 
         // check if we already have set up the provider
         for (final AdditionalDataProvider<?> provider : getAdditionalDataProviders()) {
-            if (provider instanceof TriggerDate &&
+            if (provider instanceof TriggerDate date &&
                 provider.getName().equals(driverName)) {
                 // the Jacobian column generator has already been set up in a previous propagation
-                triggerGenerator = (TriggerDate) provider;
+                triggerGenerator = date;
                 break;
             }
         }
@@ -713,10 +710,10 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
 
         // check if we already have set up the provider
         for (final AdditionalDataProvider<?> provider : getAdditionalDataProviders()) {
-            if (provider instanceof MedianDate &&
+            if (provider instanceof MedianDate date &&
                 provider.getName().equals(medianName)) {
                 // the Jacobian column generator has already been set up in a previous propagation
-                medianGenerator = (MedianDate) provider;
+                medianGenerator = date;
                 break;
             }
         }
@@ -750,10 +747,10 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
 
         // check if we already have set up the provider
         for (final AdditionalDataProvider<?> provider : getAdditionalDataProviders()) {
-            if (provider instanceof Duration &&
+            if (provider instanceof Duration duration &&
                 provider.getName().equals(durationName)) {
                 // the Jacobian column generator has already been set up in a previous propagation
-                durationGenerator = (Duration) provider;
+                durationGenerator = duration;
                 break;
             }
         }
@@ -810,10 +807,10 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
                 IntegrableJacobianColumnGenerator generator = null;
                 // check if we already have set up the providers
                 for (final AdditionalDerivativesProvider provider : getAdditionalDerivativesProviders()) {
-                    if (provider instanceof IntegrableJacobianColumnGenerator &&
+                    if (provider instanceof IntegrableJacobianColumnGenerator columnGenerator &&
                         provider.getName().equals(currentNameSpan.getData())) {
                         // the Jacobian column generator has already been set up in a previous propagation
-                        generator = (IntegrableJacobianColumnGenerator) provider;
+                        generator = columnGenerator;
                         break;
                     }
 

@@ -16,6 +16,9 @@
  */
 package org.orekit.utils;
 
+import java.io.Serial;
+
+
 import org.hipparchus.analysis.differentiation.Derivative;
 import org.hipparchus.geometry.euclidean.threed.FieldRotation;
 import org.hipparchus.geometry.euclidean.threed.Rotation;
@@ -33,6 +36,7 @@ import org.orekit.time.TimeStamped;
 public class TimeStampedAngularCoordinates extends AngularCoordinates implements TimeStamped {
 
     /** Serializable UID. */
+    @Serial
     private static final long serialVersionUID = 20140723L;
 
     /** The date. */

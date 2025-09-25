@@ -330,15 +330,15 @@ class FieldImpulseManeuverTest {
         final T fieldIsp = field.getZero().add(impulseManeuver.getIsp());
         final EventDetector detector = impulseManeuver.getTrigger();
         FieldAbstractDetector<?, T> fieldDetector;
-        if (detector instanceof DateDetector) {
-            fieldDetector = new FieldDateDetector<>(field, new FieldAbsoluteDate<>(field, ((DateDetector) detector).getDate()));
-        } else if (detector instanceof LatitudeCrossingDetector) {
+        if (detector instanceof DateDetector dateDetector) {
+            fieldDetector = new FieldDateDetector<>(field, new FieldAbsoluteDate<>(field, dateDetector.getDate()));
+        } else if (detector instanceof LatitudeCrossingDetector crossingDetector) {
             fieldDetector = new FieldLatitudeCrossingDetector<>(field,
-                                                                ((LatitudeCrossingDetector) detector).getBodyShape(),
-                                                                ((LatitudeCrossingDetector) detector).getLatitude());
-        } else if (detector instanceof EclipseDetector) {
+                                                                crossingDetector.getBodyShape(),
+                                                                crossingDetector.getLatitude());
+        } else if (detector instanceof EclipseDetector eclipseDetector) {
             fieldDetector = new FieldEclipseDetector<>(field,
-                                                       ((EclipseDetector) detector).getOccultationEngine());
+                                                       eclipseDetector.getOccultationEngine());
         } else {
             throw new OrekitInternalError(null);
         }

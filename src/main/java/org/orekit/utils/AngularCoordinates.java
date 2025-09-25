@@ -16,6 +16,7 @@
  */
 package org.orekit.utils;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.hipparchus.CalculusFieldElement;
@@ -65,6 +66,7 @@ public class AngularCoordinates implements TimeShiftable<AngularCoordinates>, Se
             new AngularCoordinates(Rotation.IDENTITY, Vector3D.ZERO, Vector3D.ZERO);
 
     /** Serializable UID. */
+    @Serial
     private static final long serialVersionUID = 20140414L;
 
     /** Rotation. */
