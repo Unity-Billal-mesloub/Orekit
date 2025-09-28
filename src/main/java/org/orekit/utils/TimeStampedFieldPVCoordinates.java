@@ -26,6 +26,7 @@ import org.orekit.data.DataContext;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.FieldTimeStamped;
+import org.orekit.time.TimeOffset;
 import org.orekit.time.TimeScale;
 import org.orekit.time.TimeStamped;
 
@@ -609,10 +610,9 @@ public class TimeStampedFieldPVCoordinates<T extends CalculusFieldElement<T>>
      * @param dt time shift in seconds
      * @return a new state, shifted with respect to the instance (which is immutable)
      */
+    @Override
     public TimeStampedFieldPVCoordinates<T> shiftedBy(final double dt) {
-        final FieldPVCoordinates<T> spv = super.shiftedBy(dt);
-        return new TimeStampedFieldPVCoordinates<>(date.shiftedBy(dt),
-                                                   spv.getPosition(), spv.getVelocity(), spv.getAcceleration());
+        return shiftedBy(getDate().getField().getZero().newInstance(dt));
     }
 
     /** Get a time-shifted state.
@@ -625,10 +625,26 @@ public class TimeStampedFieldPVCoordinates<T extends CalculusFieldElement<T>>
      * @param dt time shift in seconds
      * @return a new state, shifted with respect to the instance (which is immutable)
      */
+    @Override
+    public TimeStampedFieldPVCoordinates<T> shiftedBy(final TimeOffset dt) {
+        final FieldPVCoordinates<T> spv = super.shiftedBy(dt);
+        return new TimeStampedFieldPVCoordinates<>(date.shiftedBy(dt), spv);
+    }
+
+    /** Get a time-shifted state.
+     * <p>
+     * The state can be slightly shifted to close dates. This shift is based on
+     * a simple linear model. It is <em>not</em> intended as a replacement for
+     * proper orbit propagation (it is not even Keplerian!) but should be sufficient
+     * for either small time shifts or coarse accuracy.
+     * </p>
+     * @param dt time shift in seconds
+     * @return a new state, shifted with respect to the instance (which is immutable)
+     */
+    @Override
     public TimeStampedFieldPVCoordinates<T> shiftedBy(final T dt) {
         final FieldPVCoordinates<T> spv = super.shiftedBy(dt);
-        return new TimeStampedFieldPVCoordinates<>(date.shiftedBy(dt),
-                                                   spv.getPosition(), spv.getVelocity(), spv.getAcceleration());
+        return new TimeStampedFieldPVCoordinates<>(date.shiftedBy(dt), spv);
     }
 
     /** Convert to a constant position-velocity.
@@ -636,10 +652,7 @@ public class TimeStampedFieldPVCoordinates<T extends CalculusFieldElement<T>>
      * @since 9.0
      */
     public TimeStampedPVCoordinates toTimeStampedPVCoordinates() {
-        return new TimeStampedPVCoordinates(date.toAbsoluteDate(),
-                                            getPosition().toVector3D(),
-                                            getVelocity().toVector3D(),
-                                            getAcceleration().toVector3D());
+        return new TimeStampedPVCoordinates(date.toAbsoluteDate(), toPVCoordinates());
     }
 
     /** Return a string representation of this date, position, velocity, and acceleration.

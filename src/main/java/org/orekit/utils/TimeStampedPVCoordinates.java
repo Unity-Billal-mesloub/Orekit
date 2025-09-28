@@ -229,7 +229,7 @@ public class TimeStampedPVCoordinates extends PVCoordinates implements TimeStamp
      * @return provider based on Taylor expansion, for small time shifts around instance date
      */
     public PVCoordinatesProvider toTaylorProvider(final Frame instanceFrame) {
-        return new ShiftingPVCoordinatesProvider(this, instanceFrame);
+        return new AbsolutePVCoordinates(instanceFrame, this);
     }
 
     /** Return a string representation of this date, position, velocity, and acceleration.
