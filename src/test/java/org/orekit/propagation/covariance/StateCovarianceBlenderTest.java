@@ -150,12 +150,12 @@ class StateCovarianceBlenderTest {
         // When & Then
         doTestBlending(DEFAULT_SERGEI_PROPAGATION_TIME, DEFAUTL_SERGEI_TABULATED_TIMESTEP, blendingFunction,
                        new KeplerianPropagator(sergeiOrbit),
-                       0.11333019740,
-                       0.23518823987,
-                       0.11116079511,
-                       0.26216208074,
-                       0.268782359940,
-                       0.402221757858,
+                       0.11333019497792202,
+                       0.23518824663901824,
+                       0.11116079242912695,
+                       0.262162090182946,
+                       0.26878235693764996,
+                       0.4022217852454418,
                        tolerance,
                        showResults);
 
@@ -200,12 +200,12 @@ class StateCovarianceBlenderTest {
         // When & Then
         doTestBlending(DEFAULT_SERGEI_PROPAGATION_TIME, DEFAUTL_SERGEI_TABULATED_TIMESTEP, blendingFunction,
                        propagator,
-                       0.13366703460,
-                       0.13160856461,
+                       0.13366703358550922,
+                       0.1316085681168163,
                        0.14205498786,
-                       0.13656689649,
-                       0.21941543409,
-                       0.25091794341,
+                0.13656689295385213,
+                       0.21941543647520736,
+                       0.25091795252061877,
                        tolerance,
                        showResults);
 
@@ -251,12 +251,12 @@ class StateCovarianceBlenderTest {
         // When & Then
         doTestBlending(DEFAULT_SERGEI_PROPAGATION_TIME, DEFAUTL_SERGEI_TABULATED_TIMESTEP, blendingFunction,
                        propagator,
-                       0.13366703460,
-                       0.13160856461,
+                       0.13366703358550922,
+                       0.1316085681168163,
                        0.14205498786,
-                       0.13656689649,
-                       0.21941543409,
-                       0.25091794341,
+                       0.13656689295385213,
+                       0.21941543647520736,
+                       0.25091795252061877,
                        tolerance,
                        showResults);
 
@@ -301,12 +301,12 @@ class StateCovarianceBlenderTest {
         // When & Then
         doTestBlending(DEFAULT_SERGEI_PROPAGATION_TIME, DEFAUTL_SERGEI_TABULATED_TIMESTEP, blendingFunction,
                        propagator,
-                       0.092022772744,
-                       0.175328981237,
-                       0.085754375985,
-                       0.193319970362,
-                       0.169348422233,
-                       0.347302066023,
+                       0.09202277200022312,
+                       0.17532898825582388,
+                       0.08575437063962035,
+                       0.1933199742018083,
+                       0.169348424343085,
+                       0.3473020907178953,
                        tolerance,
                        showResults);
 
@@ -371,12 +371,12 @@ class StateCovarianceBlenderTest {
         }
 
         // Results obtained when using modified orbit date to use truncated JPL test resource file
-        Assertions.assertEquals( 0.1190324127, relativeRMSSigmaError[0].getMean(), tolerance);
-        Assertions.assertEquals( 19.9401863789, relativeRMSSigmaError[1].getMean(), tolerance);
-        Assertions.assertEquals( 0.1221432731, relativeRMSSigmaError[0].getPercentile(50), tolerance);
-        Assertions.assertEquals( 14.0023883813, relativeRMSSigmaError[1].getPercentile(50), tolerance);
-        Assertions.assertEquals( 0.2282143786, relativeRMSSigmaError[0].getMax(), tolerance);
-        Assertions.assertEquals(99.776271400, relativeRMSSigmaError[1].getMax(), tolerance);
+        Assertions.assertEquals( 0.11903240992855382, relativeRMSSigmaError[0].getMean(), tolerance);
+        Assertions.assertEquals( 19.94018728392389, relativeRMSSigmaError[1].getMean(), tolerance);
+        Assertions.assertEquals( 0.12214326925020916, relativeRMSSigmaError[0].getPercentile(50), tolerance);
+        Assertions.assertEquals( 14.002392196321479, relativeRMSSigmaError[1].getPercentile(50), tolerance);
+        Assertions.assertEquals( 0.22821437465452005, relativeRMSSigmaError[0].getMax(), tolerance);
+        Assertions.assertEquals(99.77604533145814, relativeRMSSigmaError[1].getMax(), tolerance);
 
         // Assert getters as well
         Assertions.assertNull(covarianceInterpolator.getOutFrame());

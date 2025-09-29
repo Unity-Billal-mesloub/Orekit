@@ -63,6 +63,7 @@ import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeStampedPVCoordinates;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,15 +79,21 @@ class SwitchEventHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = Action.class)
+    @SuppressWarnings("unchecked")
     void testEventOccurred(final Action action) {
         // GIVEN
         final AbsoluteDate date = AbsoluteDate.ARBITRARY_EPOCH;
         final NumericalPropagationHarvester harvester = mockHarvester();
         final EventHandler handler = (s, e, i) -> action;
-        final SwitchEventHandler switchEventHandler = buildSwitchEventHandler(mock(ForceModel.class), harvester, handler);
+        final ForceModel mockedForce = mock(ForceModel.class);
+        final List<FieldEventDetector<?>> fieldEventDetectors = new ArrayList<>();
+        fieldEventDetectors.add(new FieldDateDetector<>(GradientField.getField(0)));
+        when(mockedForce.getFieldEventDetectors(Mockito.any(Field.class))).thenReturn(fieldEventDetectors.stream());
+        final SwitchEventHandler switchEventHandler = buildSwitchEventHandler(mockedForce, harvester, handler);
         final SpacecraftState stateAtSwitch = buildAbsoluteState(date, new double[0]);
+        final EventDetector detector = new DateDetector(AbsoluteDate.ARBITRARY_EPOCH);
         // WHEN
-        final Action wrappedAction = switchEventHandler.eventOccurred(stateAtSwitch, new DateDetector(), true);
+        final Action wrappedAction = switchEventHandler.eventOccurred(stateAtSwitch, detector, true);
         // THEN
         assertEquals(action, wrappedAction);
     }
@@ -304,7 +311,9 @@ class SwitchEventHandlerTest {
         final NumericalTimeDerivativesEquations equations = new NumericalTimeDerivativesEquations(null,
                 null, Collections.singletonList(forceModel));
         final AttitudeProvider attitudeProvider = new FrameAlignedProvider(Rotation.IDENTITY);
-        return new SwitchEventHandler(handler, harvester, equations, attitudeProvider);
+        final GradientField field = GradientField.getField(8);
+        return new SwitchEventHandler(handler, harvester, equations, attitudeProvider,
+                forceModel.getFieldEventDetectors(field).collect(Collectors.toList()));
     }
 
     private static SpacecraftState buildAbsoluteState(final AbsoluteDate date, final double[] stmArray) {

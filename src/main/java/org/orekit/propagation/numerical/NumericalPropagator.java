@@ -16,6 +16,8 @@
  */
 package org.orekit.propagation.numerical;
 
+import org.hipparchus.analysis.differentiation.Gradient;
+import org.hipparchus.analysis.differentiation.GradientField;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.linear.DecompositionSolver;
@@ -55,6 +57,7 @@ import org.orekit.propagation.Propagator;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.DetectorModifier;
 import org.orekit.propagation.events.EventDetector;
+import org.orekit.propagation.events.FieldEventDetector;
 import org.orekit.propagation.events.ParameterDrivenDateIntervalDetector;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.integration.AbstractIntegratedPropagator;
@@ -1022,32 +1025,40 @@ public class NumericalPropagator extends AbstractIntegratedPropagator {
         private void setUpInternalDetectors(final ODEIntegrator integrator) {
             final NumericalTimeDerivativesEquations cartesianEquations = new NumericalTimeDerivativesEquations(OrbitType.CARTESIAN,
                     null, forceModels);
+            final List<FieldEventDetector<Gradient>> fieldDetectors = new ArrayList<>();
+            if (getHarvester() != null) {
+                final GradientField field = GradientField.getField(getHarvester().getStateDimension() + 1);
+                getForceModels().stream().flatMap(forceModel -> forceModel.getFieldEventDetectors(field))
+                        .filter(fieldEventDetector -> !fieldEventDetector.dependsOnTimeOnly())
+                        .forEach(fieldDetectors::add);
+                getAttitudeProvider().getFieldEventDetectors(field)
+                        .filter(fieldEventDetector -> !fieldEventDetector.dependsOnTimeOnly())
+                        .forEach(fieldDetectors::add);
+            }
             for (final ForceModel forceModel : getForceModels()) {
                 forceModel.getEventDetectors().forEach(detector -> setUpInternalEventDetector(integrator, detector,
-                        cartesianEquations));
+                        cartesianEquations, fieldDetectors));
             }
             getAttitudeProvider().getEventDetectors().forEach(detector -> setUpInternalEventDetector(integrator,
-                    detector, cartesianEquations));
+                    detector, cartesianEquations, fieldDetectors));
         }
 
         /** Set up one internal event detector.
          * @param integrator numerical integrator to use for propagation.
          * @param eventDetector detector
          * @param cartesianEquations Cartesian derivatives model
+         * @param fieldDetectors detectors for Taylor differential algebra
          */
         private void setUpInternalEventDetector(final ODEIntegrator integrator,
                                                 final EventDetector eventDetector,
-                                                final NumericalTimeDerivativesEquations cartesianEquations) {
-            final Optional<ExtendedStateTransitionMatrixGenerator> generator = getAdditionalDerivativesProviders().stream()
-                    .filter(ExtendedStateTransitionMatrixGenerator.class::isInstance)
-                    .map(ExtendedStateTransitionMatrixGenerator.class::cast)
-                    .findFirst();
+                                                final NumericalTimeDerivativesEquations cartesianEquations,
+                                                final List<FieldEventDetector<Gradient>> fieldDetectors) {
             final EventDetector internalDetector;
-            if (generator.isPresent() && !eventDetector.dependsOnTimeOnly()) {
+            if (!fieldDetectors.isEmpty() && !eventDetector.dependsOnTimeOnly()) {
                 // need to modify STM at each dynamics discontinuities
                 final NumericalPropagationHarvester harvester = (NumericalPropagationHarvester) getHarvester();
                 final SwitchEventHandler handler = new SwitchEventHandler(eventDetector.getHandler(), harvester,
-                        cartesianEquations, getAttitudeProvider());
+                        cartesianEquations, getAttitudeProvider(), fieldDetectors);
                 internalDetector = getLocalDetector(eventDetector, handler);
             } else {
                 internalDetector = eventDetector;
