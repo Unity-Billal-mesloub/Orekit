@@ -30,7 +30,7 @@ public class DateDriver extends ParameterDriver implements TimeStamped {
     private final AbsoluteDate base;
 
     /** Indicator for start date. */
-    private boolean start;
+    private final boolean start;
 
     /** Simple constructor.
      * <p>

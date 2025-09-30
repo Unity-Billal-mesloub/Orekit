@@ -43,7 +43,7 @@ import org.orekit.propagation.events.handlers.StopOnIncreasing;
 public class GeographicZoneDetector extends AbstractDetector<GeographicZoneDetector> {
 
     /** Body on which the geographic zone is defined. */
-    private BodyShape body;
+    private final BodyShape body;
 
     /** Zone definition. */
     private final SphericalPolygonsSet zone;

@@ -78,7 +78,7 @@ public class AemParser extends AdmParser<Aem, AemParser> implements AttitudeEphe
     private AemData currentBlock;
 
     /** Default interpolation degree. */
-    private int defaultInterpolationDegree;
+    private final int defaultInterpolationDegree;
 
     /** Processor for global message structure. */
     private ProcessingState structureProcessor;

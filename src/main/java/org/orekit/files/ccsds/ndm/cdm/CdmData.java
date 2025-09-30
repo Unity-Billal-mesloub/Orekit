@@ -51,10 +51,10 @@ public class CdmData implements Data {
     private final SigmaEigenvectorsCovariance sig3EigVec3CovarianceBlock;
 
     /** Type of alternate covariance, if present. */
-    private AltCovarianceType altCovarianceType;
+    private final AltCovarianceType altCovarianceType;
 
     /** Additional Covariance Metadata block. */
-    private AdditionalCovarianceMetadata additionalCovMetadata;
+    private final AdditionalCovarianceMetadata additionalCovMetadata;
 
     /** The block containing the user defined parameters. */
     private UserDefined userDefinedBlock;

@@ -28,7 +28,7 @@ import org.hipparchus.analysis.polynomials.PolynomialFunction;
 public class PolynomialFunctionMatrix {
 
     /** The order of the matrix. */
-    private int order;
+    private final int order;
     /** The elements of the matrix. */
     private PolynomialFunction[][] elements;
 

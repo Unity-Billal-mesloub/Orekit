@@ -306,7 +306,7 @@ public class ZipJarCrawler implements DataProvider {
             private final String name;
 
             /** Directory indicator. */
-            private boolean isDirectory;
+            private final boolean isDirectory;
 
             /** Indicator for already closed stream. */
             private boolean closed;

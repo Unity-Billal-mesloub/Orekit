@@ -177,7 +177,7 @@ public class UpdatableFrame extends Frame {
     private static class UpdatableProvider implements TransformProvider {
 
         /** Current transform. */
-        private AtomicReference<Transform> transform;
+        private final AtomicReference<Transform> transform;
 
         /** Simple constructor.
          * @param transform initial value of the transform

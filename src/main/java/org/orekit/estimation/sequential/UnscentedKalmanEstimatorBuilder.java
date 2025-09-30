@@ -45,13 +45,13 @@ public class UnscentedKalmanEstimatorBuilder {
     private MatrixDecomposer decomposer;
 
     /** Builders for propagators. */
-    private List<PropagatorBuilder> propagatorBuilders;
+    private final List<PropagatorBuilder> propagatorBuilders;
 
     /** Estimated measurements parameters. */
     private ParameterDriversList estimatedMeasurementsParameters;
 
     /** Process noise matrix providers. */
-    private List<CovarianceMatrixProvider> processNoiseMatrixProviders;
+    private final List<CovarianceMatrixProvider> processNoiseMatrixProviders;
 
     /** Process noise matrix provider for measurement parameters. */
     private CovarianceMatrixProvider measurementProcessNoiseMatrix;

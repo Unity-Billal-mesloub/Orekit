@@ -35,7 +35,7 @@ class AttitudeEntry {
     private AbsoluteDate epoch;
 
     /** Attitude components. */
-    private double[] components;
+    private final double[] components;
 
     /** Build an uninitialized entry.
      * @param metadata metadata used to interpret the data fields

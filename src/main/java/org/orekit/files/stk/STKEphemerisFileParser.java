@@ -280,10 +280,10 @@ public class STKEphemerisFileParser implements EphemerisFileParser<STKEphemerisF
         private int numberOfEphemerisPointsRead;
 
         /** Segment boundary times. */
-        private SortedSet<Double> segmentBoundaryTimes;
+        private final SortedSet<Double> segmentBoundaryTimes;
 
         /** Ephemeris segments. */
-        private List<STKEphemerisSegment> ephemerisSegments;
+        private final List<STKEphemerisSegment> ephemerisSegments;
 
         /** Last-saved ephemeris. */
         private TimeStampedPVCoordinates lastSavedEphemeris;

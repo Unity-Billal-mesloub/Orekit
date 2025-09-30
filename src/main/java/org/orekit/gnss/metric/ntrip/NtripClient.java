@@ -128,7 +128,7 @@ public class NtripClient {
     private Proxy proxy;
 
     /** NMEA GGA sentence (may be null). */
-    private AtomicReference<String> gga;
+    private final AtomicReference<String> gga;
 
     /** Observers for encoded messages. */
     private final List<ObserverHolder> observers;

@@ -216,7 +216,7 @@ public class CRDParser {
     private class ParseInfo {
 
         /** The corresponding CDR file. */
-        private CRD file;
+        private final CRD file;
 
         /** Version. */
         private int version;
@@ -231,7 +231,7 @@ public class CRDParser {
         private CRDConfiguration configurationRecords;
 
         /** Time scale. */
-        private TimeScale timeScale;
+        private final TimeScale timeScale;
 
         /** Current data block start epoch, DateComponents only. */
         private DateComponents startEpochDateComponents;

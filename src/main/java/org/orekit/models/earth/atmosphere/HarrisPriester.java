@@ -122,7 +122,7 @@ public class HarrisPriester extends AbstractSunInfluencedAtmosphere {
     private double n;
 
     /** Earth body shape. */
-    private OneAxisEllipsoid earth;
+    private final OneAxisEllipsoid earth;
 
     /** Density table. */
     private double[][] tabAltRho;

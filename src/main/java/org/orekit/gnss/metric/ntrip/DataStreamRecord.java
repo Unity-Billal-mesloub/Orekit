@@ -68,7 +68,7 @@ public class DataStreamRecord extends Record {
     private final boolean fees;
 
     /** Bit rate. */
-    private int bitRate;
+    private final int bitRate;
 
     /** Build a data stream record by parsing a source table line.
      * @param line source table line

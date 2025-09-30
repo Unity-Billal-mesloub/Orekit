@@ -51,16 +51,16 @@ public class DSSTTesseralContext extends DSSTGravityContext {
     private static final int I = 1;
 
     /** Central body rotation angle θ. */
-    private double theta;
+    private final double theta;
 
     /** ecc². */
-    private double e2;
+    private final double e2;
 
     /** Keplerian period. */
-    private double period;
+    private final double period;
 
     /** Ratio of satellite period to central body rotation period. */
-    private double ratio;
+    private final double ratio;
 
     /**
      * Simple constructor.

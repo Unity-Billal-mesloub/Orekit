@@ -436,16 +436,16 @@ public class GenericTimeStampedCache<T extends TimeStamped> implements TimeStamp
         private final List<Entry> cache;
 
         /** Earliest quantum. */
-        private AtomicLong earliestQuantum;
+        private final AtomicLong earliestQuantum;
 
         /** Latest quantum. */
-        private AtomicLong latestQuantum;
+        private final AtomicLong latestQuantum;
 
         /** Index from a previous recent call. */
-        private AtomicInteger guessedIndex;
+        private final AtomicInteger guessedIndex;
 
         /** Last access time. */
-        private AtomicLong lastAccess;
+        private final AtomicLong lastAccess;
 
         /** Simple constructor.
          * @param date central date for initial entries to insert in the slot

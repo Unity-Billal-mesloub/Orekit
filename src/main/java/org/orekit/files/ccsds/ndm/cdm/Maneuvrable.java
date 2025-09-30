@@ -32,7 +32,7 @@ public enum Maneuvrable {
     N_A("N/A");
 
     /** Value of the enum .*/
-    private String value;
+    private final String value;
 
     /**
      * Constructor.

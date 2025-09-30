@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class CoefficientsFactory {
 
     /** Internal storage of the polynomial values. Reused for further computation. */
-    private static SortedMap<NSKey, Double> VNS = new ConcurrentSkipListMap<>();
+    private static final SortedMap<NSKey, Double> VNS = new ConcurrentSkipListMap<>();
 
     /** Last computed order for V<sub>ns</sub> coefficients. */
     private static int         LAST_VNS_ORDER = 2;

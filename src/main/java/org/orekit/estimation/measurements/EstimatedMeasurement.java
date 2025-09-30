@@ -38,7 +38,7 @@ import org.orekit.utils.TimeSpanMap.Span;
 public class EstimatedMeasurement<T extends ObservedMeasurement<T>> extends EstimatedMeasurementBase<T> {
 
     /** Partial derivatives with respect to states. */
-    private double[][][] stateDerivatives;
+    private final double[][][] stateDerivatives;
 
     /** Partial derivatives with respect to parameters. */
     private final Map<ParameterDriver, TimeSpanMap<double[]>> parametersDerivatives;

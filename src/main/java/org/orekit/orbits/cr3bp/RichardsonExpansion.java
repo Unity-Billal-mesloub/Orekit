@@ -105,10 +105,10 @@ public class RichardsonExpansion {
     private double orbitalPeriod;
 
     /** Lagrangian Point considered. */
-    private LagrangianPoints point;
+    private final LagrangianPoints point;
 
     /** CR3BP System considered. */
-    private CR3BPSystem cr3bpSystem;
+    private final CR3BPSystem cr3bpSystem;
 
     /** Simple Constructor.
      * @param cr3bpSystem CR3BP System considered

@@ -39,25 +39,25 @@ public class FieldDSSTZonalContext<T extends CalculusFieldElement<T>> extends Fi
 
     // Short period terms
     /** h * k. */
-    private T hk;
+    private final T hk;
     /** k² - h². */
-    private T k2mh2;
+    private final T k2mh2;
     /** (k² - h²) / 2. */
-    private T k2mh2o2;
+    private final T k2mh2o2;
     /** 1 / (n² * a²). */
-    private T oon2a2;
+    private final T oon2a2;
     /** 1 / (n² * a) . */
-    private T oon2a;
+    private final T oon2a;
     /** χ³ / (n² * a). */
-    private T x3on2a;
+    private final T x3on2a;
     /** χ / (n² * a²). */
-    private T xon2a2;
+    private final T xon2a2;
     /** (C * χ) / ( 2 * n² * a² ). */
-    private T cxo2n2a2;
+    private final T cxo2n2a2;
     /** (χ²) / (n² * a² * (χ + 1 ) ). */
-    private T x2on2a2xp1;
+    private final T x2on2a2xp1;
     /** B * B. */
-    private T BB;
+    private final T BB;
 
     /** Constructor with central body frame equals orbit frame.
      *

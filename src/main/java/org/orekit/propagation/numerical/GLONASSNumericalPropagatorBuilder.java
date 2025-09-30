@@ -66,7 +66,7 @@ public class GLONASSNumericalPropagatorBuilder {
     private Frame eci;
 
     /** Data context for the propagator. */
-    private DataContext dataContext;
+    private final DataContext dataContext;
 
     /**
      * Initializes the builder.

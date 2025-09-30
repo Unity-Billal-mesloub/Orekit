@@ -33,10 +33,10 @@ import org.orekit.time.AbsoluteDate;
 public class TectonicsDisplacement implements StationDisplacement {
 
     /** Coordinates reference epoch. */
-    private AbsoluteDate epoch;
+    private final AbsoluteDate epoch;
 
     /** Station velocity. */
-    private Vector3D velocity;
+    private final Vector3D velocity;
 
     /** Simple constructor.
      * @param velocity station velocity in Earth frame (m/s)

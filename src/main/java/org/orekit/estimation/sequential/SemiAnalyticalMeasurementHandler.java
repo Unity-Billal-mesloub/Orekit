@@ -42,7 +42,7 @@ public class SemiAnalyticalMeasurementHandler implements OrekitStepHandler {
     private int index;
 
     /** Reference date. */
-    private AbsoluteDate referenceDate;
+    private final AbsoluteDate referenceDate;
 
     /** Kalman model. */
     private final SemiAnalyticalProcess model;

@@ -79,7 +79,7 @@ public class ParseToken {
                                                                  Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
     /** Type of the token. */
-    private TokenType type;
+    private final TokenType type;
 
     /** Name of the entry. */
     private final String name;

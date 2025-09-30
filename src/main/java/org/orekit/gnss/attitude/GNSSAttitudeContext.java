@@ -94,15 +94,15 @@ class GNSSAttitudeContext implements TimeStamped {
     /** Relative orbit angle to turn center.
      * @since 12.0
      */
-    private UnivariateDerivative2 delta;
+    private final UnivariateDerivative2 delta;
 
     /** Sun elevation at center.
      * @since 12.0
      */
-    private UnivariateDerivative2 beta;
+    private final UnivariateDerivative2 beta;
 
     /** Spacecraft angular velocity. */
-    private double muRate;
+    private final double muRate;
 
     /** Limit cosine for the midnight turn. */
     private double cNight;

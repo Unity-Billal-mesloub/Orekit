@@ -33,7 +33,7 @@ public class PolynomialNutation implements Serializable {
     private static final long serialVersionUID = 20131007L;
 
     /** Coefficients of the polynomial part. */
-    private double[] coefficients;
+    private final double[] coefficients;
 
     /** Build a polynomial from its coefficients.
      * @param coefficients polynomial coefficients in increasing degree

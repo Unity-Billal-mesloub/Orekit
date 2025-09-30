@@ -39,7 +39,7 @@ public class FieldTransformGenerator<T extends CalculusFieldElement<T>> implemen
     private final Field<T> field;
 
     /** Number of neighbors. */
-    private int neighborsSize;
+    private final int neighborsSize;
 
     /** Underlying provider. */
     private final TransformProvider provider;

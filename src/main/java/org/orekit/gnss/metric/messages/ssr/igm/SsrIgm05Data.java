@@ -36,7 +36,7 @@ public class SsrIgm05Data extends SsrIgmData {
      * First key: the signal ID
      * Second key: the code bias object
      */
-    private Map<Integer, CodeBias> biases;
+    private final Map<Integer, CodeBias> biases;
 
     /** Constructor. */
     public SsrIgm05Data() {

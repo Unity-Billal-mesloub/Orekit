@@ -97,7 +97,7 @@ public class OemParser extends OdmParser<Oem, OemParser> implements EphemerisFil
     private int currentRow;
 
     /** Default interpolation degree. */
-    private int defaultInterpolationDegree;
+    private final int defaultInterpolationDegree;
 
     /** Processor for global message structure. */
     private ProcessingState structureProcessor;

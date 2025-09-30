@@ -41,7 +41,7 @@ public class DSSTThirdBodyStaticContext extends ForceModelContext {
     private int maxEccPow;
 
     /** Max frequency of F. */
-    private int maxFreqF;
+    private final int maxFreqF;
 
     /**
      * Constructor.

@@ -37,16 +37,16 @@ import org.orekit.time.FieldAbsoluteDate;
 public class SimpleExponentialAtmosphere implements Atmosphere {
 
     /** Earth shape model. */
-    private BodyShape    shape;
+    private final BodyShape    shape;
 
     /** Reference density. */
-    private double       rho0;
+    private final double       rho0;
 
     /** Reference altitude. */
-    private double       h0;
+    private final double       h0;
 
     /** Reference altitude scale. */
-    private double       hscale;
+    private final double       hscale;
 
     /** Create an exponential atmosphere.
      * @param shape body shape model
