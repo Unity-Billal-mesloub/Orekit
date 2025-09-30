@@ -51,9 +51,9 @@ public abstract class AbstractFrames implements Frames {
     /** Provider of the ICRF frame, usually delegated to {@link CelestialBodies}. */
     private final Supplier<Frame> icrfSupplier;
     /** Predefined frames. */
-    private Map<Predefined, FactoryManagedFrame> frames;
+    private final Map<Predefined, FactoryManagedFrame> frames;
     /** Predefined versioned ITRF frames. */
-    private Map<ITRFKey, VersionedITRF> versionedItrfFrames;
+    private final Map<ITRFKey, VersionedITRF> versionedItrfFrames;
 
     /**
      * Simple constructor.

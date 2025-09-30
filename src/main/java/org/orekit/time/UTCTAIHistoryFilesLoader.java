@@ -82,10 +82,10 @@ public class UTCTAIHistoryFilesLoader extends AbstractSelfFeedingLoader
     public static class Parser implements UTCTAIOffsetsLoader.Parser {
 
         /** Regular data lines pattern. */
-        private Pattern regularPattern;
+        private final Pattern regularPattern;
 
         /** Last line pattern pattern. */
-        private Pattern lastPattern;
+        private final Pattern lastPattern;
 
         /** Simple constructor.
          */

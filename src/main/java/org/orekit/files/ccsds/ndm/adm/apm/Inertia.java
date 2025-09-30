@@ -32,7 +32,7 @@ public class Inertia extends CommonPhysicalProperties {
     private FrameFacade frame;
 
     /** Inertia matrix. */
-    private RealMatrix inertiaMatrix;
+    private final RealMatrix inertiaMatrix;
 
     /** Simple constructor.
      */

@@ -196,7 +196,7 @@ public class HatanakaCompressFilter implements DataFilter {
     private static class TextDifferential {
 
         /** Buffer holding the current state. */
-        private CharBuffer state;
+        private final CharBuffer state;
 
         /** Simple constructor.
          * @param fieldLength length of the uncompressed text field
@@ -241,10 +241,10 @@ public class HatanakaCompressFilter implements DataFilter {
     private static class CombinedDifferentials {
 
         /** Observation differentials. */
-        private NumericDifferential[] observations;
+        private final NumericDifferential[] observations;
 
         /** Flags differential. */
-        private TextDifferential flags;
+        private final TextDifferential flags;
 
         /** Simple constructor.
          * Build an empty container.

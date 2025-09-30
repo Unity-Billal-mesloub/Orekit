@@ -113,7 +113,7 @@ class GNSSFieldAttitudeContext<T extends CalculusFieldElement<T>> implements Fie
     private final FieldUnivariateDerivative2<T> beta;
 
     /** Spacecraft angular velocity. */
-    private T muRate;
+    private final T muRate;
 
     /** Limit cosine for the midnight turn. */
     private double cNight;

@@ -32,7 +32,7 @@ import org.orekit.utils.TimeStampedGenerator;
 public class TransformGenerator implements TimeStampedGenerator<Transform> {
 
     /** Number of neighbors. */
-    private int neighborsSize;
+    private final int neighborsSize;
 
     /** Underlying provider. */
     private final TransformProvider provider;

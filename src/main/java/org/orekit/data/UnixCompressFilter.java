@@ -114,7 +114,7 @@ public class UnixCompressFilter implements DataFilter {
         private int lookAheadWidth;
 
         /** Input buffer. */
-        private Buffer input;
+        private final Buffer input;
 
         /** Previous uncompressed sequence output. */
         private UncompressedSequence previousSequence;

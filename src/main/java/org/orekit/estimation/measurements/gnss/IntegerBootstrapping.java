@@ -47,7 +47,7 @@ import org.hipparchus.util.FastMath;;
 public class IntegerBootstrapping extends LambdaMethod {
 
     /** Minimum probability for acceptance. */
-    private double minProb;
+    private final double minProb;
 
     /** Upperbound of the probability. */
     private boolean boostrapUse;

@@ -104,7 +104,7 @@ import org.orekit.time.AbsoluteDate;
 public class PropagatorsParallelizer {
 
     /** Waiting time to avoid getting stuck waiting for interrupted threads (ms). */
-    private static long MAX_WAIT = 10;
+    private static final long MAX_WAIT = 10;
 
     /** Underlying propagators. */
     private final List<Propagator> propagators;

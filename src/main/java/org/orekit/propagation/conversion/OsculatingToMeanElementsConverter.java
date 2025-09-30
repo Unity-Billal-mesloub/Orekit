@@ -52,7 +52,7 @@ public class OsculatingToMeanElementsConverter {
     private final Propagator      propagator;
 
     /** Scaling factor used for orbital parameters normalization. */
-    private double positionScale;
+    private final double positionScale;
 
     /** Constructor.
      *  @param state initial orbit to convert

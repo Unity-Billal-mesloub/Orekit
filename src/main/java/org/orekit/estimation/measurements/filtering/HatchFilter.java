@@ -53,13 +53,13 @@ abstract class HatchFilter {
     private double previousSmoothingValue;
 
     /** History of the pseudo-range value, appended at each filter iteration. */
-    private ArrayList<Double> codeHistory;
+    private final ArrayList<Double> codeHistory;
 
     /** History of the smoothed pseudo-range value, appended at each filter iteration. */
-    private ArrayList<Double> smoothedCodeHistory;
+    private final ArrayList<Double> smoothedCodeHistory;
 
     /** Threshold for the difference between smoothed and measured values. */
-    private double threshold;
+    private final double threshold;
 
     /** Window size of the Hatch Filter. */
     private final int N;

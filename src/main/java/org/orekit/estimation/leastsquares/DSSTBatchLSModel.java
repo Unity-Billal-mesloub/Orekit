@@ -46,7 +46,7 @@ public class DSSTBatchLSModel extends AbstractBatchLSModel {
     private static final String STM_NAME = DSSTBatchLSModel.class.getName() + "-derivatives";
 
     /** Type of the orbit used for the propagation.*/
-    private PropagationType propagationType;
+    private final PropagationType propagationType;
 
     /** Simple constructor.
      * @param propagatorBuilders builders to use for propagation

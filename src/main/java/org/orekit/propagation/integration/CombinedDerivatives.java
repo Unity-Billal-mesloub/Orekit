@@ -24,7 +24,7 @@ package org.orekit.propagation.integration;
 public class CombinedDerivatives {
 
     /** Additional state derivatives. */
-    private double[] additionalDerivatives;
+    private final double[] additionalDerivatives;
 
     /** Primary state derivatives increments (may be null). */
     private final double[] mainStateDerivativesIncrements;

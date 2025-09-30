@@ -41,7 +41,7 @@ public class GHmsjPolynomials {
     /** Is the orbit represented as a retrograde orbit.
      *  I = -1 if yes, +1 otherwise.
      */
-    private int                   I;
+    private final int                   I;
 
     /** Create a set of G<sub>ms</sub><sup>j</sup> and H<sub>ms</sub><sup>j</sup> polynomials.
      *  @param k X component of the eccentricity vector

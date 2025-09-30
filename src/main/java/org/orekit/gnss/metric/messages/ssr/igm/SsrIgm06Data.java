@@ -42,7 +42,7 @@ public class SsrIgm06Data extends SsrIgmData {
      * First key: the signal ID
      * Second key: the phase bias object
      */
-    private Map<Integer, PhaseBias> biases;
+    private final Map<Integer, PhaseBias> biases;
 
     /** Constructor. */
     public SsrIgm06Data() {

@@ -94,10 +94,10 @@ enum Prefix {
     YOCTO("y", 1.0e-24);
 
     /** Symbol. */
-    private String symbol;
+    private final String symbol;
 
     /** Multiplication factor. */
-    private double factor;
+    private final double factor;
 
     /** Simple constructor.
      * @param symbol symbol

@@ -180,22 +180,22 @@ public class CPFParser implements EphemerisFileParser<CPF> {
     private class ParseInfo {
 
         /** The corresponding CPF file. */
-        private CPF file;
+        private final CPF file;
 
         /** IERS convention. */
-        private IERSConventions convention;
+        private final IERSConventions convention;
 
         /** Set of frames. */
-        private Frames frames;
+        private final Frames frames;
 
         /** Frame for the ephemeris data. */
         private Frame frame;
 
         /** Time scale. */
-        private TimeScale timeScale;
+        private final TimeScale timeScale;
 
         /** Indicates if the SP3 file has velocity entries. */
-        private boolean hasVelocityEntries;
+        private final boolean hasVelocityEntries;
 
         /** End Of File reached indicator. */
         private boolean done;

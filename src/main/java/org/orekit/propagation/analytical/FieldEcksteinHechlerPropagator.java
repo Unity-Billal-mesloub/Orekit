@@ -74,13 +74,13 @@ public class FieldEcksteinHechlerPropagator<T extends CalculusFieldElement<T>> e
     private FieldTimeSpanMap<FieldEHModel<T>, T> models;
 
     /** Reference radius of the central body attraction model (m). */
-    private double referenceRadius;
+    private final double referenceRadius;
 
     /** Central attraction coefficient (m³/s²). */
-    private T mu;
+    private final T mu;
 
     /** Un-normalized zonal coefficients. */
-    private double[] ck0;
+    private final double[] ck0;
 
     /** Build a propagator from FieldOrbit and potential provider.
      *

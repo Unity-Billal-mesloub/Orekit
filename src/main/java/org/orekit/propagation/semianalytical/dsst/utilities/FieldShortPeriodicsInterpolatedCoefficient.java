@@ -39,13 +39,13 @@ import org.orekit.time.FieldAbsoluteDate;
 public class FieldShortPeriodicsInterpolatedCoefficient <T extends CalculusFieldElement<T>> {
 
     /**Values of the already computed coefficients.*/
-    private ArrayList<T[]> values;
+    private final ArrayList<T[]> values;
 
     /**Grid points.*/
-    private ArrayList<FieldAbsoluteDate<T>> abscissae;
+    private final ArrayList<FieldAbsoluteDate<T>> abscissae;
 
     /**Number of points used in the interpolation.*/
-    private int interpolationPoints;
+    private final int interpolationPoints;
 
     /**Index of the latest closest neighbor.*/
     private int latestClosestNeighbor;

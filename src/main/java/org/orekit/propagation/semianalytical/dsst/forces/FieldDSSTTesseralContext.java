@@ -55,16 +55,16 @@ public class FieldDSSTTesseralContext<T extends CalculusFieldElement<T>> extends
     private static final int I = 1;
 
     /** Central body rotation angle θ. */
-    private T theta;
+    private final T theta;
 
     /** ecc². */
-    private T e2;
+    private final T e2;
 
     /** Keplerian period. */
-    private T period;
+    private final T period;
 
     /** Ratio of satellite period to central body rotation period. */
-    private T ratio;
+    private final T ratio;
 
     /**
      * Simple constructor.

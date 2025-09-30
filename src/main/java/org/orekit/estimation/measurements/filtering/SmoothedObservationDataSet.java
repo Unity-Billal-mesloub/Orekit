@@ -29,10 +29,10 @@ import org.orekit.files.rinex.observation.ObservationDataSet;
 public class SmoothedObservationDataSet {
 
     /** Smoothed observation data. */
-    private ObservationData smoothedObsData;
+    private final ObservationData smoothedObsData;
 
     /** Original observation data set used to compute the smoothed observation data. */
-    private ObservationDataSet obsDataSet;
+    private final ObservationDataSet obsDataSet;
 
     /**
      * Simple constructor.

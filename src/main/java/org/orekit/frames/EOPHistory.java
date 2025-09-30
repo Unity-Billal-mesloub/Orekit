@@ -306,7 +306,7 @@ public class EOPHistory {
         private final HermiteInterpolator interpolator;
 
         /** Interpolation date. */
-        private AbsoluteDate date;
+        private final AbsoluteDate date;
 
         /** Simple constructor.
          * @param date interpolation date
@@ -367,10 +367,10 @@ public class EOPHistory {
         private final FieldHermiteInterpolator<T> interpolator;
 
         /** Interpolation date. */
-        private FieldAbsoluteDate<T> date;
+        private final FieldAbsoluteDate<T> date;
 
         /** Interpolation date. */
-        private AbsoluteDate absDate;
+        private final AbsoluteDate absDate;
 
         /** Simple constructor.
          * @param date interpolation date

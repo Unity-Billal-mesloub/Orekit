@@ -99,7 +99,7 @@ public class SP3Header {
     private double clockBase;
 
     /** Satellite identifiers. */
-    private List<String> satIds;
+    private final List<String> satIds;
 
     /** Satellite accuracies. */
     private double[] accuracies;

@@ -27,7 +27,7 @@ import org.hipparchus.CalculusFieldElement;
 public class FieldCombinedDerivatives<T extends CalculusFieldElement<T>> {
 
     /** Additional state derivatives. */
-    private T[] additionalDerivatives;
+    private final T[] additionalDerivatives;
 
     /** Primary state derivatives increments (may be null). */
     private final T[] mainStateDerivativesIncrements;

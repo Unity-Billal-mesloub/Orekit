@@ -37,10 +37,10 @@ import org.orekit.time.AbsoluteDate;
 public class MultisatStepNormalizer implements MultiSatStepHandler {
 
     /** Fixed time step. */
-    private double h;
+    private final double h;
 
     /** Underlying fixed step handler. */
-    private MultiSatFixedStepHandler handler;
+    private final MultiSatFixedStepHandler handler;
 
     /** Last State vectors. */
     private List<SpacecraftState> lastStates;

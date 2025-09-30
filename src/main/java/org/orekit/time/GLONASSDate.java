@@ -47,10 +47,10 @@ public class GLONASSDate implements TimeStamped {
     private final double secInNa;
 
     /** Current Julian date JD0. */
-    private double jd0;
+    private final double jd0;
 
     /** Greenwich Mean Sidereal Time (rad). */
-    private double gmst;
+    private final double gmst;
 
     /** Corresponding date. */
     private final AbsoluteDate date;

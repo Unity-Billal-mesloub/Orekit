@@ -29,10 +29,10 @@ import org.orekit.files.ccsds.utils.generation.Generator;
 public abstract class AbstractWriter {
 
     /** Name of the XML tag surrounding the section. */
-    private String xmlTag;
+    private final String xmlTag;
 
     /** Name of the KVN tag surrounding the section (may be null). */
-    private String kvnTag;
+    private final String kvnTag;
 
     /** Simple constructor.
      * @param xmlTag name of the XML tag surrounding the section

@@ -205,7 +205,7 @@ public class SOLFSMYDataLoader implements DataLoader {
     private AbsoluteDate lastDate;
 
     /** Data set. */
-    private SortedSet<LineParameters> set;
+    private final SortedSet<LineParameters> set;
 
     /**
      * Constructor.

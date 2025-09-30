@@ -31,7 +31,7 @@ import org.hipparchus.util.FastMath;
 public class LegendrePolynomials {
 
     /** Array for the Legendre polynomials. */
-    private double[][] pCoef;
+    private final double[][] pCoef;
 
     /** Create Legendre polynomials for the given degree and order.
      * @param degree degree of the spherical harmonics

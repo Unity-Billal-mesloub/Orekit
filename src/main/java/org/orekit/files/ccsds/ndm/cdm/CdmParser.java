@@ -53,13 +53,13 @@ import org.orekit.utils.IERSConventions;
 public class CdmParser extends AbstractConstituentParser<CdmHeader, Cdm, CdmParser> {
 
     /** Comment key. */
-    private static String COMMENT = "COMMENT";
+    private static final String COMMENT = "COMMENT";
 
     /** XML relative metadata key. */
-    private static String RELATIVEMETADATA = "relativeMetadataData";
+    private static final String RELATIVEMETADATA = "relativeMetadataData";
 
     /** XML metadata key. */
-    private static String METADATA = "metadata";
+    private static final String METADATA = "metadata";
 
     /** File header. */
     private CdmHeader header;

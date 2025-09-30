@@ -87,7 +87,7 @@ public class AuxiliaryElements {
     private final int    I;
 
     /** Orbit. */
-    private Orbit orbit;
+    private final Orbit orbit;
 
     /** B = sqrt(1 - h² - k²). */
     private final double B;

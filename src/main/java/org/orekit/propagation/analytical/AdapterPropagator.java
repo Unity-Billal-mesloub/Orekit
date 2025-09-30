@@ -70,10 +70,10 @@ public class AdapterPropagator extends AbstractAnalyticalPropagator {
     }
 
     /** Underlying reference propagator. */
-    private Propagator reference;
+    private final Propagator reference;
 
     /** Effects to add. */
-    private List<DifferentialEffect> effects;
+    private final List<DifferentialEffect> effects;
 
     /** Build a propagator from an underlying reference propagator.
      * <p>The reference propagator can be almost anything, numerical,

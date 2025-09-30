@@ -197,19 +197,19 @@ public class OrekitAttitudeEphemerisFile
         implements AttitudeEphemerisFile.AttitudeEphemerisSegment<TimeStampedAngularCoordinates> {
 
         /** List of attitude data lines. */
-        private List<TimeStampedAngularCoordinates> attitudeDataLines;
+        private final List<TimeStampedAngularCoordinates> attitudeDataLines;
 
         /** The interpolation method to be used. */
-        private String interpolationMethod;
+        private final String interpolationMethod;
 
         /** The number of interpolation samples. */
-        private int interpolationSamples;
+        private final int interpolationSamples;
 
         /** Enumerate for selecting which derivatives to use in {@link #attitudeDataLines} interpolation. */
-        private AngularDerivativesFilter availableDerivatives;
+        private final AngularDerivativesFilter availableDerivatives;
 
         /** Reference frame from which attitude is defined. */
-        private Frame referenceFrame;
+        private final Frame referenceFrame;
 
         /**
          * Constructor for OrekitAttitudeEphemerisSegment.

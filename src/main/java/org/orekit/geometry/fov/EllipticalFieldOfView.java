@@ -153,7 +153,7 @@ public class EllipticalFieldOfView extends SmoothFieldOfView {
     private final double d;
 
     /** Angular semi major axis. */
-    private double a;
+    private final double a;
 
     /** Build a new instance.
      * <p>

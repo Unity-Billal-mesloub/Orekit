@@ -65,16 +65,16 @@ public class FieldParameterDrivenDateIntervalDetector<T extends CalculusFieldEle
     public static final String DURATION_SUFFIX = "_DURATION";
 
     /** Reference interval start driver. */
-    private DateDriver start;
+    private final DateDriver start;
 
     /** Reference interval stop driver. */
-    private DateDriver stop;
+    private final DateDriver stop;
 
     /** Median date driver. */
-    private DateDriver median;
+    private final DateDriver median;
 
     /** Duration driver. */
-    private ParameterDriver duration;
+    private final ParameterDriver duration;
 
     /** Build a new instance.
      * @param field field to which the elements belong

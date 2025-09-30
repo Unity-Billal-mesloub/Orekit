@@ -53,7 +53,7 @@ public class SecularAndHarmonic {
     private double[] fitted;
 
     /** Observed points. */
-    private List<WeightedObservedPoint> observedPoints;
+    private final List<WeightedObservedPoint> observedPoints;
 
     /** RMS for convergence.
      * @since 10.3

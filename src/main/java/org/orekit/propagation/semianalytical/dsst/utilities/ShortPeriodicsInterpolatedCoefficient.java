@@ -37,13 +37,13 @@ import java.util.ArrayList;
 public class ShortPeriodicsInterpolatedCoefficient {
 
     /**Values of the already computed coefficients.*/
-    private ArrayList<double[]> values;
+    private final ArrayList<double[]> values;
 
     /**Grid points.*/
-    private ArrayList<AbsoluteDate> abscissae;
+    private final ArrayList<AbsoluteDate> abscissae;
 
     /**Number of points used in the interpolation.*/
-    private int interpolationPoints;
+    private final int interpolationPoints;
 
     /**Index of the latest closest neighbor.*/
     private int latestClosestNeighbor;

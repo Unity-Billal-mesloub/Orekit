@@ -36,7 +36,7 @@ public class CdmRelativeMetadata {
     private TimeSystem timeSystem;
 
     /** Comment. */
-    private List<String> comment;
+    private final List<String> comment;
 
     /** Date and time in UTC of the closest approach. */
     private AbsoluteDate tca;

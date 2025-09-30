@@ -32,10 +32,10 @@ import org.orekit.utils.units.Unit;
 class EulerWriter extends AbstractWriter {
 
     /** Suffix for angles. */
-    private static String ANGLE = "_ANGLE";
+    private static final String ANGLE = "_ANGLE";
 
     /** Suffix for rates. */
-    private static String RATE = "_RATE";
+    private static final String RATE = "_RATE";
 
     /** Format version.
      * @since 12.0

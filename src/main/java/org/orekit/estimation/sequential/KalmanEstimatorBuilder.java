@@ -38,13 +38,13 @@ public class KalmanEstimatorBuilder {
     private MatrixDecomposer decomposer;
 
     /** Builders for propagators. */
-    private List<PropagatorBuilder> propagatorBuilders;
+    private final List<PropagatorBuilder> propagatorBuilders;
 
     /** Estimated measurements parameters. */
     private ParameterDriversList estimatedMeasurementsParameters;
 
     /** Process noise matrices providers. */
-    private List<CovarianceMatrixProvider> processNoiseMatricesProviders;
+    private final List<CovarianceMatrixProvider> processNoiseMatricesProviders;
 
     /** Process noise matrix provider for measurement parameters. */
     private CovarianceMatrixProvider measurementProcessNoiseMatrix;

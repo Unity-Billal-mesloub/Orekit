@@ -107,7 +107,7 @@ public class XmlLexicalAnalyzer implements LexicalAnalyzer {
         private final XmlTokenBuilder regularBuilder;
 
         /** Builders for special elements. */
-        private Map<String, XmlTokenBuilder> specialElements;
+        private final Map<String, XmlTokenBuilder> specialElements;
 
         /** Locator used to get current line number. */
         private Locator locator;

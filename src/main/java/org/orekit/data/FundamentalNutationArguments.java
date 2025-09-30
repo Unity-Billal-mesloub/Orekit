@@ -566,7 +566,7 @@ public class FundamentalNutationArguments {
         private final Pattern pattern;
 
         /** Parser for polynomials. */
-        private PolynomialParser polynomialParser;
+        private final PolynomialParser polynomialParser;
 
         /** Last parsed fundamental name. */
         private FundamentalName parsedName;
