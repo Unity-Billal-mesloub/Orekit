@@ -73,10 +73,7 @@ public class Attitude implements TimeStamped, TimeShiftable<Attitude> {
     public Attitude(final AbsoluteDate date, final Frame referenceFrame,
                     final AngularCoordinates orientation) {
         this(referenceFrame,
-             new TimeStampedAngularCoordinates(date,
-                                               orientation.getRotation(),
-                                               orientation.getRotationRate(),
-                                               orientation.getRotationAcceleration()));
+             new TimeStampedAngularCoordinates(date, orientation));
     }
 
     /** Creates a new instance.

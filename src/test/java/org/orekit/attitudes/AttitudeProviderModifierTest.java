@@ -29,6 +29,7 @@ import org.mockito.Mockito;
 import org.orekit.frames.Frame;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.utils.AngularCoordinates;
 import org.orekit.utils.FieldPVCoordinatesProvider;
 import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
@@ -187,7 +188,7 @@ class AttitudeProviderModifierTest {
 
         @Override
         public Attitude getAttitude(final PVCoordinatesProvider pvProv, final AbsoluteDate date, final Frame frame) {
-            return new Attitude(frame, new TimeStampedAngularCoordinates(date, r, Vector3D.ZERO, Vector3D.ZERO));
+            return new Attitude(frame, new TimeStampedAngularCoordinates(date, new AngularCoordinates(r)));
         }
 
         @Override

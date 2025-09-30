@@ -52,10 +52,7 @@ public class FixedFrameBuilder implements AttitudeBuilder {
         final AbsoluteDate date = rawAttitude.getDate();
         final Transform    t    = frame.getTransformTo(referenceFrame, date);
         final TimeStampedAngularCoordinates frame2Ref =
-                        new TimeStampedAngularCoordinates(date,
-                                                          t.getRotation(),
-                                                          t.getRotationRate(),
-                                                          t.getRotationAcceleration());
+                        new TimeStampedAngularCoordinates(date, t.getAngular());
 
         return new Attitude(frame, rawAttitude.addOffset(frame2Ref));
 

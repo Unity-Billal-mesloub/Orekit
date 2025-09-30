@@ -39,6 +39,7 @@ import org.orekit.files.ccsds.definitions.Units;
 import org.orekit.files.ccsds.utils.ContextBinding;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.AccurateFormatter;
+import org.orekit.utils.AngularCoordinates;
 import org.orekit.utils.AngularDerivativesFilter;
 import org.orekit.utils.Formatter;
 import org.orekit.utils.TimeStampedAngularCoordinates;
@@ -97,7 +98,7 @@ public enum AttitudeType {
             }
 
             // Return
-            return new TimeStampedAngularCoordinates(date, rotation, Vector3D.ZERO, Vector3D.ZERO);
+            return new TimeStampedAngularCoordinates(date, new AngularCoordinates(rotation));
 
         }
 
@@ -329,7 +330,7 @@ public enum AttitudeType {
             }
 
             // Return
-            return new TimeStampedAngularCoordinates(date, rotation, Vector3D.ZERO, Vector3D.ZERO);
+            return new TimeStampedAngularCoordinates(date, new AngularCoordinates(rotation));
         }
 
     },

@@ -406,7 +406,7 @@ public class Transform implements TimeShiftable<Transform>, KinematicTransform {
         final List<TimeStampedAngularCoordinates> datedAC = new ArrayList<>(sample.size());
         for (final Transform t : sample) {
             datedPV.add(new TimeStampedPVCoordinates(t.getDate(), t.getTranslation(), t.getVelocity(), t.getAcceleration()));
-            datedAC.add(new TimeStampedAngularCoordinates(t.getDate(), t.getRotation(), t.getRotationRate(), t.getRotationAcceleration()));
+            datedAC.add(new TimeStampedAngularCoordinates(t.getDate(), t.getAngular()));
         }
 
         // Create interpolators

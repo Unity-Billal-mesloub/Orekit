@@ -16,8 +16,6 @@
  */
 package org.orekit.utils;
 
-import java.io.Serializable;
-
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.differentiation.DSFactory;
 import org.hipparchus.analysis.differentiation.Derivative;
@@ -56,16 +54,13 @@ import org.orekit.time.TimeShiftable;
  * <p>Instances of this class are guaranteed to be immutable.</p>
  * @author Luc Maisonobe
  */
-public class AngularCoordinates implements TimeShiftable<AngularCoordinates>, Serializable {
+public class AngularCoordinates implements TimeShiftable<AngularCoordinates> {
 
     /** Fixed orientation parallel with reference frame
      * (identity rotation, zero rotation rate and acceleration).
      */
     public static final AngularCoordinates IDENTITY =
             new AngularCoordinates(Rotation.IDENTITY, Vector3D.ZERO, Vector3D.ZERO);
-
-    /** Serializable UID. */
-    private static final long serialVersionUID = 20140414L;
 
     /** Rotation. */
     private final Rotation rotation;

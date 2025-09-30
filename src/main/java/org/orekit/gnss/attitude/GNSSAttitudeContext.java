@@ -445,10 +445,7 @@ class GNSSAttitudeContext implements TimeStamped {
      */
     public TimeStampedAngularCoordinates orbitNormalYaw() {
         final Transform t = LOFType.LVLH_CCSDS.transformFromInertial(date, pvProv.getPVCoordinates(date, inertialFrame));
-        return new TimeStampedAngularCoordinates(date,
-                                                 t.getRotation(),
-                                                 t.getRotationRate(),
-                                                 t.getRotationAcceleration());
+        return new TimeStampedAngularCoordinates(date, t.getAngular());
     }
 
 }

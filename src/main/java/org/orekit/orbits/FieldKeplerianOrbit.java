@@ -33,6 +33,7 @@ import org.orekit.errors.OrekitMessages;
 import org.orekit.frames.FieldKinematicTransform;
 import org.orekit.frames.Frame;
 import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.time.TimeOffset;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 
@@ -1102,6 +1103,12 @@ public class FieldKeplerianOrbit<T extends CalculusFieldElement<T>> extends Fiel
     @Override
     public FieldKeplerianOrbit<T> shiftedBy(final double dt) {
         return shiftedBy(getZero().newInstance(dt));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public FieldKeplerianOrbit<T> shiftedBy(final TimeOffset dt) {
+        return shiftedBy(dt.toDouble());
     }
 
     /** {@inheritDoc} */

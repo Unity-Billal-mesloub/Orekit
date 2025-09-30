@@ -29,6 +29,7 @@ import org.orekit.errors.OrekitMessages;
 import org.orekit.frames.FieldKinematicTransform;
 import org.orekit.frames.Frame;
 import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.time.TimeOffset;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 
@@ -906,6 +907,12 @@ public class FieldEquinoctialOrbit<T extends CalculusFieldElement<T>> extends Fi
 
     /** {@inheritDoc} */
     @Override
+    public FieldEquinoctialOrbit<T> shiftedBy(final TimeOffset dt) {
+        return shiftedBy(dt.toDouble());
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public FieldEquinoctialOrbit<T> shiftedBy(final T dt) {
 
         // use Keplerian-only motion
@@ -1153,12 +1160,12 @@ public class FieldEquinoctialOrbit<T extends CalculusFieldElement<T>> extends Fi
      * @return a string representation of this object
      */
     public String toString() {
-        return new StringBuilder().append("equinoctial parameters: ").append('{').
-                                  append("a: ").append(a.getReal()).
-                                  append("; ex: ").append(ex.getReal()).append("; ey: ").append(ey.getReal()).
-                                  append("; hx: ").append(hx.getReal()).append("; hy: ").append(hy.getReal()).
-                                  append("; lv: ").append(FastMath.toDegrees(getLv().getReal())).
-                                  append(";}").toString();
+        return "equinoctial parameters: " + '{' +
+                "a: " + a.getReal() +
+                "; ex: " + ex.getReal() + "; ey: " + ey.getReal() +
+                "; hx: " + hx.getReal() + "; hy: " + hy.getReal() +
+                "; lv: " + FastMath.toDegrees(getLv().getReal()) +
+                ";}";
     }
 
     /** {@inheritDoc} */

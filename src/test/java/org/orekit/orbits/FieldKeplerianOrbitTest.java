@@ -48,6 +48,7 @@ import org.orekit.frames.FramesFactory;
 import org.orekit.frames.Transform;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.time.TimeOffset;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
 import org.orekit.utils.FieldPVCoordinates;
@@ -58,13 +59,13 @@ import java.util.function.Function;
 
 import static org.orekit.OrekitMatchers.relativelyCloseTo;
 
-public class FieldKeplerianOrbitTest {
+class FieldKeplerianOrbitTest {
 
      // Body mu
     public double mu;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
 
         Utils.setDataRoot("regular-data");
 
@@ -333,6 +334,24 @@ public class FieldKeplerianOrbitTest {
     @Test
     void testNormalize() {
         doTestNormalize(Binary64Field.getInstance());
+    }
+
+    @Test
+    void testShiftedBy() {
+        // GIVEN
+        final ComplexField field = ComplexField.getInstance();
+        final KeplerianOrbit expectedOrbit = createOrbitForTestFromKeplerianOrbit(true);
+        final FieldKeplerianOrbit<Complex> fieldOrbit = new FieldKeplerianOrbit<>(field, expectedOrbit);
+        final double dt = 1;
+        // WHEN
+        final FieldKeplerianOrbit<Complex> actualFieldOrbit = fieldOrbit.shiftedBy(dt);
+        // THEN
+        final FieldKeplerianOrbit<Complex> expected = fieldOrbit.shiftedBy(new TimeOffset(dt));
+        Assertions.assertEquals(expected.getMu(), actualFieldOrbit.getMu());
+        Assertions.assertEquals(expected.getDate(), actualFieldOrbit.getDate());
+        Assertions.assertEquals(expected.getFrame(), actualFieldOrbit.getFrame());
+        Assertions.assertEquals(expected.getPosition(), actualFieldOrbit.getPosition());
+        Assertions.assertEquals(expected.getVelocity(), actualFieldOrbit.getVelocity());
     }
 
     @Test

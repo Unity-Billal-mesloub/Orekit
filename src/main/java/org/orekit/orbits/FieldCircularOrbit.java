@@ -29,6 +29,7 @@ import org.orekit.errors.OrekitMessages;
 import org.orekit.frames.FieldKinematicTransform;
 import org.orekit.frames.Frame;
 import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.time.TimeOffset;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 
@@ -1075,6 +1076,12 @@ public class FieldCircularOrbit<T extends CalculusFieldElement<T>> extends Field
 
     /** {@inheritDoc} */
     @Override
+    public FieldCircularOrbit<T> shiftedBy(final TimeOffset dt) {
+        return shiftedBy(dt.toDouble());
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public FieldCircularOrbit<T> shiftedBy(final T dt) {
 
         // use Keplerian-only motion
@@ -1393,13 +1400,13 @@ public class FieldCircularOrbit<T extends CalculusFieldElement<T>> extends Field
      * @return a string representation of this object
      */
     public String toString() {
-        return new StringBuilder().append("circular parameters: ").append('{').
-                                  append("a: ").append(a.getReal()).
-                                  append(", ex: ").append(ex.getReal()).append(", ey: ").append(ey.getReal()).
-                                  append(", i: ").append(FastMath.toDegrees(i.getReal())).
-                                  append(", raan: ").append(FastMath.toDegrees(raan.getReal())).
-                                  append(", alphaV: ").append(FastMath.toDegrees(getAlphaV().getReal())).
-                                  append(";}").toString();
+        return "circular parameters: " + '{' +
+                "a: " + a.getReal() +
+                ", ex: " + ex.getReal() + ", ey: " + ey.getReal() +
+                ", i: " + FastMath.toDegrees(i.getReal()) +
+                ", raan: " + FastMath.toDegrees(raan.getReal()) +
+                ", alphaV: " + FastMath.toDegrees(getAlphaV().getReal()) +
+                ";}";
     }
 
     /** {@inheritDoc} */

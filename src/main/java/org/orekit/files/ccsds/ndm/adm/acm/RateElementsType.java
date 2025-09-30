@@ -29,6 +29,7 @@ import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.orekit.errors.OrekitException;
 import org.orekit.errors.OrekitMessages;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.utils.AngularCoordinates;
 import org.orekit.utils.TimeStampedAngularCoordinates;
 import org.orekit.utils.units.Unit;
 
@@ -117,7 +118,7 @@ public enum RateElementsType {
                                                        final Rotation rotation,
                                                        final int first,
                                                        final double[] elements) {
-            return new TimeStampedAngularCoordinates(date, rotation, Vector3D.ZERO, Vector3D.ZERO);
+            return new TimeStampedAngularCoordinates(date, new AngularCoordinates(rotation));
         }
     };
 
