@@ -62,9 +62,7 @@ public class PVCoordinates implements TimeShiftable<PVCoordinates>, Blendable<PV
      * <p> Set the Coordinates to default : (0 0 0), (0 0 0), (0 0 0).</p>
      */
     public PVCoordinates() {
-        position     = Vector3D.ZERO;
-        velocity     = Vector3D.ZERO;
-        acceleration = Vector3D.ZERO;
+        this(Vector3D.ZERO, Vector3D.ZERO);
     }
 
     /** Builds a PVCoordinates triplet with zero acceleration.
@@ -73,9 +71,7 @@ public class PVCoordinates implements TimeShiftable<PVCoordinates>, Blendable<PV
      * @param velocity the velocity vector (m/s)
      */
     public PVCoordinates(final Vector3D position, final Vector3D velocity) {
-        this.position     = position;
-        this.velocity     = velocity;
-        this.acceleration = Vector3D.ZERO;
+        this(position, velocity, Vector3D.ZERO);
     }
 
     /** Builds a PVCoordinates triplet.
@@ -212,36 +208,60 @@ public class PVCoordinates implements TimeShiftable<PVCoordinates>, Blendable<PV
      * The {@link DerivativeStructure} coordinates correspond to time-derivatives up
      * to the user-specified order.
      * </p>
-     * @param order derivation order for the vector components (must be either 0, 1 or 2)
+     * @param order derivation order for the vector components
      * @return vector with time-derivatives embedded within the coordinates
      */
     public FieldVector3D<DerivativeStructure> toDerivativeStructureVector(final int order) {
+        return toDerivativeStructureVector(order, 1);
+    }
 
-        final DSFactory factory;
+    /** Transform the instance to a {@link FieldVector3D}&lt;{@link DerivativeStructure}&gt;.
+     * <p>
+     * The {@link DerivativeStructure} coordinates correspond to time-derivatives up
+     * to the user-specified order.
+     * </p>
+     * @param order derivation order for the vector components
+     * @param totalFreeParameters total number of independent variables in Taylor differential algebra. Must be at least 1 for time.
+     * @return vector with time-derivatives embedded within the coordinates
+     * @since 14.0
+     */
+    public FieldVector3D<DerivativeStructure> toDerivativeStructureVector(final int order, final int totalFreeParameters) {
+        if (order < 0) {
+            throw new OrekitException(OrekitMessages.OUT_OF_RANGE_DERIVATION_ORDER, order);
+        }
+        final DSFactory factory = new DSFactory(totalFreeParameters, order);
         final DerivativeStructure x;
         final DerivativeStructure y;
         final DerivativeStructure z;
-        switch (order) {
-            case 0 :
-                factory = new DSFactory(1, order);
-                x = factory.build(position.getX());
-                y = factory.build(position.getY());
-                z = factory.build(position.getZ());
-                break;
-            case 1 :
-                factory = new DSFactory(1, order);
-                x = factory.build(position.getX(), velocity.getX());
-                y = factory.build(position.getY(), velocity.getY());
-                z = factory.build(position.getZ(), velocity.getZ());
-                break;
-            case 2 :
-                factory = new DSFactory(1, order);
-                x = factory.build(position.getX(), velocity.getX(), acceleration.getX());
-                y = factory.build(position.getY(), velocity.getY(), acceleration.getY());
-                z = factory.build(position.getZ(), velocity.getZ(), acceleration.getZ());
-                break;
-            default :
-                throw new OrekitException(OrekitMessages.OUT_OF_RANGE_DERIVATION_ORDER, order);
+        if (order == 0) {
+            x = factory.constant(position.getX());
+            y = factory.constant(position.getY());
+            z = factory.constant(position.getZ());
+        } else if (order == 1) {
+            final double[] derivatives = new double[factory.getCompiler().getSize()];
+            derivatives[0] = position.getX();
+            derivatives[1] = velocity.getX();
+            x = factory.build(derivatives);
+            derivatives[0] = position.getY();
+            derivatives[1] = velocity.getY();
+            y = factory.build(derivatives);
+            derivatives[0] = position.getZ();
+            derivatives[1] = velocity.getZ();
+            z = factory.build(derivatives);
+        } else {
+            final double[] derivatives = new double[factory.getCompiler().getSize()];
+            derivatives[0] = position.getX();
+            derivatives[1] = velocity.getX();
+            derivatives[2] = acceleration.getX();
+            x = factory.build(derivatives);
+            derivatives[0] = position.getY();
+            derivatives[1] = velocity.getY();
+            derivatives[2] = acceleration.getY();
+            y = factory.build(derivatives);
+            derivatives[0] = position.getZ();
+            derivatives[1] = velocity.getZ();
+            derivatives[2] = acceleration.getZ();
+            z = factory.build(derivatives);
         }
 
         return new FieldVector3D<>(x, y, z);

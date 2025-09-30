@@ -64,10 +64,7 @@ public class FieldPVCoordinates<T extends CalculusFieldElement<T>>
      * @param velocity the velocity vector (m/s)
      */
     public FieldPVCoordinates(final FieldVector3D<T> position, final FieldVector3D<T> velocity) {
-        this.position     = position;
-        this.velocity     = velocity;
-        final T zero      = position.getX().getField().getZero();
-        this.acceleration = new FieldVector3D<>(zero, zero, zero);
+        this(position, velocity, FieldVector3D.getZero(position.getX().getField()));
     }
 
     /** Builds a FieldPVCoordinates triplet.

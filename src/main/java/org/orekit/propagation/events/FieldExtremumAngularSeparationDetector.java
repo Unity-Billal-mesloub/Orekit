@@ -23,7 +23,6 @@ import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.ExtendedPositionProvider;
-import org.orekit.utils.FieldPVCoordinates;
 
 /** Detector of local extrema with angular separation.
  * @author Romain Serra
@@ -78,11 +77,11 @@ public class FieldExtremumAngularSeparationDetector<T extends CalculusFieldEleme
 
     @Override
     public T g(final FieldSpacecraftState<T> s) {
-        final FieldPVCoordinates<FieldUnivariateDerivative1<T>> pv = s.getPVCoordinates().toUnivariateDerivative1PV();
+        final FieldVector3D<FieldUnivariateDerivative1<T>> position = s.getPVCoordinates().toUnivariateDerivative1Vector();
         final FieldAbsoluteDate<FieldUnivariateDerivative1<T>> fieldDate = s.getDate().toFUD1Field();
         final FieldVector3D<FieldUnivariateDerivative1<T>> bP = beacon.getPosition(fieldDate, s.getFrame());
         final FieldVector3D<FieldUnivariateDerivative1<T>> oP = observer.getPosition(fieldDate, s.getFrame());
-        final FieldUnivariateDerivative1<T> separation = FieldVector3D.angle(pv.getPosition().subtract(oP), bP.subtract(oP));
+        final FieldUnivariateDerivative1<T> separation = FieldVector3D.angle(position.subtract(oP), bP.subtract(oP));
         return separation.getFirstDerivative();
     }
 

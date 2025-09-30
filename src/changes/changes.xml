@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
+        <action dev="serrof" type="add" issue="1832">
+            Add more options for toDerivativeStructureVector in TimestampedPVCoordinates and Field.
+        </action>
         <action dev="serrof" type="update" issue="1830">
             Refactored (Field)AbsolutePVCoordinates and deleted (Field)ShiftingPVCoordinatesProvider.
         </action>
