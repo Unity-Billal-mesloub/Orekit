@@ -385,8 +385,8 @@ public class IodLambertTest {
             } else {
                 dP1Tol = 5.47e-25;
                 dV1Tol = 3.03e-12;
-                dP2Tol = 9.86e-7;
-                dV2Tol = 4.01e-10;
+                dP2Tol = 9.89e-7;
+                dV2Tol = 4.04e-10;
             }
 
             // Check results

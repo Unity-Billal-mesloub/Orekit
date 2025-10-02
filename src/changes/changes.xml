@@ -35,6 +35,9 @@
         <action dev="serrof" type="add" issue="1825">
             Add getVelocity in ExtendedPositionProvider.
         </action>
+        <action dev="afossa" type="fix" issue="1822">
+            Change algorithm in KeplerianMotionCartesianUtility.predictPVElliptic().
+        </action>
         <action dev="serrof" type="update" issue="1815">
             Make protected constructors in abstract classes.
         </action>

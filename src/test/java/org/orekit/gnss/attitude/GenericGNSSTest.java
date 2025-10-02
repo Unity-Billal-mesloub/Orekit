@@ -28,7 +28,7 @@ class GenericGNSSTest extends AbstractGNSSAttitudeProviderTest {
 
     @Test
     void testPatchedLargePositiveBetaGalileo() {
-        doTestAxes("patched-eclips/beta-large-positive-GALILEO.txt", 7.3e-15, 7.9e-16, true);
+        doTestAxes("patched-eclips/beta-large-positive-GALILEO.txt", 7.3e-15, 1.02e-15, true);
     }
 
     @Test
@@ -78,7 +78,7 @@ class GenericGNSSTest extends AbstractGNSSAttitudeProviderTest {
 
     @Test
     void testOriginalLargePositiveBetaGalileo() {
-        doTestAxes("original-eclips/beta-large-positive-GALILEO.txt", 7.3e-15, 7.9e-16, true);
+        doTestAxes("original-eclips/beta-large-positive-GALILEO.txt", 7.3e-15, 1.02e-15, true);
     }
 
     @Test

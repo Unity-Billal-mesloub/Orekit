@@ -823,7 +823,7 @@ public class StateCovarianceKeplerianHermiteInterpolatorTest {
         assertEquals( 0.06492523452029023, relativeRMSSigmaError[0].getPercentile(50), tolerance);
         assertEquals( 13.96269987707154, relativeRMSSigmaError[1].getPercentile(50), tolerance);
         assertEquals( 0.1405955447287148, relativeRMSSigmaError[0].getMax(), tolerance);
-        assertEquals(99.87380777796545, relativeRMSSigmaError[1].getMax(), tolerance);
+        assertEquals(99.87380777796545, relativeRMSSigmaError[1].getMax(), 3 * tolerance);
     }
 
     @Test
