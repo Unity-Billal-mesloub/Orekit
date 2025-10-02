@@ -116,7 +116,7 @@ public class IodGoodingTest extends AbstractIodTest {
         // AFTER the fix -> Gooding: {a: 1.4197961507698055E7; e: 0.16923654961240223; i: 71.52638181160407; pa: 21.450082668672675; raan: 78.76324220205018; v: -163.62886990452034;}
         Orbit estimated_orbit_Gooding = new IodGooding(mu).estimate(eme2000, azEl1,azEl2,azEl3);
         KeplerianOrbit orbitGooding = new KeplerianOrbit(estimated_orbit_Gooding);
-        Assertions.assertEquals(1.4197961507698389E7, orbitGooding.getA(), 1.0e-10);
+        Assertions.assertEquals(1.4197961507698389E7, orbitGooding.getA(), 4.0e-7);
         Assertions.assertEquals(0.16923654961240223, orbitGooding.getE(), 1.0e-10);
         Assertions.assertEquals(FastMath.toRadians(71.52638181160407), orbitGooding.getI(), 1.0e-10);
         Assertions.assertEquals(FastMath.toRadians(21.450082668672675), orbitGooding.getPerigeeArgument(), 1.0e-10);

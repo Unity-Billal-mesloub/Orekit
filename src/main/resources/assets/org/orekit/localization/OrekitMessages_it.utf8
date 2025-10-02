@@ -481,6 +481,9 @@ UNABLE_TO_GENERATE_NEW_DATA_BEFORE=impossibile generare nuovi dati prima del {0}
 # unable to generate new data after {0}, but data is requested for {1} which is {2,number,0.0##############E0} s after
 UNABLE_TO_GENERATE_NEW_DATA_AFTER=impossibile generare dati dopo il {0}, dati richiesti per il {1} che è {2,number,0.0##############E0} s dopo
 
+# unable to compute elliptic eccentric anomaly from the mean anomaly after {0} iterations
+UNABLE_TO_COMPUTE_ELLIPTIC_ECCENTRIC_ANOMALY=impossibile calcolare l''anomalia eccentrica ellittica a partire dall''anomalia media dopo {0} iterazioni
+
 # unable to compute hyperbolic eccentric anomaly from the mean anomaly after {0} iterations
 UNABLE_TO_COMPUTE_HYPERBOLIC_ECCENTRIC_ANOMALY=impossibile calcolare l''anomalia eccentrica iperbolica a partire dall''anomalia media dopo {0} iterazioni
 

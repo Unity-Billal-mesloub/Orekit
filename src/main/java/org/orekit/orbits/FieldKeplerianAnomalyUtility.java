@@ -452,6 +452,44 @@ public class FieldKeplerianAnomalyUtility {
     }
 
     /**
+     * Computes the difference in elliptic eccentric anomaly given that in elliptic mean anomaly.
+     * <p>This function solves Eq. 4.43 in Battin (1999).</p>
+     * @param s0 intermediate quantity {@code s0}
+     * @param c0 intermediate quantity {@code c0}
+     * @param deltaM difference in elliptic mean anomaly
+     * @return difference in elliptic eccentric anomaly
+     * @param <T> field type
+     * @since 14.0
+     */
+    public static <T extends CalculusFieldElement<T>> T ellipticMeanToEccentricDifference(final T s0,
+                                                                                          final T c0,
+                                                                                          final T deltaM) {
+        T deltaE = deltaM;
+        T delta;
+        boolean hasConverged;
+        int iter = 0;
+
+        do {
+            final FieldSinCos<T> scE = deltaE.sinCos();
+            final T f = deltaE
+                    .add(s0.multiply(scE.cos().negate().add(1.0)))
+                    .subtract(c0.multiply(scE.sin()))
+                    .subtract(deltaM);
+            final T df = s0.multiply(scE.sin()).subtract(c0.multiply(scE.cos())).add(1.0);
+
+            delta = f.divide(df);
+            deltaE = deltaE.subtract(delta);
+            hasConverged = delta.norm() <= KeplerianAnomalyUtility.CONVERGENCE_THRESHOLD;
+        } while (++iter < KeplerianAnomalyUtility.MAXIMUM_ITERATIONS && !hasConverged);
+
+        if (!hasConverged) {
+            throw new OrekitException(OrekitMessages.UNABLE_TO_COMPUTE_ELLIPTIC_ECCENTRIC_ANOMALY, iter);
+        }
+
+        return deltaE;
+    }
+
+    /**
      * Computes the difference in hyperbolic eccentric anomaly given that in hyperbolic mean anomaly.
      * <p>This function solves Eq. 4.64 in Battin (1999).</p>
      * @param s0 intermediate quantity {@code s0}
