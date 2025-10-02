@@ -222,7 +222,7 @@ class KeplerianMotionCartesianUtilityTest {
 
     @ParameterizedTest
     @ValueSource(ints = {2, 4, 6})
-    public void testIssue1822(final int order) {
+    void testIssue1822(final int order) {
 
         // GIVEN
         final int freePars = 7;

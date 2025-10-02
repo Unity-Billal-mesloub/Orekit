@@ -36,7 +36,7 @@
             Add getVelocity in ExtendedPositionProvider.
         </action>
         <action dev="afossa" type="fix" issue="1822">
-            Change algorithm in KeplerianMotionCartesianUtility.predictPVElliptic().
+            Change algorithm in KeplerianMotionCartesianUtility.predictPVElliptic(), fixing high order terms with Field.
         </action>
         <action dev="serrof" type="update" issue="1815">
             Make protected constructors in abstract classes.
@@ -99,7 +99,7 @@
             Compute derivatives properly in mean-to-eccentric conversions.
         </action>
         <action dev="afossa" type="fix" issue="1642">
-            Change algorithm in KeplerianMotionCartesianUtility.predictPVHyperbolic().
+            Change algorithm in KeplerianMotionCartesianUtility.predictPVHyperbolic() to fix numerical issues.
         </action>
         <action dev="vcucchie" type="fix" issue="1521">
             Fixed state covariance interpolator getSubInterpolators method.
