@@ -556,6 +556,9 @@ public enum OrekitMessages implements Localizable {
     /** UNABLE_TO_GENERATE_NEW_DATA_AFTER. */
     UNABLE_TO_GENERATE_NEW_DATA_AFTER("unable to generate new data after {0}, but data is requested for {1} which is {2,number,0.0##############E0} s after"),
 
+    /** UNABLE_TO_COMPUTE_ELLIPTIC_ECCENTRIC_ANOMALY. */
+    UNABLE_TO_COMPUTE_ELLIPTIC_ECCENTRIC_ANOMALY("unable to compute elliptic eccentric anomaly from the mean anomaly after {0} iterations"),
+
     /** UNABLE_TO_COMPUTE_HYPERBOLIC_ECCENTRIC_ANOMALY. */
     UNABLE_TO_COMPUTE_HYPERBOLIC_ECCENTRIC_ANOMALY("unable to compute hyperbolic eccentric anomaly from the mean anomaly after {0} iterations"),
 

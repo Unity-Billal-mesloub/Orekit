@@ -38,10 +38,16 @@ public final class KeplerianAnomalyUtility {
      */
     static final double MAXIMUM_INITIAL_HYPERBOLIC_SINE = 1e3;
 
-    /** Convergence threshold in the iterative computation of the hyperbolic eccentric anomaly difference. */
+    /**
+     * Convergence threshold in the iterative computation of the
+     * elliptic and hyperbolic eccentric anomalies differences.
+     */
     static final double CONVERGENCE_THRESHOLD = 1e-10;
 
-    /** Maximum number of iterations in the iterative computation of the hyperbolic eccentric anomaly difference. */
+    /**
+     * Maximum number of iterations in the iterative computation of
+     * the elliptic and hyperbolic eccentric anomalies differences.
+     */
     static final int MAXIMUM_ITERATIONS = 50;
 
     /** First coefficient to compute elliptic Kepler equation solver starter. */
@@ -418,6 +424,40 @@ public final class KeplerianAnomalyUtility {
             }
             throw new OrekitInternalError(null);
         }
+    }
+
+    /**
+     * Computes the difference in elliptic eccentric anomaly given that in elliptic mean anomaly.
+     * <p>This function solves Eq. 4.43 in Battin (1999).</p>
+     * @param s0 intermediate quantity {@code s0}
+     * @param c0 intermediate quantity {@code c0}
+     * @param deltaM difference in elliptic mean anomaly
+     * @return difference in elliptic eccentric anomaly
+     */
+    public static double ellipticMeanToEccentricDifference(final double s0, final double c0, final double deltaM) {
+
+        double deltaE = deltaM;
+        double delta;
+        boolean hasConverged;
+        int iter = 0;
+
+        do {
+            final double sE = FastMath.sin(deltaE);
+            final double cE = FastMath.cos(deltaE);
+
+            final double f = deltaE + s0 * (1.0 - cE) - c0 * sE - deltaM;
+            final double df = 1.0 + s0 * sE - c0 * cE;
+
+            delta = f / df;
+            deltaE -= delta;
+            hasConverged = FastMath.abs(delta) <= CONVERGENCE_THRESHOLD;
+        } while (++iter < MAXIMUM_ITERATIONS && !hasConverged);
+
+        if (!hasConverged) {
+            throw new OrekitException(OrekitMessages.UNABLE_TO_COMPUTE_ELLIPTIC_ECCENTRIC_ANOMALY, iter);
+        }
+
+        return deltaE;
     }
 
     /**

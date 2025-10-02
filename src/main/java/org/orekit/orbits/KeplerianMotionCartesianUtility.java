@@ -17,15 +17,11 @@
 package org.orekit.orbits;
 
 import org.hipparchus.CalculusFieldElement;
-import org.hipparchus.geometry.euclidean.threed.FieldRotation;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
-import org.hipparchus.geometry.euclidean.threed.Rotation;
-import org.hipparchus.geometry.euclidean.threed.RotationConvention;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.FieldSinCos;
 import org.hipparchus.util.FieldSinhCosh;
-import org.hipparchus.util.SinCos;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.PVCoordinates;
 
@@ -80,46 +76,34 @@ public class KeplerianMotionCartesianUtility {
      */
     private static PVCoordinates predictPVElliptic(final double dt, final Vector3D position, final Vector3D velocity,
                                                    final double mu, final double a, final double r) {
-        // preliminary computation
-        final Vector3D pvM     = position.crossProduct(velocity);
-        final double muA       = mu * a;
 
-        // compute mean anomaly
-        final double eSE    = position.dotProduct(velocity) / FastMath.sqrt(muA);
-        final double eCE    = 1. - r / a;
-        final double E0     = FastMath.atan2(eSE, eCE);
-        final double M0     = E0 - eSE;
+        // preliminary computations
+        final double sigma0 = position.dotProduct(velocity) / FastMath.sqrt(mu);
+        final double c0 = 1.0 - r / a;
+        final double s0 = sigma0 / FastMath.sqrt(a);
 
-        final double e         = FastMath.sqrt(eCE * eCE + eSE * eSE);
-        final double sqrt      = FastMath.sqrt((1 + e) / (1 - e));
+        // change in elliptic mean and eccentric anomalies
+        final double deltaM = FastMath.sqrt(mu / FastMath.pow(a, 3)) * dt;
+        final double deltaE = KeplerianAnomalyUtility.ellipticMeanToEccentricDifference(s0, c0, deltaM);
 
-        // find canonical 2D frame with p pointing to perigee
-        final double v0     = 2 * FastMath.atan(sqrt * FastMath.tan(E0 / 2));
-        final Rotation rotation = new Rotation(pvM, v0, RotationConvention.FRAME_TRANSFORM);
-        final Vector3D p    = rotation.applyTo(position).normalize();
-        final Vector3D q    = pvM.crossProduct(p).normalize();
+        final double sE = FastMath.sin(deltaE);
+        final double cE = FastMath.cos(deltaE);
 
-        // compute shifted eccentric anomaly
-        final double sqrtRatio = FastMath.sqrt(mu / a);
-        final double meanMotion = sqrtRatio / a;
-        final double M1     = M0 + meanMotion * dt;
-        final double E1     = KeplerianAnomalyUtility.ellipticMeanToEccentric(e, M1);
+        // Lagrange f and g coefficients
+        final double f = 1.0 - a / r * (1.0 - cE);
+        final double g = a * sigma0 / FastMath.sqrt(mu) * (1.0 - cE) + r * FastMath.sqrt(a / mu) * sE;
 
-        // compute shifted in-plane Cartesian coordinates
-        final SinCos scE    = FastMath.sinCos(E1);
-        final double cE     = scE.cos();
-        final double sE     = scE.sin();
-        final double sE2m1  = FastMath.sqrt((1 - e) * (1 + e));
+        // predicted position
+        final Vector3D predictedPosition = new Vector3D(f, position, g, velocity);
+        final double predictedR = predictedPosition.getNorm();
 
-        // coordinates of position and velocity in the orbital plane
-        final double x      = a * (cE - e);
-        final double y      = a * sE2m1 * sE;
-        final double factor = sqrtRatio / (1 - e * cE);
-        final double xDot   = -factor * sE;
-        final double yDot   =  factor * sE2m1 * cE;
+        // time derivatives of Lagrange f and g coefficients
+        final double fDot = -FastMath.sqrt(mu * a) / (predictedR * r) * sE;
+        final double gDot = 1.0 - a / predictedR * (1.0 - cE);
 
-        final Vector3D predictedPosition = new Vector3D(x, p, y, q);
-        final Vector3D predictedVelocity = new Vector3D(xDot, p, yDot, q);
+        // predicted velocity
+        final Vector3D predictedVelocity = new Vector3D(fDot, position, gDot, velocity);
+
         return new PVCoordinates(predictedPosition, predictedVelocity);
     }
 
@@ -191,6 +175,7 @@ public class KeplerianMotionCartesianUtility {
 
     /**
      * Method to propagate position and velocity according to Keplerian dynamics, in the case of an elliptic trajectory.
+     * <p>This method is described in Battin (1999), pp. 162-164.</p>
      * @param <T> field type
      * @param dt time of flight
      * @param position initial position vector
@@ -205,69 +190,35 @@ public class KeplerianMotionCartesianUtility {
                                                                                                final FieldVector3D<T> velocity,
                                                                                                final T mu, final T a,
                                                                                                final T r) {
-        // preliminary computation0
-        final FieldVector3D<T>      pvM = position.crossProduct(velocity);
-        final T muA                     = mu.multiply(a);
 
-        // check for near-circular case as automatic differentiation with arctan2 and sqrt does not work there
-        final T eSE              = position.dotProduct(velocity).divide(muA.sqrt());
-        final T eCE              = r.divide(a).negate().add(1);
-        final T e = eCE.square().add(eSE.square()).sqrt();
-        if (e.getReal() < 1e-8) {
-            // one iteration of fixed point algorithm to solve generalized Kepler equation (see Eq. 4.43 in Battin)
-            final T meanMotion = mu.divide(a.square().multiply(a)).sqrt();
-            final T deltaM = meanMotion.multiply(dt);
-            final T sqrtA = a.sqrt();
-            final T sigma = eSE.multiply(sqrtA);
-            final FieldSinCos<T> sinCosDeltaM = FastMath.sinCos(deltaM);
-            final T deltaE = deltaM.add((r.divide(a).negate().add(1)).multiply(sinCosDeltaM.sin())).add(sigma.divide(sqrtA).multiply(sinCosDeltaM.cos().subtract(1)));
-            // F and G Lagrange functions
-            final FieldSinCos<T> sinCosDeltaE = FastMath.sinCos(deltaE);
-            final T sqrtMu = mu.sqrt();
-            final T f = (a.divide(r)).multiply(sinCosDeltaE.cos().subtract(1)).add(1);
-            final T g = a.multiply(sigma).divide(sqrtMu).multiply(sinCosDeltaE.cos().negate().add(1)).add(r.multiply(sqrtA.divide(sqrtMu)).multiply(sinCosDeltaE.sin()));
-            final T shiftedR = a.add(r.subtract(a).multiply(sinCosDeltaE.cos())).add(sigma.multiply(sqrtA).multiply(sinCosDeltaE.sin()));
-            final T fDot = sqrtMu.multiply(sqrtA).divide(r.multiply(shiftedR)).multiply(sinCosDeltaE.sin()).negate();
-            final T gDot = (a.divide(shiftedR)).multiply(sinCosDeltaE.cos().subtract(1)).add(1);
-            // Transition
-            final FieldVector3D<T> shiftedPosition = new FieldVector3D<>(f, position, g, velocity);
-            final FieldVector3D<T> shiftedVelocity = new FieldVector3D<>(fDot, position, gDot, velocity);
-            return new FieldPVCoordinates<>(shiftedPosition, shiftedVelocity);
-        }
+        // preliminary computations
+        final T sigma0 = position.dotProduct(velocity).divide(mu.sqrt());
+        final T c0 = r.divide(a).negate().add(1.0);
+        final T s0 = sigma0.divide(a.sqrt());
 
-        final T E0               = FastMath.atan2(eSE, eCE);
-        final T M0               = E0.subtract(eSE);
-        final T ePlusOne = e.add(1);
-        final T oneMinusE = e.negate().add(1);
-        final T sqrt                    = ePlusOne.divide(oneMinusE).sqrt();
+        // change in elliptic mean and eccentric anomalies
+        final T deltaM = mu.divide(a.multiply(a).multiply(a)).sqrt().multiply(dt);
+        final T deltaE = FieldKeplerianAnomalyUtility.ellipticMeanToEccentricDifference(s0, c0, deltaM);
 
-        // find canonical 2D frame with p pointing to perigee
-        final T v0               = sqrt.multiply((E0.divide(2)).tan()).atan().multiply(2);
-        final FieldRotation<T> rotation = new FieldRotation<>(pvM, v0, RotationConvention.FRAME_TRANSFORM);
-        final FieldVector3D<T> p = rotation.applyTo(position).normalize();
-        final FieldVector3D<T> q = pvM.crossProduct(p).normalize();
+        final FieldSinCos<T> scE = deltaE.sinCos();
+        final T oneMinusCE = scE.cos().negate().add(1.0);
 
-        // compute shifted eccentric anomaly
-        final T sqrtRatio = (a.reciprocal().multiply(mu)).sqrt();
-        final T meanMotion = sqrtRatio.divide(a);
-        final T M1               = M0.add(meanMotion.multiply(dt));
-        final T E1               = FieldKeplerianAnomalyUtility.ellipticMeanToEccentric(e, M1);
+        // Lagrange f and g coefficients
+        final T f = a.divide(r).multiply(oneMinusCE).negate().add(1.0);
+        final T g = a.multiply(sigma0).divide(mu.sqrt()).multiply(oneMinusCE)
+                .add(r.multiply(a.divide(mu).sqrt()).multiply(scE.sin()));
 
-        // compute shifted in-plane Cartesian coordinates
-        final FieldSinCos<T> scE = FastMath.sinCos(E1);
-        final T               cE = scE.cos();
-        final T               sE = scE.sin();
-        final T            sE2m1 = oneMinusE.multiply(ePlusOne).sqrt();
+        // predicted position
+        final FieldVector3D<T> predictedPosition = new FieldVector3D<>(f, position, g, velocity);
+        final T predictedR = predictedPosition.getNorm();
 
-        // coordinates of position and velocity in the orbital plane
-        final T x        = a.multiply(cE.subtract(e));
-        final T y        = a.multiply(sE2m1).multiply(sE);
-        final T factor   = sqrtRatio.divide(e.multiply(cE).negate().add(1));
-        final T xDot     = factor.multiply(sE).negate();
-        final T yDot     = factor.multiply(sE2m1).multiply(cE);
+        // time derivatives of Lagrange f and g coefficients
+        final T fDot = mu.multiply(a).sqrt().divide(predictedR.multiply(r)).multiply(scE.sin()).negate();
+        final T gDot = a.divide(predictedR).multiply(oneMinusCE).negate().add(1.0);
 
-        final FieldVector3D<T> predictedPosition = new FieldVector3D<>(x, p, y, q);
-        final FieldVector3D<T> predictedVelocity = new FieldVector3D<>(xDot, p, yDot, q);
+        // predicted velocity
+        final FieldVector3D<T> predictedVelocity = new FieldVector3D<>(fDot, position, gDot, velocity);
+
         return new FieldPVCoordinates<>(predictedPosition, predictedVelocity);
     }
 

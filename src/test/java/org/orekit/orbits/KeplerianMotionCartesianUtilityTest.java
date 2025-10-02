@@ -16,6 +16,9 @@
  */
 package org.orekit.orbits;
 
+import org.hipparchus.Field;
+import org.hipparchus.analysis.differentiation.DSFactory;
+import org.hipparchus.analysis.differentiation.DerivativeStructure;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.analysis.differentiation.GradientField;
 import org.hipparchus.complex.Complex;
@@ -27,8 +30,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.DerivativeStateUtils;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.PVCoordinates;
@@ -213,5 +218,59 @@ class KeplerianMotionCartesianUtilityTest {
         final FieldPVCoordinates<Gradient> expectedPV = new FieldPVCoordinates<>(position, velocity);
         comparePV(expectedPV.toPVCoordinates(), predictedPV.toPVCoordinates(), 1e-15, 1e-15);
         compareDerivatives(expectedPV, predictedPV, 1e-15, 1e-15);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {2, 4, 6})
+    void testIssue1822(final int order) {
+
+        // GIVEN
+        final int freePars = 7;
+        final DSFactory factory = new DSFactory(freePars, order);
+        final Field<DerivativeStructure> field = factory.getDerivativeField();
+
+        final DerivativeStructure mu = field.getOne();
+        final DerivativeStructure dt = factory.variable(6, FastMath.PI / 4.0);
+
+        final FieldVector3D<DerivativeStructure> pos = new FieldVector3D<>(
+                factory.variable(0, 1.0),
+                factory.variable(1, 0.0),
+                factory.variable(2, 0.0)
+        );
+        final FieldVector3D<DerivativeStructure> vel = new FieldVector3D<>(
+                factory.variable(3, 0.0),
+                factory.variable(4, pos.getX().divide(mu).sqrt().getValue()),
+                factory.variable(5, 0.0)
+        );
+
+        // WHEN
+        final FieldPVCoordinates<DerivativeStructure> predictedPV =
+                KeplerianMotionCartesianUtility.predictPositionVelocity(dt, pos, vel, mu);
+
+        final Frame frame = FramesFactory.getGCRF();
+        final FieldAbsoluteDate<DerivativeStructure> date =
+                new FieldAbsoluteDate<>(field, AbsoluteDate.ARBITRARY_EPOCH);
+        final FieldCartesianOrbit<DerivativeStructure> cartesianOrbit =
+                new FieldCartesianOrbit<>(new FieldPVCoordinates<>(pos, vel), frame, date, mu);
+
+        final FieldEquinoctialOrbit<DerivativeStructure> equinoctialOrbit =
+                new FieldEquinoctialOrbit<>(cartesianOrbit);
+        final FieldPVCoordinates<DerivativeStructure> expectedPV =
+                equinoctialOrbit.shiftedBy(dt).getPVCoordinates();
+
+        // THEN
+        final FieldPVCoordinates<DerivativeStructure> deltaPV = new FieldPVCoordinates<>(
+                predictedPV.getPosition().subtract(expectedPV.getPosition()),
+                predictedPV.getVelocity().subtract(expectedPV.getVelocity())
+        );
+        final double[] deltaPartialsNorms = {
+                deltaPV.getPosition().getX().norm(),
+                deltaPV.getPosition().getY().norm(),
+                deltaPV.getPosition().getZ().norm(),
+                deltaPV.getVelocity().getX().norm(),
+                deltaPV.getVelocity().getY().norm(),
+                deltaPV.getVelocity().getZ().norm(),
+        };
+        Assertions.assertArrayEquals(new double[6], deltaPartialsNorms, 2e-10);
     }
 }

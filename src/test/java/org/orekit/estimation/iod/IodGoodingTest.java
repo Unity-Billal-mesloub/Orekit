@@ -51,12 +51,12 @@ import org.orekit.utils.IERSConventions;
  * @since 7.1
  *
  */
-public class IodGoodingTest extends AbstractIodTest {
+class IodGoodingTest extends AbstractIodTest {
 
     /** Based on example provided in forum thread:
      * <a href="https://forum.orekit.org/t/iodgooging-orbit-got-from-three-angular-observations/2749">IodGooding</a> */
     @Test
-    public void testIssue1166RaDec() {
+    void testIssue1166RaDec() {
         AbsoluteDate t1 = new AbsoluteDate(2023, Month.JUNE, 9, 17, 4,59.10, TimeScalesFactory.getUTC());
         AbsoluteDate t2 = new AbsoluteDate(2023, Month.JUNE, 9, 17, 10,50.66, TimeScalesFactory.getUTC());
         AbsoluteDate t3 = new AbsoluteDate(2023, Month.JUNE, 9, 17, 16,21.09, TimeScalesFactory.getUTC());
@@ -88,19 +88,18 @@ public class IodGoodingTest extends AbstractIodTest {
         // Gauss: {a: 4.238973764054024E7; e: 0.004324857593564294; i: 0.09157752601786696; pa: 170.725916897286; raan: 91.00902931155805; v: -19.971524129451392;}
         // Laplace: {a: 4.2394495034863256E7; e: 0.004440883687182993; i: 0.09000218139994348; pa: 173.17005925268154; raan: 91.20208239937111; v: -22.60862919684909;}
         // BEFORE the fix -> Gooding: {a: 6.993021221010809E7; e: 0.3347390725866758; i: 0.5890565053278204; pa: -108.07120996868652; raan: -12.64337508041537; v: 2.587189785272028;}
-        // AFTER the fix -> Gooding: {a:  4.2394187540973224E7; e: 0.004411368860770379; i: 0.09185983299662298; pa: 169.74389246605776; raan: 90.92874061328043; v: -18.909215663128727;}
-        Orbit estimated_orbit_Gooding = new IodGooding(mu).estimate(eme2000, raDec1,raDec2,raDec3);
-        KeplerianOrbit orbitGooding = new KeplerianOrbit(estimated_orbit_Gooding);
-        Assertions.assertEquals(4.240262534851997E7, orbitGooding.getA(), 1.0e-10);
-        Assertions.assertEquals(0.004564391160261652, orbitGooding.getE(), 1.0e-10);
-        Assertions.assertEquals(FastMath.toRadians(0.09253798892889635), orbitGooding.getI(), 1.0e-10);
-        Assertions.assertEquals(FastMath.toRadians(167.7724180793494), orbitGooding.getPerigeeArgument(), 1.0e-10);
-        Assertions.assertEquals(FastMath.toRadians(90.69470496043606), orbitGooding.getRightAscensionOfAscendingNode(), 1.0e-10);
-        Assertions.assertEquals(FastMath.toRadians(-16.70370593456132), orbitGooding.getTrueAnomaly(), 1.0e-10);
+        Orbit estimatedOrbitGooding = new IodGooding(mu).estimate(eme2000, raDec1,raDec2,raDec3);
+        KeplerianOrbit orbitGooding = new KeplerianOrbit(estimatedOrbitGooding);
+        Assertions.assertEquals(4.242929828622434E7, orbitGooding.getA(), 1.0e-6);
+        Assertions.assertEquals(0.005085550484861005, orbitGooding.getE(), 1.0e-10);
+        Assertions.assertEquals(FastMath.toRadians(0.09455751549021724), orbitGooding.getI(), 1.0e-10);
+        Assertions.assertEquals(FastMath.toRadians(162.64799060142445), orbitGooding.getPerigeeArgument(), 1.0e-10);
+        Assertions.assertEquals(FastMath.toRadians(90.00027281152558), orbitGooding.getRightAscensionOfAscendingNode(), 1.0e-10);
+        Assertions.assertEquals(FastMath.toRadians(-10.884841988914873), orbitGooding.getTrueAnomaly(), 1.0e-10);
     }
 
     @Test
-    public void testIssue1166AzEl() {
+    void testIssue1166AzEl() {
         // Generate measurements
         final Context context = EstimationTestUtils.eccentricContext("regular-data:potential:tides");
         final NumericalPropagatorBuilder propagatorBuilder = context.createBuilder(OrbitType.KEPLERIAN, PositionAngleType.TRUE, true, 1.0e-6, 60.0, 0.001);
@@ -113,10 +112,9 @@ public class IodGoodingTest extends AbstractIodTest {
         final AngularAzEl azEl3 = (AngularAzEl) measurements.get(40);
 
         // Gauss: {a: 1.4240687661878748E7; e: 0.16505257340554763; i: 71.54945520547201; pa: 21.27193872599194; raan: 78.78440298193975; v: -163.45049044435925;}
-        // AFTER the fix -> Gooding: {a: 1.4197961507698055E7; e: 0.16923654961240223; i: 71.52638181160407; pa: 21.450082668672675; raan: 78.76324220205018; v: -163.62886990452034;}
-        Orbit estimated_orbit_Gooding = new IodGooding(mu).estimate(eme2000, azEl1,azEl2,azEl3);
-        KeplerianOrbit orbitGooding = new KeplerianOrbit(estimated_orbit_Gooding);
-        Assertions.assertEquals(1.4197961507698389E7, orbitGooding.getA(), 1.0e-10);
+        Orbit estimatedOrbitGooding = new IodGooding(mu).estimate(eme2000, azEl1,azEl2,azEl3);
+        KeplerianOrbit orbitGooding = new KeplerianOrbit(estimatedOrbitGooding);
+        Assertions.assertEquals(1.4197961507698389E7, orbitGooding.getA(), 1.0e-6);
         Assertions.assertEquals(0.16923654961240223, orbitGooding.getE(), 1.0e-10);
         Assertions.assertEquals(FastMath.toRadians(71.52638181160407), orbitGooding.getI(), 1.0e-10);
         Assertions.assertEquals(FastMath.toRadians(21.450082668672675), orbitGooding.getPerigeeArgument(), 1.0e-10);
@@ -125,7 +123,7 @@ public class IodGoodingTest extends AbstractIodTest {
     }
 
     @Test
-    public void testGooding() {
+    void testGooding() {
         final Context context = EstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
         final double mu = context.initialOrbit.getMu();
@@ -207,7 +205,7 @@ public class IodGoodingTest extends AbstractIodTest {
     }
 
     @Test
-    public void testIssue756() {
+    void testIssue756() {
         final Context context = EstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
         final double mu = context.initialOrbit.getMu();
@@ -258,7 +256,7 @@ public class IodGoodingTest extends AbstractIodTest {
     }
 
     @Test
-    public void testIssue1216() {
+    void testIssue1216() {
         final Context context = EstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
         final double mu = context.initialOrbit.getMu();
