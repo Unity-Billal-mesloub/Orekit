@@ -16,9 +16,7 @@
  */
 package org.orekit.control.indirect.shooting;
 
-import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
-import org.hipparchus.ode.FieldOrdinaryDifferentialEquation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -33,7 +31,6 @@ import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.integration.AdditionalDerivativesProvider;
 import org.orekit.propagation.numerical.NumericalPropagator;
 import org.orekit.time.AbsoluteDate;
-import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.Constants;
 import org.orekit.utils.PVCoordinates;

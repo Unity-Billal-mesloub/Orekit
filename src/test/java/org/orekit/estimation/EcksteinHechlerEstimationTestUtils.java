@@ -28,7 +28,6 @@ import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.data.DataContext;
 import org.orekit.estimation.leastsquares.BatchLSEstimator;
 import org.orekit.estimation.measurements.EstimatedMeasurement;
-import org.orekit.estimation.measurements.GroundStation;
 import org.orekit.estimation.measurements.MeasurementCreator;
 import org.orekit.estimation.measurements.ObservedMeasurement;
 import org.orekit.estimation.sequential.KalmanEstimator;

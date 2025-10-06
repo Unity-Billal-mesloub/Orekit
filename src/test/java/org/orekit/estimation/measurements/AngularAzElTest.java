@@ -135,8 +135,8 @@ class AngularAzElTest {
             final AbsoluteDate datemeas  = measurement.getDate();
             SpacecraftState    state     = propagator.propagate(datemeas);
             final Vector3D     stationP  = stationParameter.getOffsetToInertial(state.getFrame(), datemeas, false).transformPosition(Vector3D.ZERO);
-            final double       meanDelay = AbstractMeasurement.signalTimeOfFlightAdjustableEmitter(state.getPVCoordinates(), stationP,
-                                                                                                   datemeas, state.getFrame());
+            final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = SignalTravelTimeAdjustableEmitter.of(state);
+            final double       meanDelay = signalTimeOfFlight.compute(state.getDate(), stationP, datemeas, state.getFrame());
 
             final AbsoluteDate date      = measurement.getDate().shiftedBy(-0.75 * meanDelay);
                                state     = propagator.propagate(date);
@@ -238,8 +238,8 @@ class AngularAzElTest {
             final AbsoluteDate    datemeas  = measurement.getDate();
             final SpacecraftState stateini  = propagator.propagate(datemeas);
             final Vector3D        stationP  = stationParameter.getOffsetToInertial(stateini.getFrame(), datemeas, false).transformPosition(Vector3D.ZERO);
-            final double          meanDelay = AbstractMeasurement.signalTimeOfFlightAdjustableEmitter(stateini.getPVCoordinates(), stationP,
-                                                                                                      datemeas, stateini.getFrame());
+            final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = SignalTravelTimeAdjustableEmitter.of(stateini);
+            final double          meanDelay = signalTimeOfFlight.compute(stateini.getDate(), stationP, datemeas, stateini.getFrame());
 
             final AbsoluteDate    date      = measurement.getDate().shiftedBy(-0.75 * meanDelay);
             final SpacecraftState state     = propagator.propagate(date);

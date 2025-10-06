@@ -25,7 +25,9 @@ import org.orekit.frames.Frame;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.Constants;
+import org.orekit.utils.FieldAbsolutePVCoordinates;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinates;
@@ -136,7 +138,8 @@ public class InterSatellitesRange extends AbstractMeasurement<InterSatellitesRan
 
         final TimeStampedPVCoordinates s1Downlink =
                         pvaL.shiftedBy(arrivalDate.durationFrom(pvaL.getDate()));
-        final double tauD = signalTimeOfFlightAdjustableEmitter(pvaR, s1Downlink.getPosition(), arrivalDate, frame);
+        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(new AbsolutePVCoordinates(frame, pvaR));
+        final double tauD = signalTimeOfFlight.compute(pvaR.getDate(), s1Downlink.getPosition(), arrivalDate, frame);
 
         // Transit state
         final double delta      = getDate().durationFrom(remote.getDate());
@@ -151,10 +154,8 @@ public class InterSatellitesRange extends AbstractMeasurement<InterSatellitesRan
             final TimeStampedPVCoordinates transitState = pvaR.shiftedBy(deltaMTauD);
 
             // uplink delay
-            final double tauU = signalTimeOfFlightAdjustableEmitter(pvaL,
-                                                                    transitState.getPosition(),
-                                                                    transitState.getDate(),
-                                                                    frame);
+            final SignalTravelTimeAdjustableEmitter signalTimeOfFlightReturn = new SignalTravelTimeAdjustableEmitter(new AbsolutePVCoordinates(frame, pvaL));
+            final double tauU = signalTimeOfFlightReturn.compute(pvaL.getDate(), transitState.getPosition(), transitState.getDate(), frame);
             estimated = new EstimatedMeasurementBase<>(this, iteration, evaluation,
                                                        new SpacecraftState[] {
                                                            local.shiftedBy(deltaMTauD),
@@ -242,8 +243,8 @@ public class InterSatellitesRange extends AbstractMeasurement<InterSatellitesRan
 
         final TimeStampedFieldPVCoordinates<Gradient> s1Downlink =
                         pvaL.shiftedBy(arrivalDate.durationFrom(pvaL.getDate()));
-        final Gradient tauD = signalTimeOfFlightAdjustableEmitter(pvaR, s1Downlink.getPosition(),
-                                                                  arrivalDate, frame);
+        final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(new FieldAbsolutePVCoordinates<>(frame, pvaR));
+        final Gradient tauD = fieldComputer.compute(pvaR.getDate(), s1Downlink.getPosition(), arrivalDate, frame);
 
         // Transit state
         final double              delta      = getDate().durationFrom(remote.getDate());
@@ -258,10 +259,8 @@ public class InterSatellitesRange extends AbstractMeasurement<InterSatellitesRan
             final TimeStampedFieldPVCoordinates<Gradient> transitStateDS = pvaR.shiftedBy(deltaMTauD);
 
             // uplink delay
-            final Gradient tauU = signalTimeOfFlightAdjustableEmitter(pvaL,
-                                                                      transitStateDS.getPosition(),
-                                                                      transitStateDS.getDate(),
-                                                                      frame);
+            final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputerReturn = new FieldSignalTravelTimeAdjustableEmitter<>(new FieldAbsolutePVCoordinates<>(frame, pvaL));
+            final Gradient tauU = fieldComputerReturn.compute(pvaL.getDate(), transitStateDS.getPosition(), transitStateDS.getDate(), frame);
             estimated = new EstimatedMeasurement<>(this, iteration, evaluation,
                                                    new SpacecraftState[] {
                                                        local.shiftedBy(deltaMTauD.getValue()),

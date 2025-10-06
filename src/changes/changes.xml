@@ -21,6 +21,9 @@
   <body>
     <release version="14.0" date="TBD" description="TBD">
         <action dev="serrof" type="update" issue="1832">
+            Introduced dedicated classes for signal travel time.
+        </action>
+        <action dev="serrof" type="update" issue="1832">
             Remove serialization in TimestampedAngularCoordinates and add constructors.
         </action>
         <action dev="serrof" type="add" issue="1832">

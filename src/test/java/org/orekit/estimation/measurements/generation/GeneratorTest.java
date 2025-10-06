@@ -31,7 +31,6 @@ import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
 import org.orekit.propagation.Propagator;
 import org.orekit.propagation.conversion.NumericalPropagatorBuilder;
-import org.orekit.propagation.events.ElevationDetector;
 import org.orekit.propagation.events.EventDetector;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FixedStepSelector;

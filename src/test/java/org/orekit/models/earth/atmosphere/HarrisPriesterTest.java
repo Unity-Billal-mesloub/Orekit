@@ -43,7 +43,6 @@ import org.orekit.time.TimeComponents;
 import org.orekit.time.TimeScale;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
-import org.orekit.utils.PVCoordinatesProvider;
 
 class HarrisPriesterTest {
 

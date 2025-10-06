@@ -43,9 +43,6 @@ import org.orekit.time.TimeScale;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
 import org.orekit.utils.IERSConventions;
-import org.orekit.utils.PVCoordinatesProvider;
-import org.orekit.utils.TimeStampedFieldPVCoordinates;
-import org.orekit.utils.TimeStampedPVCoordinates;
 
 import java.util.TimeZone;
 
