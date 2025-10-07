@@ -48,8 +48,10 @@ import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.conversion.NumericalPropagatorBuilder;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.Constants;
 import org.orekit.utils.Differentiation;
+import org.orekit.utils.FieldAbsolutePVCoordinates;
 import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.ParameterFunction;
@@ -218,9 +220,8 @@ class RangeTest {
             // adjust emitter, double version
             final TimeStampedPVCoordinates staPV = stationParameter.getOffsetToInertial(state.getFrame(), datemeas, false).
                                                    transformPVCoordinates(new TimeStampedPVCoordinates(datemeas, PVCoordinates.ZERO));
-            final double    downDelayE = AbstractMeasurement.signalTimeOfFlightAdjustableEmitter(state.getPVCoordinates(),
-                                                                                                 staPV.getPosition(),
-                                                                                                 datemeas, state.getFrame());
+            final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = SignalTravelTimeAdjustableEmitter.of(state);
+            final double    downDelayE = signalTimeOfFlight.compute(state.getDate(), staPV.getPosition(), datemeas, state.getFrame());
             final Vector3D satPosE = propagator2.propagate(datemeas.shiftedBy(-downDelayE)).getPosition();
             Assertions.assertEquals(Vector3D.distance(satPosE, staPV.getPosition()), downDelayE * Constants.SPEED_OF_LIGHT, 2.0e-7);
 
@@ -229,9 +230,8 @@ class RangeTest {
             final FieldAbsoluteDate<Binary64> datemeasF = new FieldAbsoluteDate<>(field, datemeas);
             final FieldSpacecraftState<Binary64> stateF = new FieldSpacecraftState<>(field, state);
             final TimeStampedFieldPVCoordinates<Binary64> staPVF = new TimeStampedFieldPVCoordinates<>(field, staPV);
-            final Binary64    downDelayEF = AbstractMeasurement.signalTimeOfFlightAdjustableEmitter(stateF.getPVCoordinates(),
-                                                                                                    staPVF.getPosition(),
-                                                                                                    datemeasF, state.getFrame());
+            final FieldSignalTravelTimeAdjustableEmitter<Binary64> fieldComputer = FieldSignalTravelTimeAdjustableEmitter.of(stateF);
+            final Binary64    downDelayEF = fieldComputer.compute(staPVF.getDate(), staPVF.getPosition(), datemeasF, state.getFrame());
             final FieldVector3D<Binary64> satPosEF =
                 new FieldVector3D<>(field, propagator2.propagate(datemeas.shiftedBy(-downDelayEF.getReal())).getPosition());
             Assertions.assertEquals(FieldVector3D.distance(satPosEF, staPVF.getPosition()).getReal(),
@@ -239,10 +239,8 @@ class RangeTest {
                                     2.0e-7);
 
             // adjust receiver, double version
-            final double    downDelayR = AbstractMeasurement.signalTimeOfFlightAdjustableReceiver(state.getPVCoordinates().getPosition(),
-                                                                                                  state.getDate(),
-                                                                                                  staPV,
-                                                                                                  datemeas, state.getFrame());
+            final SignalTravelTimeAdjustableReceiver computer = new SignalTravelTimeAdjustableReceiver(new AbsolutePVCoordinates(state.getFrame(), staPV));
+            final double    downDelayR = computer.compute(state.getPVCoordinates().getPosition(), state.getDate(), datemeas, state.getFrame());
             final Vector3D staPosR = stationParameter.
                                      getOffsetToInertial(state.getFrame(), state.getDate().shiftedBy(downDelayR), false).
                                      transformPosition(Vector3D.ZERO);
@@ -250,10 +248,9 @@ class RangeTest {
                                     downDelayR * Constants.SPEED_OF_LIGHT, 2.0e-7);
 
             // adjust receiver, field version
-            final Binary64    downDelayRF = AbstractMeasurement.signalTimeOfFlightAdjustableReceiver(stateF.getPVCoordinates().getPosition(),
-                                                                                                     stateF.getDate(),
-                                                                                                     staPVF,
-                                                                                                     datemeasF, state.getFrame());
+            final FieldSignalTravelTimeAdjustableReceiver<Binary64> fieldAdjustableReceiverComputer = new FieldSignalTravelTimeAdjustableReceiver<>(new FieldAbsolutePVCoordinates<Binary64>(state.getFrame(),
+                    staPVF));
+            final Binary64    downDelayRF = fieldAdjustableReceiverComputer.compute(stateF.getPVCoordinates().getPosition(), stateF.getDate(), datemeasF, state.getFrame());
             final FieldVector3D<Binary64> staPosRF = new FieldVector3D<>(field,
                                                                          stationParameter.
                                                                              getOffsetToInertial(state.getFrame(),

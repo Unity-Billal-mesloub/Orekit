@@ -141,7 +141,6 @@ import org.orekit.models.earth.troposphere.TroposphericModel;
 import org.orekit.models.earth.troposphere.TroposphericModelUtils;
 import org.orekit.models.earth.weather.ConstantPressureTemperatureHumidityProvider;
 import org.orekit.models.earth.weather.GlobalPressureTemperature;
-import org.orekit.models.earth.weather.PressureTemperature;
 import org.orekit.models.earth.weather.PressureTemperatureHumidity;
 import org.orekit.models.earth.weather.PressureTemperatureHumidityProvider;
 import org.orekit.models.earth.weather.water.CIPM2007;

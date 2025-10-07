@@ -1,10 +1,7 @@
 package org.orekit.propagation.events;
 
-import org.hipparchus.Field;
 import org.hipparchus.analysis.differentiation.FieldUnivariateDerivative1;
 import org.hipparchus.analysis.differentiation.FieldUnivariateDerivative1Field;
-import org.hipparchus.analysis.differentiation.UnivariateDerivative2;
-import org.hipparchus.analysis.differentiation.UnivariateDerivative2Field;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.util.Binary64;
 import org.hipparchus.util.Binary64Field;
@@ -20,14 +17,12 @@ import org.orekit.models.earth.ReferenceEllipsoid;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.handlers.FieldStopOnEvent;
-import org.orekit.propagation.events.handlers.StopOnEvent;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.ExtendedPositionProvider;
 import org.orekit.utils.FieldPVCoordinates;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 class FieldExtremumAngularSeparationDetectorTest {

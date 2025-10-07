@@ -21,7 +21,9 @@ import java.util.Arrays;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.Constants;
+import org.orekit.utils.FieldAbsolutePVCoordinates;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeSpanMap.Span;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
@@ -107,8 +109,8 @@ public class Range extends GroundReceiverMeasurement<Range> {
             // Station at transit state date (derivatives of tauD taken into account)
             final TimeStampedPVCoordinates stationAtTransitDate = common.getStationDownlink().shiftedBy(-common.getTauD());
             // Uplink delay
-            final double tauU = signalTimeOfFlightAdjustableEmitter(stationAtTransitDate, transitPV.getPosition(),
-                                                                    transitPV.getDate(), common.getState().getFrame());
+            final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(new AbsolutePVCoordinates(common.getState().getFrame(), stationAtTransitDate));
+            final double tauU = signalTimeOfFlight.compute(stationAtTransitDate.getDate(), transitPV.getPosition(), transitPV.getDate(), common.getState().getFrame());
             final TimeStampedPVCoordinates stationUplink = common.getStationDownlink().shiftedBy(-common.getTauD() - tauU);
 
             // Prepare the evaluation
@@ -182,9 +184,9 @@ public class Range extends GroundReceiverMeasurement<Range> {
             final TimeStampedFieldPVCoordinates<Gradient> stationAtTransitDate =
                             common.getStationDownlink().shiftedBy(common.getTauD().negate());
             // Uplink delay
+            final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(new FieldAbsolutePVCoordinates<>(state.getFrame(), stationAtTransitDate));
             final Gradient tauU =
-                            signalTimeOfFlightAdjustableEmitter(stationAtTransitDate, transitPV.getPosition(), transitPV.getDate(),
-                                                                state.getFrame());
+                            fieldComputer.compute(stationAtTransitDate.getDate(), transitPV.getPosition(), transitPV.getDate(), state.getFrame());
             final TimeStampedFieldPVCoordinates<Gradient> stationUplink =
                             common.getStationDownlink().shiftedBy(-common.getTauD().getValue() - tauU.getValue());
 

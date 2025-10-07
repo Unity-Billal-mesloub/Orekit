@@ -30,6 +30,8 @@ import org.orekit.frames.Transform;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.utils.AbsolutePVCoordinates;
+import org.orekit.utils.FieldAbsolutePVCoordinates;
 import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeSpanMap.Span;
@@ -159,7 +161,8 @@ public abstract class GroundReceiverMeasurement<T extends GroundReceiverMeasurem
         //  we will have delta == tauD and transitState will be the same as state)
 
         // Downlink delay
-        final double tauD = signalTimeOfFlightAdjustableEmitter(pva, stationDownlink.getPosition(), downlinkDate, state.getFrame());
+        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(new AbsolutePVCoordinates(state.getFrame(), pva));
+        final double tauD = signalTimeOfFlight.compute(pva.getDate(), stationDownlink.getPosition(), downlinkDate, state.getFrame());
 
         // Transit state & Transit state (re)computed with gradients
         final double          delta        = downlinkDate.durationFrom(state.getDate());
@@ -210,8 +213,8 @@ public abstract class GroundReceiverMeasurement<T extends GroundReceiverMeasurem
         //  we will have delta == tauD and transitState will be the same as state)
 
         // Downlink delay
-        final Gradient tauD = signalTimeOfFlightAdjustableEmitter(pva, stationDownlink.getPosition(),
-                                                                  downlinkDate, state.getFrame());
+        final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(new FieldAbsolutePVCoordinates<>(state.getFrame(), pva));
+        final Gradient tauD = fieldComputer.compute(pva.getDate(), stationDownlink.getPosition(), downlinkDate, state.getFrame());
 
         // Transit state & Transit state (re)computed with gradients
         final Gradient        delta        = downlinkDate.durationFrom(state.getDate());

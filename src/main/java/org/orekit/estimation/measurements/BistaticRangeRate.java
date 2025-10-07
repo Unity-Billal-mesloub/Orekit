@@ -26,6 +26,8 @@ import org.orekit.frames.Transform;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.utils.AbsolutePVCoordinates;
+import org.orekit.utils.FieldAbsolutePVCoordinates;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeSpanMap.Span;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
@@ -121,8 +123,8 @@ public class BistaticRangeRate extends GroundReceiverMeasurement<BistaticRangeRa
                         Vector3D.ZERO, Vector3D.ZERO, Vector3D.ZERO));
 
         // Uplink time of flight from emitter station to transit state
-        final double tauU = signalTimeOfFlightAdjustableEmitter(emitterApprox, transitPV.getPosition(), transitDate,
-                                                                common.getState().getFrame());
+        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(new AbsolutePVCoordinates(common.getState().getFrame(), emitterApprox));
+        final double tauU = signalTimeOfFlight.compute(emitterApprox.getDate(), transitPV.getPosition(), transitDate, common.getState().getFrame());
 
         // Secondary station PV in inertial frame at rebound date on secondary station
         final TimeStampedPVCoordinates emitterPV = emitterApprox.shiftedBy(-tauU);
@@ -190,8 +192,8 @@ public class BistaticRangeRate extends GroundReceiverMeasurement<BistaticRangeRa
                         zero, zero, zero));
 
         // Uplink time of flight from emiiter to transit state
-        final Gradient tauU = signalTimeOfFlightAdjustableEmitter(emitterApprox, transitPV.getPosition(), transitPV.getDate(),
-                                                                  state.getFrame());
+        final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(new FieldAbsolutePVCoordinates<>(state.getFrame(), emitterApprox));
+        final Gradient tauU = fieldComputer.compute(emitterApprox.getDate(), transitPV.getPosition(), transitPV.getDate(), state.getFrame());
 
         // Emitter coordinates at transmit time
         final TimeStampedFieldPVCoordinates<Gradient> emitterPV = emitterApprox.shiftedBy(tauU.negate());

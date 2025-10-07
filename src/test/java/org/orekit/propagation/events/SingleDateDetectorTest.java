@@ -18,7 +18,6 @@ package org.orekit.propagation.events;
 
 import org.junit.jupiter.api.Test;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.events.handlers.ContinueOnEvent;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnEvent;
 import org.orekit.time.AbsoluteDate;

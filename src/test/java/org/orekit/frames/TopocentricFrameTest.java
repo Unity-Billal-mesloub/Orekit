@@ -16,7 +16,6 @@
  */
 package org.orekit.frames;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
 import org.hipparchus.CalculusFieldElement;
