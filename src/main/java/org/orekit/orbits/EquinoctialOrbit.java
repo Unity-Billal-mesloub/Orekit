@@ -865,24 +865,10 @@ public class EquinoctialOrbit extends Orbit implements PositionAngleBased<Equino
                                                                        getDate().shiftedBy(dt), getMu());
 
         if (dtS != 0. && hasNonKeplerianRates()) {
-
-            // extract non-Keplerian acceleration from first time derivatives
-            final Vector3D nonKeplerianAcceleration = nonKeplerianAcceleration();
-
-            // add quadratic effect of non-Keplerian acceleration to Keplerian-only shift
-            keplerianShifted.computePVWithoutA();
-            final Vector3D fixedP   = new Vector3D(1, keplerianShifted.partialPV.getPosition(),
-                                                   0.5 * dtS * dtS, nonKeplerianAcceleration);
-            final double   fixedR2 = fixedP.getNorm2Sq();
-            final double   fixedR  = FastMath.sqrt(fixedR2);
-            final Vector3D fixedV  = new Vector3D(1, keplerianShifted.partialPV.getVelocity(),
-                                                  dtS, nonKeplerianAcceleration);
-            final Vector3D fixedA  = new Vector3D(-getMu() / (fixedR2 * fixedR), keplerianShifted.partialPV.getPosition(),
-                                                  1, nonKeplerianAcceleration);
+            final PVCoordinates pvCoordinates = shiftNonKeplerian(keplerianShifted.getPVCoordinates(), dtS);
 
             // build a new orbit, taking non-Keplerian acceleration into account
-            return new EquinoctialOrbit(new TimeStampedPVCoordinates(keplerianShifted.getDate(),
-                                                                     fixedP, fixedV, fixedA),
+            return new EquinoctialOrbit(new TimeStampedPVCoordinates(keplerianShifted.getDate(), pvCoordinates),
                                         keplerianShifted.getFrame(), keplerianShifted.getMu());
 
         } else {

@@ -465,26 +465,7 @@ public class FieldCartesianOrbit<T extends CalculusFieldElement<T>> extends Fiel
 
         if (!dt.isZero() && hasNonKeplerianAcceleration) {
 
-            final FieldVector3D<T> pvP = getPosition();
-            final T r2 = pvP.getNorm2Sq();
-            final T r = r2.sqrt();
-            // extract non-Keplerian part of the initial acceleration
-            final FieldVector3D<T> nonKeplerianAcceleration = new FieldVector3D<>(getOne(), getPVCoordinates().getAcceleration(),
-                                                                                  r.multiply(r2).reciprocal().multiply(getMu()), pvP);
-
-            // add the quadratic motion due to the non-Keplerian acceleration to the Keplerian motion
-            final FieldVector3D<T> shiftedP = shiftedPV.getPosition();
-            final FieldVector3D<T> shiftedV = shiftedPV.getVelocity();
-            final FieldVector3D<T> fixedP   = new FieldVector3D<>(getOne(), shiftedP,
-                                                                  dt.square().multiply(0.5), nonKeplerianAcceleration);
-            final T                fixedR2 = fixedP.getNorm2Sq();
-            final T                fixedR  = fixedR2.sqrt();
-            final FieldVector3D<T> fixedV  = new FieldVector3D<>(getOne(), shiftedV,
-                                                                 dt, nonKeplerianAcceleration);
-            final FieldVector3D<T> fixedA  = new FieldVector3D<>(fixedR.multiply(fixedR2).reciprocal().multiply(getMu().negate()), shiftedP,
-                                                                 getOne(), nonKeplerianAcceleration);
-
-            return new FieldPVCoordinates<>(fixedP, fixedV, fixedA);
+            return shiftNonKeplerian(shiftedPV, dt);
 
         } else {
             // don't include acceleration,

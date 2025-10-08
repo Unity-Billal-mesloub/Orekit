@@ -430,25 +430,7 @@ public class CartesianOrbit extends Orbit {
 
         if (dt != 0. && hasNonKeplerianAcceleration) {
 
-            // extract non-Keplerian part of the initial acceleration
-            final double r2 = pvP.getNorm2Sq();
-            final double r = FastMath.sqrt(r2);
-            final Vector3D nonKeplerianAcceleration = new Vector3D(1, getPVCoordinates().getAcceleration(),
-                                                                   getMu() / (r2 * r), pvP);
-
-            // add the quadratic motion due to the non-Keplerian acceleration to the Keplerian motion
-            final Vector3D shiftedP = shiftedPV.getPosition();
-            final Vector3D shiftedV = shiftedPV.getVelocity();
-            final Vector3D fixedP   = new Vector3D(1, shiftedP,
-                                                   0.5 * dt * dt, nonKeplerianAcceleration);
-            final double   fixedR2 = fixedP.getNorm2Sq();
-            final double   fixedR  = FastMath.sqrt(fixedR2);
-            final Vector3D fixedV  = new Vector3D(1, shiftedV,
-                                                  dt, nonKeplerianAcceleration);
-            final Vector3D fixedA  = new Vector3D(-getMu() / (fixedR2 * fixedR), shiftedP,
-                                                  1, nonKeplerianAcceleration);
-
-            return new PVCoordinates(fixedP, fixedV, fixedA);
+            return shiftNonKeplerian(shiftedPV, dt);
 
         } else {
             // don't include acceleration,

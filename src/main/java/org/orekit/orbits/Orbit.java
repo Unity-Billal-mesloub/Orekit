@@ -209,6 +209,27 @@ public abstract class Orbit
         }
     }
 
+    /**
+     * Compute corrected shift from non-Keplerian part.
+     * @param keplerianShifted Keplerian shift
+     * @param dt time shift
+     * @return corrected position-velocity-acceleration vector
+     * @since 14.0
+     */
+    protected PVCoordinates shiftNonKeplerian(final PVCoordinates keplerianShifted, final double dt) {
+        // extract non-Keplerian acceleration from first time derivatives
+        final Vector3D nonKeplerianAcceleration = nonKeplerianAcceleration();
+
+        // add second order effect of non-Keplerian acceleration to Keplerian-only shift
+        final Vector3D fixedV = nonKeplerianAcceleration.scalarMultiply(dt).add(keplerianShifted.getVelocity());
+        final Vector3D fixedP   = nonKeplerianAcceleration.scalarMultiply(dt * dt / 2.).add(keplerianShifted.getPosition());
+        final double   fixedR2 = fixedP.getNorm2Sq();
+        final double   fixedR  = FastMath.sqrt(fixedR2);
+        final Vector3D fixedA  = nonKeplerianAcceleration.add(new Vector3D(-getMu() / (fixedR2 * fixedR),
+                keplerianShifted.getPosition()));
+        return new PVCoordinates(fixedP, fixedV, fixedA);
+    }
+
     /** Returns true if and only if the orbit is elliptical i.e. has a non-negative semi-major axis.
      * @return true if getA() is strictly greater than 0
      * @since 12.0

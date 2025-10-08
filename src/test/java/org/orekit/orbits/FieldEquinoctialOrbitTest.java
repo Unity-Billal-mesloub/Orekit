@@ -290,6 +290,27 @@ class FieldEquinoctialOrbitTest {
     }
 
     @Test
+    void testShiftedByVersusNonField() {
+        // GIVEN
+        final ComplexField field = ComplexField.getInstance();
+        final EquinoctialOrbit orbit = new EquinoctialOrbit(7e6, 1e-3, 0., 2, 1,1, 1, 0., 0., 0., 0., 0., PositionAngleType.TRUE,
+                FramesFactory.getGCRF(), AbsoluteDate.ARBITRARY_EPOCH, Constants.EGM96_EARTH_MU);
+        final FieldEquinoctialOrbit<Complex> fieldOrbit = new FieldEquinoctialOrbit<>(field, orbit);
+        final double dt = 1;
+        // WHEN
+        final FieldEquinoctialOrbit<Complex> actualFieldOrbit = fieldOrbit.shiftedBy(dt);
+        // THEN
+        final EquinoctialOrbit shiftedOrbit = orbit.shiftedBy(dt);
+        Assertions.assertEquals(shiftedOrbit.getMu(), actualFieldOrbit.getMu().getReal());
+        Assertions.assertEquals(shiftedOrbit.getDate(), actualFieldOrbit.getDate().toAbsoluteDate());
+        Assertions.assertEquals(shiftedOrbit.getFrame(), actualFieldOrbit.getFrame());
+        Assertions.assertArrayEquals(shiftedOrbit.getPosition().toArray(), actualFieldOrbit.getPosition().toVector3D().toArray(), 1e-8);
+        Assertions.assertArrayEquals(shiftedOrbit.getVelocity().toArray(), actualFieldOrbit.getVelocity().toVector3D().toArray(), 1e-9);
+        Assertions.assertArrayEquals(shiftedOrbit.getPVCoordinates().getAcceleration().toArray(),
+                actualFieldOrbit.getPVCoordinates().getAcceleration().toVector3D().toArray(), 1e12);
+    }
+
+    @Test
     void testWithKeplerianRates() {
         // GIVEN
         final ComplexField field = ComplexField.getInstance();

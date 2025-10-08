@@ -923,24 +923,10 @@ public class FieldEquinoctialOrbit<T extends CalculusFieldElement<T>> extends Fi
 
         if (!dt.isZero() && hasNonKeplerianRates()) {
 
-            // extract non-Keplerian acceleration from first time derivatives
-            final FieldVector3D<T> nonKeplerianAcceleration = nonKeplerianAcceleration();
-
-            // add quadratic effect of non-Keplerian acceleration to Keplerian-only shift
-            keplerianShifted.computePVWithoutA();
-            final FieldVector3D<T> fixedP   = new FieldVector3D<>(getOne(), keplerianShifted.partialPV.getPosition(),
-                                                                  dt.square().multiply(0.5), nonKeplerianAcceleration);
-            final T   fixedR2 = fixedP.getNorm2Sq();
-            final T   fixedR  = fixedR2.sqrt();
-            final FieldVector3D<T> fixedV  = new FieldVector3D<>(getOne(), keplerianShifted.partialPV.getVelocity(),
-                                                                 dt, nonKeplerianAcceleration);
-            final FieldVector3D<T> fixedA  = new FieldVector3D<>(fixedR2.multiply(fixedR).reciprocal().multiply(getMu().negate()),
-                                                                 keplerianShifted.partialPV.getPosition(),
-                                                                 getOne(), nonKeplerianAcceleration);
+            final FieldPVCoordinates<T> pvCoordinates = shiftNonKeplerian(keplerianShifted.getPVCoordinates(), dt);
 
             // build a new orbit, taking non-Keplerian acceleration into account
-            return new FieldEquinoctialOrbit<>(new TimeStampedFieldPVCoordinates<>(keplerianShifted.getDate(),
-                                                                                   fixedP, fixedV, fixedA),
+            return new FieldEquinoctialOrbit<>(new TimeStampedFieldPVCoordinates<>(keplerianShifted.getDate(), pvCoordinates),
                                                keplerianShifted.getFrame(), keplerianShifted.getMu());
 
         } else {

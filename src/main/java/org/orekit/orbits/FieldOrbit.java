@@ -17,7 +17,6 @@
 package org.orekit.orbits;
 
 
-
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.hipparchus.analysis.differentiation.Derivative;
@@ -27,6 +26,7 @@ import org.hipparchus.linear.FieldLUDecomposition;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.FieldVector;
 import org.hipparchus.linear.MatrixUtils;
+import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathArrays;
 import org.orekit.errors.OrekitIllegalArgumentException;
 import org.orekit.errors.OrekitInternalError;
@@ -244,6 +244,29 @@ public abstract class FieldOrbit<T extends CalculusFieldElement<T>>
             }
         }
 
+    }
+
+
+    /**
+     * Compute corrected shift from non-Keplerian part.
+     * @param keplerianShifted Keplerian shift
+     * @param dt time shift
+     * @return corrected position-velocity-acceleration vector
+     * @since 14.0
+     */
+    protected FieldPVCoordinates<T> shiftNonKeplerian(final FieldPVCoordinates<T> keplerianShifted, final T dt) {
+        // extract non-Keplerian acceleration from first time derivatives
+        final FieldVector3D<T> nonKeplerianAcceleration = nonKeplerianAcceleration();
+
+        // add second order effect of non-Keplerian acceleration to Keplerian-only shift
+        final FieldVector3D<T> fixedV = nonKeplerianAcceleration.scalarMultiply(dt).add(keplerianShifted.getVelocity());
+        final FieldVector3D<T> fixedP   = nonKeplerianAcceleration.scalarMultiply(dt.square().divide(2.))
+                .add(keplerianShifted.getPosition());
+        final T   fixedR2 = fixedP.getNorm2Sq();
+        final T   fixedR  = FastMath.sqrt(fixedR2);
+        final FieldVector3D<T> fixedA  = nonKeplerianAcceleration.add(new FieldVector3D<>(getMu().negate().divide(fixedR.multiply(fixedR2)),
+                keplerianShifted.getPosition()));
+        return new FieldPVCoordinates<>(fixedP, fixedV, fixedA);
     }
 
     /** Returns true if and only if the orbit is elliptical i.e. has a non-negative semi-major axis.
