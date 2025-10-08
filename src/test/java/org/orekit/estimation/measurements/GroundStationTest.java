@@ -196,8 +196,8 @@ class GroundStationTest {
         moved.getNorthOffsetDriver().setSelected(true);
         moved.getZenithOffsetDriver().setSelected(true);
 
-        EstimationTestUtils.checkFit(context, estimator, 2, 3,
-                                     0.0, 6.4e-7,
+        EstimationTestUtils.checkFit(context, estimator, 2, 6,
+                                     0.0, 6.7e-7,
                                      0.0, 1.8e-6,
                                      0.0, 9e-7,
                                      0.0, 5e-10);

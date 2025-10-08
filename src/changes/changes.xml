@@ -20,7 +20,13 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
-        <action dev="serrof" type="update" issue="1832">
+        <action dev="serrof" type="update" issue="1837">
+            Reduced code duplication for non-Keplerian part of (Field)Orbit's shiftedBy.
+        </action>
+        <action dev="serrof" type="update" issue="1836">
+            Reworked finite differences.
+        </action>
+        <action dev="serrof" type="update" issue="1836">
             Introduced dedicated classes for signal travel time.
         </action>
         <action dev="serrof" type="update" issue="1832">

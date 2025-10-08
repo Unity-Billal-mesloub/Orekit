@@ -79,9 +79,9 @@ public class InterSatellitesOneWayRangeRateTest {
             System.out.println("\nTest inter-satellites Range Rate State Derivatives - Finite Differences Comparison\n");
         }
         // Run test
-        double refErrorsPMedian = 7.1e-10;
-        double refErrorsPMean   = 7.1e-09;
-        double refErrorsPMax    = 1.8e-06;
+        double refErrorsPMedian = 1.3e-08;
+        double refErrorsPMean   = 7.9e-08;
+        double refErrorsPMax    = 4.5e-06;
         double refErrorsVMedian = 2.4e-10;
         double refErrorsVMean   = 5.2e-10;
         double refErrorsVMax    = 2.5e-08;
@@ -102,10 +102,10 @@ public class InterSatellitesOneWayRangeRateTest {
             System.out.println("\nTest inter-satellites Range Rate State Derivatives - Finite Differences Comparison\n");
         }
         // Run test
-        double refErrorsPMedian = 7.1e-10;
-        double refErrorsPMean   = 7.1e-09;
-        double refErrorsPMax    = 1.8e-06;
-        double refErrorsVMedian = 2.6e-010;
+        double refErrorsPMedian = 1.8e-07;
+        double refErrorsPMean   = 9.3e-07;
+        double refErrorsPMax    = 1.2e-04;
+        double refErrorsVMedian = 2.6e-10;
         double refErrorsVMean   = 4.9e-10;
         double refErrorsVMax    = 1.1e-08;
         this.genericTestStateDerivatives(printResults, 1,

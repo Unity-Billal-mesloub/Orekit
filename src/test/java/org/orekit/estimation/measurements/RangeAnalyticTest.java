@@ -109,7 +109,7 @@ public class RangeAnalyticTest {
         boolean isModifier = true;
         boolean isFiniteDifferences = false;
         genericTestStateDerivatives(isModifier, isFiniteDifferences, printResults,
-                                    4.1e-7, 1.9e-6, 6.3e-5, 9.8e-11, 8.8e-10, 3.3e-8);
+                                    4.1e-7, 1.9e-6, 6.3e-5, 3e-10, 1.8e-9, 6.4e-8);
     }
 
     /**
