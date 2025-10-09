@@ -196,8 +196,8 @@ class GroundStationTest {
         moved.getNorthOffsetDriver().setSelected(true);
         moved.getZenithOffsetDriver().setSelected(true);
 
-        EstimationTestUtils.checkFit(context, estimator, 2, 7,
-                                     0.0, 6.3e-7,
+        EstimationTestUtils.checkFit(context, estimator, 2, 6,
+                                     0.0, 6.7e-7,
                                      0.0, 1.8e-6,
                                      0.0, 9e-7,
                                      0.0, 5e-10);
@@ -329,12 +329,12 @@ class GroundStationTest {
         final double computedXpDot = station.getPolarDriftXDriver().getValue()  / Constants.ARC_SECONDS_TO_RADIANS * Constants.JULIAN_DAY;
         final double computedYp    = station.getPolarOffsetYDriver().getValue() / Constants.ARC_SECONDS_TO_RADIANS;
         final double computedYpDot = station.getPolarDriftYDriver().getValue()  / Constants.ARC_SECONDS_TO_RADIANS * Constants.JULIAN_DAY;
-        Assertions.assertEquals(0.0, FastMath.abs(dut10 - computedDut1),  4.3e-10);
-        Assertions.assertEquals(0.0, FastMath.abs(lod - computedLOD),     4.9e-10);
+        Assertions.assertEquals(0.0, FastMath.abs(dut10 - computedDut1),  4.4e-10);
+        Assertions.assertEquals(0.0, FastMath.abs(lod - computedLOD),     5.0e-10);
         Assertions.assertEquals(0.0, FastMath.abs(xp0 - computedXp),      5.9e-9);
         Assertions.assertEquals(0.0, FastMath.abs(xpDot - computedXpDot), 7.5e-9);
         Assertions.assertEquals(0.0, FastMath.abs(yp0 - computedYp),      1.1e-9);
-        Assertions.assertEquals(0.0, FastMath.abs(ypDot - computedYpDot), 1.2e-10);
+        Assertions.assertEquals(0.0, FastMath.abs(ypDot - computedYpDot), 1.4e-10);
 
         // thresholds to use if orbit is estimated
         // (i.e. when commenting out the loop above that sets orbital parameters drivers to "not selected")

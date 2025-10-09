@@ -54,12 +54,12 @@ abstract class FieldAbstractSignalTravelTime<T extends CalculusFieldElement<T>> 
         T delta;
         int count = 0;
         do {
-            final double previous           = delay.getReal();
+            final T previous           = delay.add(0.0);
             final T shift = computeShift(initialOffset, delay);
             final FieldVector3D<T> position = pvCoordinatesProvider.getPosition(guessDate.shiftedBy(shift), frame);
             delay                           = position.distance(fixedPosition).multiply(C_RECIPROCAL);
             delta                           = FastMath.abs(delay.subtract(previous));
-        } while (count++ < MAX_ITER && delta.getReal() >= 2 * FastMath.ulp(delay.getReal()));
+        } while (count++ < MAX_ITER && delta.norm() >= 2 * FastMath.ulp(delay.getReal()));
 
         return delay;
     }

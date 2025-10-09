@@ -50,13 +50,13 @@ import org.orekit.utils.ParameterDriversList;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DSSTBatchLSEstimatorTest {
+class DSSTBatchLSEstimatorTest {
 
     /**
      * Perfect PV measurements with a perfect start
      */
     @Test
-    public void testKeplerPV() {
+    void testKeplerPV() {
 
         DSSTContext context = DSSTEstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
@@ -99,7 +99,7 @@ public class DSSTBatchLSEstimatorTest {
 
     /** Test PV measurements generation and backward propagation in least-square orbit determination. */
     @Test
-    public void testKeplerPVBackward() {
+    void testKeplerPVBackward() {
 
         DSSTContext context = DSSTEstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
@@ -144,7 +144,7 @@ public class DSSTBatchLSEstimatorTest {
      * Perfect range measurements with a biased start
      */
     @Test
-    public void testKeplerRange() {
+    void testKeplerRange() {
 
         DSSTContext context = DSSTEstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
@@ -237,7 +237,7 @@ public class DSSTBatchLSEstimatorTest {
      * Perfect range measurements with a biased start and an on-board antenna range offset
      */
     @Test
-    public void testKeplerRangeWithOnBoardAntennaOffset() {
+    void testKeplerRangeWithOnBoardAntennaOffset() {
 
         DSSTContext context = DSSTEstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
@@ -336,7 +336,7 @@ public class DSSTBatchLSEstimatorTest {
     }
 
     @Test
-    public void testWrappedException() {
+    void testWrappedException() {
 
         DSSTContext context = DSSTEstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
@@ -397,7 +397,7 @@ public class DSSTBatchLSEstimatorTest {
      * Perfect range rate measurements with a perfect start
      */
     @Test
-    public void testKeplerRangeRate() {
+    void testKeplerRangeRate() {
 
         DSSTContext context = DSSTEstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
@@ -430,7 +430,7 @@ public class DSSTBatchLSEstimatorTest {
         estimator.setMaxIterations(10);
         estimator.setMaxEvaluations(20);
 
-        DSSTEstimationTestUtils.checkFit(context, estimator, 1, 2,
+        DSSTEstimationTestUtils.checkFit(context, estimator, 1, 3,
                                      0.0, 5.4e-7,
                                      0.0, 1.2e-6,
                                      0.0, 8.3e-4,
@@ -441,7 +441,7 @@ public class DSSTBatchLSEstimatorTest {
      * Perfect range and range rate measurements with a perfect start
      */
     @Test
-    public void testKeplerRangeAndRangeRate() {
+    void testKeplerRangeAndRangeRate() {
 
         DSSTContext context = DSSTEstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
@@ -483,14 +483,14 @@ public class DSSTBatchLSEstimatorTest {
 
         // we have low correlation between the two types of measurement. We can expect a good estimate.
         DSSTEstimationTestUtils.checkFit(context, estimator, 1, 3,
-                                     0.0, 5.1e-7,
+                                     0.0, 5.4e-7,
                                      0.0, 3e-6,
                                      0.0, 9.e-8,
                                      0.0, 6e-11);
     }
 
     @Test
-    public void testIssue359() {
+    void testIssue359() {
         DSSTContext context = DSSTEstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
         final DSSTPropagatorBuilder propagatorBuilder =

@@ -85,9 +85,9 @@ public class OneWayGNSSRangeRateTest {
         // about 9 significant figures, so it is expected that partial derivatives
         // computed with finite differences will only have a few digits corrects and
         // that there will be outliers
-        double refErrorsPMedian = 5.6e-10;
-        double refErrorsPMean   = 3.4e-09;
-        double refErrorsPMax    = 6.8e-07;
+        double refErrorsPMedian = 1.3e-08;
+        double refErrorsPMean   = 7.9e-08;
+        double refErrorsPMax    = 4.6e-06;
         double refErrorsVMedian = 6.6e-11;
         double refErrorsVMean   = 1.8e-10;
         double refErrorsVMax    = 7.1e-09;

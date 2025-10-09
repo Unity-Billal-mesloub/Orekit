@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hipparchus.Field;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.analysis.differentiation.GradientField;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
@@ -27,12 +28,16 @@ import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.orekit.frames.FieldTransform;
 import org.orekit.frames.Frame;
 import org.orekit.frames.Transform;
+import org.orekit.orbits.CartesianOrbit;
+import org.orekit.orbits.FieldCartesianOrbit;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.FieldAbsolutePVCoordinates;
+import org.orekit.utils.FieldPVCoordinatesProvider;
 import org.orekit.utils.PVCoordinates;
+import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeSpanMap.Span;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
@@ -156,12 +161,16 @@ public abstract class GroundReceiverMeasurement<T extends GroundReceiverMeasurem
                                                                              Vector3D.ZERO, Vector3D.ZERO, Vector3D.ZERO);
         final TimeStampedPVCoordinates stationDownlink = offsetToInertialDownlink.transformPVCoordinates(origin);
 
+
+        // Form coordinates provider
+        final PVCoordinatesProvider pvCoordinatesProvider = extractPVCoordinatesProvider(state, pva);
+
         // Compute propagation times
         // (if state has already been set up to pre-compensate propagation delay,
         //  we will have delta == tauD and transitState will be the same as state)
 
         // Downlink delay
-        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(new AbsolutePVCoordinates(state.getFrame(), pva));
+        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(pvCoordinatesProvider);
         final double tauD = signalTimeOfFlight.compute(pva.getDate(), stationDownlink.getPosition(), downlinkDate, state.getFrame());
 
         // Transit state & Transit state (re)computed with gradients
@@ -178,6 +187,24 @@ public abstract class GroundReceiverMeasurement<T extends GroundReceiverMeasurem
 
     }
 
+    /**
+     * Create PV provider from position-velocity-acceleration vector and template state.
+     * @param templateState template state
+     * @param pvCoordinates position-velocity-acceleration
+     * @return position-velocity-acceleration provider
+     * @since 14.0
+     */
+    private PVCoordinatesProvider extractPVCoordinatesProvider(final SpacecraftState templateState,
+                                                               final TimeStampedPVCoordinates pvCoordinates) {
+        if (templateState.isOrbitDefined()) {
+            final CartesianOrbit cartesianOrbit = new CartesianOrbit(pvCoordinates, templateState.getFrame(),
+                    templateState.getOrbit().getMu());
+            return templateState.getOrbit().getType().convertType(cartesianOrbit);
+        } else {
+            return new AbsolutePVCoordinates(templateState.getFrame(), pvCoordinates);
+        }
+    }
+
     /** Compute common estimation parameters.
      * @param state orbital state at measurement date
      * @return common parameters
@@ -192,7 +219,8 @@ public abstract class GroundReceiverMeasurement<T extends GroundReceiverMeasurem
                 }
             }
         }
-        final FieldVector3D<Gradient> zero = FieldVector3D.getZero(GradientField.getField(nbParams));
+        final GradientField field = GradientField.getField(nbParams);
+        final FieldVector3D<Gradient> zero = FieldVector3D.getZero(field);
 
         // Coordinates of the spacecraft expressed as a gradient
         final TimeStampedFieldPVCoordinates<Gradient> pva = getCoordinates(state, 0, nbParams);
@@ -208,19 +236,24 @@ public abstract class GroundReceiverMeasurement<T extends GroundReceiverMeasurem
                         offsetToInertialDownlink.transformPVCoordinates(new TimeStampedFieldPVCoordinates<>(downlinkDate,
                                                                                                             zero, zero, zero));
 
+        // Form coordinates provider
+        final FieldPVCoordinatesProvider<Gradient> fieldPVCoordinatesProvider = extractFieldPVCoordinatesProvider(state, pva);
+
         // Compute propagation times
         // (if state has already been set up to pre-compensate propagation delay,
         //  we will have delta == tauD and transitState will be the same as state)
 
         // Downlink delay
-        final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(new FieldAbsolutePVCoordinates<>(state.getFrame(), pva));
+        final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(fieldPVCoordinatesProvider);
         final Gradient tauD = fieldComputer.compute(pva.getDate(), stationDownlink.getPosition(), downlinkDate, state.getFrame());
 
         // Transit state & Transit state (re)computed with gradients
         final Gradient        delta        = downlinkDate.durationFrom(state.getDate());
         final Gradient        deltaMTauD   = tauD.negate().add(delta);
         final SpacecraftState transitState = state.shiftedBy(deltaMTauD.getValue());
-        final TimeStampedFieldPVCoordinates<Gradient> transitPV = pva.shiftedBy(deltaMTauD);
+        final FieldAbsoluteDate<Gradient> fieldDate = new FieldAbsoluteDate<>(field, state.getDate()).shiftedBy(deltaMTauD);
+        final TimeStampedFieldPVCoordinates<Gradient> transitPV = fieldPVCoordinatesProvider.getPVCoordinates(fieldDate,
+                state.getFrame());
 
         return new GroundReceiverCommonParametersWithDerivatives(state,
                                                                  indices,
@@ -230,6 +263,26 @@ public abstract class GroundReceiverMeasurement<T extends GroundReceiverMeasurem
                                                                  transitState,
                                                                  transitPV);
 
+    }
+
+    /**
+     * Create PV provider from position-velocity-acceleration vector and template state.
+     *
+     * @param templateState template state
+     * @param pvCoordinates position-velocity-acceleration
+     * @return position-velocity-acceleration provider
+     * @since 14.0
+     */
+    private FieldPVCoordinatesProvider<Gradient> extractFieldPVCoordinatesProvider(final SpacecraftState templateState,
+                                                                                   final TimeStampedFieldPVCoordinates<Gradient> pvCoordinates) {
+        final Field<Gradient> field = pvCoordinates.getDate().getField();
+        if (templateState.isOrbitDefined()) {
+            final FieldCartesianOrbit<Gradient> cartesianOrbit = new FieldCartesianOrbit<>(pvCoordinates, templateState.getFrame(),
+                    field.getZero().newInstance(templateState.getOrbit().getMu()));
+            return templateState.getOrbit().getType().convertType(cartesianOrbit);
+        } else {
+            return new FieldAbsolutePVCoordinates<>(templateState.getFrame(), pvCoordinates);
+        }
     }
 
     /**

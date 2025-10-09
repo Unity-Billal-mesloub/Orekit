@@ -49,7 +49,7 @@ public class RangeAnalyticTest {
      * Both are calculated with a different algorithm
       */
     @Test
-    public void testValues() {
+    void testValues() {
         boolean printResults = false;
         if (printResults) {
             System.out.println("\nTest Range Analytical Values\n");
@@ -63,7 +63,7 @@ public class RangeAnalyticTest {
      * using Range function as a comparison
      */
     @Test
-    public void testStateDerivatives() {
+    void testStateDerivatives() {
 
         boolean printResults = false;
         if (printResults) {
@@ -81,7 +81,7 @@ public class RangeAnalyticTest {
      * using a numerical finite differences calculation as a reference
      */
     @Test
-    public void testStateDerivativesFiniteDifferences() {
+    void testStateDerivativesFiniteDifferences() {
 
         boolean printResults = false;
         if (printResults) {
@@ -99,7 +99,7 @@ public class RangeAnalyticTest {
      * using Range function as a comparison
      */
     @Test
-    public void testStateDerivativesWithModifier() {
+    void testStateDerivativesWithModifier() {
 
         boolean printResults = false;
         if (printResults) {
@@ -109,7 +109,7 @@ public class RangeAnalyticTest {
         boolean isModifier = true;
         boolean isFiniteDifferences = false;
         genericTestStateDerivatives(isModifier, isFiniteDifferences, printResults,
-                                    4.1e-7, 1.9e-6, 6.3e-5, 4.7e-11, 4.7e-11, 5.6e-11);
+                                    4.1e-7, 1.9e-6, 6.3e-5, 3e-10, 1.8e-9, 6.4e-8);
     }
 
     /**
@@ -117,7 +117,7 @@ public class RangeAnalyticTest {
      * using a numerical finite differences calculation as a reference
      */
     @Test
-    public void testStateDerivativesWithModifierFiniteDifferences() {
+    void testStateDerivativesWithModifierFiniteDifferences() {
 
         boolean printResults = false;
         if (printResults) {
@@ -135,7 +135,7 @@ public class RangeAnalyticTest {
      * using Range function as a comparison
      */
     @Test
-    public void testParameterDerivatives() {
+    void testParameterDerivatives() {
 
         boolean printResults = false;
         if (printResults) {
@@ -152,7 +152,7 @@ public class RangeAnalyticTest {
      * using a numerical finite differences calculation as a reference
      */
     @Test
-    public void testParameterDerivativesFiniteDifferences() {
+    void testParameterDerivativesFiniteDifferences() {
 
         boolean printResults = false;
         if (printResults) {
@@ -169,7 +169,7 @@ public class RangeAnalyticTest {
      * using Range function as a comparison
      */
     @Test
-    public void testParameterDerivativesWithModifier() {
+    void testParameterDerivativesWithModifier() {
 
         boolean printResults = false;
         if (printResults) {
@@ -186,7 +186,7 @@ public class RangeAnalyticTest {
      * using a numerical finite differences calculation as a reference
      */
     @Test
-    public void testParameterDerivativesWithModifierFiniteDifferences() {
+    void testParameterDerivativesWithModifierFiniteDifferences() {
 
         boolean printResults = false;
         if (printResults) {
