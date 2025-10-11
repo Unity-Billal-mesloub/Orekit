@@ -20,7 +20,10 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
-        <action dev="serrof" type="update" issue="1839">
+        <action dev="serrof" type="update" issue="1840">
+            Removed ConstantPVCoordinatesProvider.
+        </action>
+        <action dev="serrof" type="add" issue="1839">
             Added geodetic position provider.
         </action>
         <action dev="serrof" type="update" issue="1837">
