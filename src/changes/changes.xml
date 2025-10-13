@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
+        <action dev="serrof" type="update" issue="1842">
+            Refactored counting handlers.
+        </action>
         <action dev="serrof" type="update" issue="1840">
             Removed ConstantPVCoordinatesProvider.
         </action>

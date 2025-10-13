@@ -65,7 +65,6 @@ class CountingHandlerTest {
             this.countAll = countAll;
         }
 
-        @Override
         protected boolean doesCount(SpacecraftState state, EventDetector detector, boolean increasing) {
             return countAll;
         }
