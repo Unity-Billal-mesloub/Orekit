@@ -52,7 +52,7 @@ import org.orekit.propagation.analytical.FieldEcksteinHechlerPropagator;
 import org.orekit.propagation.analytical.KeplerianPropagator;
 import org.orekit.propagation.events.*;
 import org.orekit.propagation.events.handlers.ContinueOnEvent;
-import org.orekit.propagation.events.handlers.CountAndContinue;
+import org.orekit.propagation.events.handlers.CountingHandler;
 import org.orekit.propagation.numerical.NumericalPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
@@ -65,7 +65,7 @@ import java.util.List;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AttitudesSequenceTest {
+class AttitudesSequenceTest {
 
     private AbsoluteDate lastChange;
     private boolean inEclipse;
@@ -200,25 +200,24 @@ public class AttitudesSequenceTest {
                                                          0.0,
                                                          FramesFactory.getGTOD(IERSConventions.IERS_2010, true))).
                         withMaxCheck(600).
-                withHandler(new CountAndContinue(0) {
+                withHandler(new CountingHandler(0, Action.STOP) {
                     @Override
-                    public Action eventOccurred(final SpacecraftState s,
-                                                             final EventDetector d,
-                                                             final boolean increasing) {
+                    public boolean doesCount(final SpacecraftState s, final EventDetector d,
+                                             final boolean increasing) {
                         setInEclipse(s.getDate(), !increasing);
                         if (getCount() == 7) {
-                            increment();
-                            return Action.STOP;
+                            setAction(Action.STOP);
                         } else {
                             switch (getCount() % 3) {
-                                case 0 :
-                                    return Action.CONTINUE;
-                                case 1 :
-                                    return Action.RESET_DERIVATIVES;
+                                case 0:
+                                    setAction(Action.CONTINUE);
+                                case 1:
+                                    setAction(Action.RESET_DERIVATIVES);
                                 default :
-                                    return Action.RESET_STATE;
+                                    setAction(Action.RESET_STATE);
                             }
                         }
+                        return false;
                     }
                 });
         final EventDetector monitored = logger.monitorDetector(ed);

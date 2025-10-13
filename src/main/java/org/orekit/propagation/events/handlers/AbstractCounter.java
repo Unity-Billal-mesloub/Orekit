@@ -24,7 +24,7 @@ import org.hipparchus.ode.events.Action;
  * @author Romain Serra
  * @since 13.0
  */
-abstract class AbstractGenericCountingHandler {
+abstract class AbstractCounter {
 
     /** Action to return. */
     private Action action;
@@ -36,7 +36,7 @@ abstract class AbstractGenericCountingHandler {
      * @param startingCount value to initialize count
      * @param action Action to initialize attribute
      */
-    protected AbstractGenericCountingHandler(final int startingCount, final Action action) {
+    protected AbstractCounter(final int startingCount, final Action action) {
         this.count = startingCount;
         this.action = action;
     }
@@ -67,9 +67,17 @@ abstract class AbstractGenericCountingHandler {
 
     /**
      * Reset count.
+     * @param count new value
+     */
+    public void setCount(final int count) {
+        this.count = count;
+    }
+
+    /**
+     * Reset count.
      */
     public void reset() {
-        count = 0;
+        setCount(0);
     }
 
     /**

@@ -20,7 +20,7 @@ import org.hipparchus.ode.events.Action;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class AbstractGenericCountingHandlerTest {
+class AbstractCounterTest {
 
     @Test
     void testSetHandler() {
@@ -55,7 +55,7 @@ class AbstractGenericCountingHandlerTest {
         Assertions.assertEquals(1, testHandler.getCount());
     }
 
-    private static class TestHandler extends AbstractGenericCountingHandler {
+    private static class TestHandler extends AbstractCounter {
 
         protected TestHandler(int startingCount) {
             super(startingCount, Action.CONTINUE);

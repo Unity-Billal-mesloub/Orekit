@@ -22,23 +22,39 @@ import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.events.FieldEventDetector;
 
 /**
- * Event handler counting event occurrences and always returning {@link Action#CONTINUE}.
+ * Event handler counting event occurrences and always returning {@link Action#CONTINUE}. The count cannot be reset.
  * @author Romain Serra
  * @since 13.0
  */
-public class FieldCountAndContinue<T extends CalculusFieldElement<T>> extends FieldCountingHandler<T> {
+public class FieldCountAndContinue<T extends CalculusFieldElement<T>> implements FieldEventHandler<T> {
+
+    /** Count. */
+    private int count;
+
+    /** Constructor with initial count at zero.
+     */
+    public FieldCountAndContinue() {
+        this(0);
+    }
 
     /** Constructor.
      * @param startingCount value to initialize count
      */
     public FieldCountAndContinue(final int startingCount) {
-        super(startingCount, Action.CONTINUE);
+        this.count = startingCount;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Getter for current count.
+     * @return count
+     */
+    public int getCount() {
+        return count;
+    }
+
     @Override
-    protected boolean doesCount(final FieldSpacecraftState<T> state, final FieldEventDetector<T> detector,
-                                final boolean increasing) {
-        return true;
+    public Action eventOccurred(final FieldSpacecraftState<T> s, final FieldEventDetector<T> detector, final boolean increasing) {
+        count++;
+        return Action.CONTINUE;
     }
 }

@@ -51,7 +51,11 @@ class FieldCountingHandlerTest {
 
         @Override
         protected boolean doesCount(FieldSpacecraftState<Binary64> state, FieldEventDetector<Binary64> detector, boolean increasing) {
-            return countAll;
+            if (countAll) {
+                return super.doesCount(state, detector, increasing);
+            } else {
+                return false;
+            }
         }
     }
 
