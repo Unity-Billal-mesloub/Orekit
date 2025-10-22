@@ -25,7 +25,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.orekit.TestUtils;
 import org.orekit.Utils;
+import org.orekit.errors.OrekitIllegalArgumentException;
 import org.orekit.frames.FramesFactory;
 import org.orekit.propagation.analytical.EcksteinHechlerPropagator;
 import org.orekit.time.AbsoluteDate;
@@ -534,5 +536,27 @@ class OrbitHermiteInterpolatorTest {
                                 interpolator.getNbInterpolationPoints());
         Assertions.assertEquals(CartesianDerivativesFilter.USE_PVA, interpolator.getPVAFilter());
     }
+
+   @Test
+   public void testErrorThrownWhenUsingOrbitWithFrameMismatch() {
+      // GIVEN
+      // Define sample with frame mismatch
+      final Orbit orbit1 = TestUtils.getFakeOrbit();
+      final Orbit orbit2 = new CartesianOrbit(orbit1.shiftedBy(1).getPVCoordinates(),
+                                              FramesFactory.getEME2000(),
+                                              orbit1.getMu());
+
+      final List<Orbit> sample = new ArrayList<>();
+      sample.add(orbit1);
+      sample.add(orbit2);
+
+      // Define interpolator
+      final OrbitHermiteInterpolator interpolator =
+              new OrbitHermiteInterpolator(FramesFactory.getGCRF());
+
+      // WHEN & THEN
+      Assertions.assertThrows(OrekitIllegalArgumentException.class,
+                              () -> interpolator.interpolate(new AbsoluteDate(), sample));
+   }
 
 }
