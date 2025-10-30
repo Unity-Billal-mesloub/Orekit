@@ -1007,7 +1007,16 @@ public enum OrekitMessages implements Localizable {
     INVALID_FORMAT("invalid format: width = {0}, precision = {1}"),
 
     /** OUTPUT_ALREADY_CLOSED. */
-    OUTPUT_ALREADY_CLOSED("output {0} has already been closed");
+    OUTPUT_ALREADY_CLOSED("output {0} has already been closed"),
+
+    /** LAMBERT_HOUSEHOLDER_DID_NOT_CONVERGE. */
+    LAMBERT_HOUSEHOLDER_DID_NOT_CONVERGE("Householder solver failed to converge after {0} iterations"),
+
+    /** LAMBERT_CORRECTION_DID_NOT_CONVERGE. */
+    LAMBERT_CORRECTION_DID_NOT_CONVERGE("correction of perturbed Lambert solution failed to converge after {0} iterations"),
+
+    /** LAMBERT_INVALID_NUMBER_OF_REVOLUTIONS. */
+    LAMBERT_INVALID_NUMBER_OF_REVOLUTIONS("invalid number of revolutions {0} for Lambert problem, a maximum of {1} is possible with the given time of flight");
 
     /** Base name of the resource bundle in classpath. */
     private static final String RESOURCE_BASE_NAME = "assets/org/orekit/localization/OrekitMessages";
