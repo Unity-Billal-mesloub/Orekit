@@ -946,25 +946,34 @@ COVARIANCE_MUST_BE_SQUARE=la matriz de covarianza debe ser cuadrada
 INCONSISTENT_STATE_DIMENSIONS=las dimensiones del vector de estado ({0}) y de la covarianza ({1}) son incompatibles
 
 # data at date {0} has already been automatically expunged
-EXPUNGED_SPAN=
+EXPUNGED_SPAN=los datos para la fecha {0} ya han sido eliminados automáticamente
 
 # line never crosses altitude {0}
 LINE_NEVER_CROSSES_ALTITUDE=la línea nunca atraviesa la altitud {0}
 
 # body shape must be a one-axis ellipsoid
-BODY_SHAPE_MUST_BE_A_ONE_AXIS_ELLIPSOID=
+BODY_SHAPE_MUST_BE_A_ONE_AXIS_ELLIPSOID=la forma del cuerpo debe ser un elipsoide de un eje
 
 # missing time system definition in file {0}
-MISSING_TIME_SYSTEM_DEFINITION=
+MISSING_TIME_SYSTEM_DEFINITION=sistema de tiempo no definido en el archivo {0}
 
 # wrong stations numbers in file {0}, expected {1}, got {2}
-WRONG_STATIONS_NUMBER=
+WRONG_STATIONS_NUMBER=número de estaciones incorrecto en el archivo {0}, se esperaba {1}, se recibió {2}
 
 # wrong satellites numbers in file {0}, expected {1}, got {2}
-WRONG_SATELLITES_NUMBER=
+WRONG_SATELLITES_NUMBER=número de satélites incorrecto en el archivo {0}, se esperaba {1}, se recibió {2}
 
 # invalid format: width = {0}, precision = {1}
-INVALID_FORMAT=
+INVALID_FORMAT=formato inválido: ancho = {0}, precisión = {1}
 
 # output {0} has already been closed
-OUTPUT_ALREADY_CLOSED=
+OUTPUT_ALREADY_CLOSED=la salida {0} ya se ha cerrado
+
+# Householder solver failed to converge after {0} iterations
+LAMBERT_HOUSEHOLDER_DID_NOT_CONVERGE=el resolvedor Householder no consiguió converger tras {0} iteraciones
+
+# correction of perturbed Lambert solution failed to converge after {0} iterations
+LAMBERT_CORRECTION_DID_NOT_CONVERGE=la corrección de la solución de Lambert perturbada no consiguió converger tras {0} iteraciones
+
+# invalid number of revolutions {0} for Lambert problem, a maximum of {1} is possible with the given time of flight
+LAMBERT_INVALID_NUMBER_OF_REVOLUTIONS=número de revoluciones {0} inválido para el problema de Lambert, un máximo de {1} es posible con el tiempo de vuelo especificado

@@ -968,3 +968,12 @@ INVALID_FORMAT=invalid format: width = {0}, precision = {1}
 
 # output {0} has already been closed
 OUTPUT_ALREADY_CLOSED=output {0} has already been closed
+
+# Householder solver failed to converge after {0} iterations
+LAMBERT_HOUSEHOLDER_DID_NOT_CONVERGE=Householder solver failed to converge after {0} iterations
+
+# correction of perturbed Lambert solution failed to converge after {0} iterations
+LAMBERT_CORRECTION_DID_NOT_CONVERGE=correction of perturbed Lambert solution failed to converge after {0} iterations
+
+# invalid number of revolutions {0} for Lambert problem, a maximum of {1} is possible with the given time of flight
+LAMBERT_INVALID_NUMBER_OF_REVOLUTIONS=invalid number of revolutions {0} for Lambert problem, a maximum of {1} is possible with the given time of flight
