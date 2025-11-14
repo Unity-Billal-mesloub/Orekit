@@ -50,6 +50,7 @@ import org.orekit.propagation.analytical.tle.generation.FixedPointTleGenerationA
 import org.orekit.propagation.conversion.NumericalPropagatorBuilder;
 import org.orekit.propagation.conversion.TLEPropagatorBuilder;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.clocks.QuadraticClockModel;
 import org.orekit.utils.Constants;
 import org.orekit.utils.IERSConventions;
 import org.orekit.utils.ParameterDriver;
@@ -1096,7 +1097,8 @@ public class UnscentedKalmanEstimatorTest {
 
         // Create a station
         final OneAxisEllipsoid shape = new OneAxisEllipsoid(Constants.WGS84_EARTH_EQUATORIAL_RADIUS, Constants.WGS84_EARTH_FLATTENING, FramesFactory.getITRF(IERSConventions.IERS_2010, false));
-        final GroundStation station = new GroundStation(new TopocentricFrame(shape, new GeodeticPoint(1.44, 0.2, 100.0), "topo"));
+        final QuadraticClockModel blankClock = new QuadraticClockModel(reference, 0.0, 0.0, 0.0);
+        final GroundStation station = new GroundStation(new TopocentricFrame(shape, new GeodeticPoint(1.44, 0.2, 100.0), "topo"), blankClock);
 
         // Create three different measurement types
         final double sigmaPos = 2.0;

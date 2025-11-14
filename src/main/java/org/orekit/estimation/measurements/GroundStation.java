@@ -366,7 +366,7 @@ public class GroundStation extends MeasurementObject implements Observer {
     /** {@inheritDoc} */
     @Override
     public final PVCoordinatesProvider getPVCoordinatesProvider() {
-        return baseFrame;
+        return getBaseFrame();
     }
 
     /** Get the base frame associated with the station.

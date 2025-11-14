@@ -20,13 +20,13 @@ package org.orekit.estimation.measurements;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+//import java.util.Map;
 
-import org.hipparchus.analysis.differentiation.Gradient;
+//import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.util.FastMath;
-import org.orekit.time.AbsoluteDate;
+//import org.orekit.time.AbsoluteDate;
 import org.orekit.time.clocks.QuadraticClockModel;
-import org.orekit.time.clocks.QuadraticFieldClockModel;
+//import org.orekit.time.clocks.QuadraticFieldClockModel;
 import org.orekit.utils.ParameterDriver;
 
 /** Abstract class underlying both observed and observing measurement
@@ -153,11 +153,13 @@ abstract class MeasurementObject {
      * must be span name and not driver name
      * @return emitting satellite clock provider
      */
+    /*
     protected QuadraticFieldClockModel<Gradient> getQuadraticFieldClock(final int freeParameters,
                                                                         final AbsoluteDate date,
                                                                         final Map<String, Integer> indices) {
         return getQuadraticClockModel().toGradientModel(freeParameters, indices, date);
     }
+    */
 
     /** Return all parameter drivers associated with the MeasurementObject.
      * @return list of parameter drivers
@@ -172,15 +174,5 @@ abstract class MeasurementObject {
      */
     protected final void addParameterDriver(final ParameterDriver parameterDriver) {
         parameterDrivers.add(parameterDriver);
-    }
-
-    /**
-     * Add a list of parameter drivers.
-     * @param parametersDrivers parameters being added to the MeasurementObject
-     */
-    protected final void addParametersDrivers(final List<ParameterDriver> parametersDrivers) {
-        for (ParameterDriver param : parametersDrivers) {
-            addParameterDriver(param);
-        }
     }
 }

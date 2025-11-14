@@ -57,10 +57,12 @@ import org.orekit.orbits.PositionAngleType;
 import org.orekit.propagation.Propagator;
 import org.orekit.propagation.conversion.NumericalPropagatorBuilder;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.clocks.QuadraticClockModel;
 import org.orekit.utils.Constants;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.IERSConventions;
 import org.orekit.utils.PVCoordinates;
+import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
 
 class GroundStationTest {
@@ -87,9 +89,11 @@ class GroundStationTest {
         final BodyShape parent       = base.getParentShape();
         final double deltaClock      = 0.00084532;
         final String changedSuffix   = "-changed";
+        final QuadraticClockModel blankClock = new QuadraticClockModel(context.initialOrbit.getDate(), 0.0, 0.0, 0.0);
         final GroundStation changed  = new GroundStation(new TopocentricFrame(parent, base.getPoint(),
                                                                               base.getName() + changedSuffix), context.ut1.getEOPHistory(),
-                                                         context.stations.get(0).getDisplacements());
+                                                         blankClock, context.stations.get(0).getDisplacements());
+        final PVCoordinatesProvider groundCoordProvider = changed.getPVCoordinatesProvider();
 
         // create orbit estimator
         final BatchLSEstimator estimator = new BatchLSEstimator(new LevenbergMarquardtOptimizer(),
