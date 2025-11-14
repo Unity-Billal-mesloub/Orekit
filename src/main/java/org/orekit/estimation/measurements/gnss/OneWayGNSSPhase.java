@@ -22,11 +22,10 @@ import org.hipparchus.analysis.differentiation.Gradient;
 import org.orekit.estimation.measurements.EstimatedMeasurement;
 import org.orekit.estimation.measurements.EstimatedMeasurementBase;
 import org.orekit.estimation.measurements.ObservableSatellite;
-import org.orekit.time.clocks.QuadraticClockModel;
+import org.orekit.estimation.measurements.ObserverSatellite;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.Constants;
-import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeSpanMap.Span;
 import org.orekit.utils.TimeStampedPVCoordinates;
@@ -62,9 +61,7 @@ public class OneWayGNSSPhase extends AbstractOneWayGNSSMeasurement<OneWayGNSSPha
     private final double wavelength;
 
     /** Simple constructor.
-     * @param remote provider for GNSS satellite which simply emits the signal
-     * @param remoteName name of the remote
-     * @param remoteClock clock offset of the GNSS satellite
+     * @param gnssSatellite GNSS observer satellite
      * @param date date of the measurement
      * @param phase observed value, in cycles
      * @param wavelength phase observed value wavelength, in meters
@@ -74,18 +71,16 @@ public class OneWayGNSSPhase extends AbstractOneWayGNSSMeasurement<OneWayGNSSPha
      * @param cache from which ambiguity drive should come
      * @since 12.1
      */
-    public OneWayGNSSPhase(final PVCoordinatesProvider remote,
-                           final String remoteName,
-                           final QuadraticClockModel remoteClock,
+    public OneWayGNSSPhase(final ObserverSatellite gnssSatellite,
                            final AbsoluteDate date,
                            final double phase, final double wavelength, final double sigma,
                            final double baseWeight, final ObservableSatellite local,
                            final AmbiguityCache cache) {
         // Call super constructor
-        super(remote, remoteClock, date, phase, sigma, baseWeight, local);
+        super(gnssSatellite, date, phase, sigma, baseWeight, local);
 
         // Initialize phase ambiguity driver
-        ambiguityDriver = cache.getAmbiguity(remoteName, local.getName(), wavelength);
+        ambiguityDriver = cache.getAmbiguity(gnssSatellite.getName(), local.getName(), wavelength);
 
         // The local satellite clock offset affects the measurement
         addParameterDriver(ambiguityDriver);

@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.hipparchus.random.CorrelatedRandomVectorGenerator;
 import org.orekit.estimation.measurements.ObservableSatellite;
+import org.orekit.estimation.measurements.ObserverSatellite;
 import org.orekit.estimation.measurements.gnss.OneWayGNSSRange;
 import org.orekit.propagation.sampling.OrekitStepInterpolator;
 import org.orekit.time.AbsoluteDate;
@@ -31,7 +32,7 @@ import org.orekit.time.AbsoluteDate;
 public class OneWayGNSSRangeBuilder extends AbstractMeasurementBuilder<OneWayGNSSRange> {
 
     /** Satellite which simply emits the signal. */
-    private final ObservableSatellite remote;
+    private final ObserverSatellite remote;
 
    /** Simple constructor.
      * @param noiseSource noise source, may be null for generating perfect measurements
@@ -41,9 +42,9 @@ public class OneWayGNSSRangeBuilder extends AbstractMeasurementBuilder<OneWayGNS
      * @param baseWeight base weight
      */
     public OneWayGNSSRangeBuilder(final CorrelatedRandomVectorGenerator noiseSource,
-                                  final ObservableSatellite local, final ObservableSatellite remote,
+                                  final ObservableSatellite local, final ObserverSatellite remote,
                                   final double sigma, final double baseWeight) {
-        super(noiseSource, sigma, baseWeight, local, remote);
+        super(noiseSource, sigma, baseWeight, local);
         this.remote           = remote;
     }
 
@@ -51,8 +52,7 @@ public class OneWayGNSSRangeBuilder extends AbstractMeasurementBuilder<OneWayGNS
     @Override
     protected OneWayGNSSRange buildObserved(final AbsoluteDate date,
                                             final Map<ObservableSatellite, OrekitStepInterpolator> interpolators) {
-        return new OneWayGNSSRange(interpolators.get(remote),
-                                   remote.getQuadraticClockModel(),
+        return new OneWayGNSSRange(remote,
                                    date, Double.NaN,
                                    getTheoreticalStandardDeviation()[0],
                                    getBaseWeight()[0], getSatellites()[0]);

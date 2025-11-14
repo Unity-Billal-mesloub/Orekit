@@ -57,4 +57,10 @@ public class ObserverSatellite extends MeasurementObject implements Observer {
         return ObserverType.SATELLITE;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public final PVCoordinatesProvider getPVCoordinatesProvider() {
+        return pvCoordsProvider;
+    }
+
 }

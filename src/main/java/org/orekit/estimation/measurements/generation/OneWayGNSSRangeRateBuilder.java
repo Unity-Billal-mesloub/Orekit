@@ -16,13 +16,14 @@
  */
 package org.orekit.estimation.measurements.generation;
 
+import java.util.Map;
+
 import org.hipparchus.random.CorrelatedRandomVectorGenerator;
 import org.orekit.estimation.measurements.ObservableSatellite;
+import org.orekit.estimation.measurements.ObserverSatellite;
 import org.orekit.estimation.measurements.gnss.OneWayGNSSRangeRate;
 import org.orekit.propagation.sampling.OrekitStepInterpolator;
 import org.orekit.time.AbsoluteDate;
-
-import java.util.Map;
 
 /** Builder for {@link org.orekit.estimation.measurements.gnss.OneWayGNSSRangeRate} measurements.
  * @author Luc Maisonobe
@@ -32,7 +33,7 @@ public class OneWayGNSSRangeRateBuilder
     extends AbstractMeasurementBuilder<OneWayGNSSRangeRate> {
 
     /** Satellite which simply emits the signal. */
-    private final ObservableSatellite remote;
+    private final ObserverSatellite remote;
 
     /** Simple constructor.
      * @param noiseSource noise source, may be null for generating perfect measurements
@@ -42,9 +43,9 @@ public class OneWayGNSSRangeRateBuilder
      * @param baseWeight base weight
      */
     public OneWayGNSSRangeRateBuilder(final CorrelatedRandomVectorGenerator noiseSource,
-                                      final ObservableSatellite local, final ObservableSatellite remote,
+                                      final ObservableSatellite local, final ObserverSatellite remote,
                                       final double sigma, final double baseWeight) {
-        super(noiseSource, sigma, baseWeight, local, remote);
+        super(noiseSource, sigma, baseWeight, local);
         this.remote = remote;
     }
 
@@ -52,8 +53,7 @@ public class OneWayGNSSRangeRateBuilder
     @Override
     protected OneWayGNSSRangeRate buildObserved(final AbsoluteDate date,
                                                 final Map<ObservableSatellite, OrekitStepInterpolator> interpolators) {
-        return new OneWayGNSSRangeRate(interpolators.get(remote),
-                                       remote.getQuadraticClockModel(),
+        return new OneWayGNSSRangeRate(remote,
                                        date, Double.NaN,
                                        getTheoreticalStandardDeviation()[0],
                                        getBaseWeight()[0], getSatellites()[0]);

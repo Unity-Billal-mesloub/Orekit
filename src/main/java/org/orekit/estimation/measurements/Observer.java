@@ -16,6 +16,8 @@
  */
 package org.orekit.estimation.measurements;
 
+import org.orekit.utils.PVCoordinatesProvider;
+
 /** Abstract interface that contains those methods necessary
  *  for both space and ground-based satellite observers.
  *
@@ -37,4 +39,10 @@ interface Observer  {
      * @since 14.0
      */
     ObserverType getObserverType();
+
+    /** Return the PVCoordinatesProvider.
+     * @return pos/vel coordinates provider
+     * @since 14.0
+     */
+    PVCoordinatesProvider getPVCoordinatesProvider();
 }

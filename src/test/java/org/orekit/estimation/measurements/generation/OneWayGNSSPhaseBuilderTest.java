@@ -33,6 +33,7 @@ import org.orekit.estimation.EstimationTestUtils;
 import org.orekit.estimation.Force;
 import org.orekit.estimation.measurements.EstimatedMeasurementBase;
 import org.orekit.estimation.measurements.ObservableSatellite;
+import org.orekit.estimation.measurements.ObserverSatellite;
 import org.orekit.estimation.measurements.gnss.AmbiguityCache;
 import org.orekit.estimation.measurements.gnss.OneWayGNSSPhase;
 import org.orekit.estimation.measurements.modifiers.Bias;
@@ -58,17 +59,15 @@ public class OneWayGNSSPhaseBuilderTest {
     private static final double WAVELENGTH = PredefinedGnssSignal.G01.getWavelength();
 
     private MeasurementBuilder<OneWayGNSSPhase> getBuilder(final RandomGenerator random,
-                                                           final ObservableSatellite receiver,
-                                                           final ObservableSatellite remote) {
+                                                           final ObservableSatellite local,
+                                                           final ObserverSatellite remote) {
         final RealMatrix covariance = MatrixUtils.createRealDiagonalMatrix(new double[] { SIGMA * SIGMA });
-        remote.getClockOffsetDriver().setValue(1.0e-16);
-        remote.getClockDriftDriver().setValue(0);
-        remote.getClockAccelerationDriver().setValue(0);
+
         MeasurementBuilder<OneWayGNSSPhase> b =
                         new OneWayGNSSPhaseBuilder(random == null ? null : new CorrelatedRandomVectorGenerator(covariance,
                                                                                                                1.0e-10,
                                                                                                                new GaussianRandomGenerator(random)),
-                                                   receiver, remote,
+                                                   local, remote,
                                                    WAVELENGTH, SIGMA, 1.0,
                                                    new AmbiguityCache());
         b.addModifier(new Bias<>(new String[] { "bias" },
@@ -100,11 +99,16 @@ public class OneWayGNSSPhaseBuilderTest {
         ObservableSatellite receiver = generator.addPropagator(buildPropagator()); // useful third propagator
         generator.addPropagator(buildPropagator()); // dummy fourth propagator
         final Orbit o1 = context.initialOrbit;
+
         // for the second satellite, we simply reverse velocity
         final Orbit o2 = new KeplerianOrbit(new PVCoordinates(o1.getPosition(),
                                                               o1.getVelocity().negate()),
                                             o1.getFrame(), o1.getDate(), o1.getMu());
-        ObservableSatellite remote = generator.addPropagator(new KeplerianPropagator(o2)); // useful sixth propagator
+        ObserverSatellite remote = new ObserverSatellite("GNSS-remote", new KeplerianPropagator(o2));
+        remote.getClockOffsetDriver().setValue(1.0e-16);
+        remote.getClockDriftDriver().setValue(0);
+        remote.getClockAccelerationDriver().setValue(0);
+
         final double step = 60.0;
 
         // beware that in order to avoid deadlocks, the secondary PV coordinates provider

@@ -45,6 +45,8 @@ import org.orekit.models.earth.displacement.StationDisplacement;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.UT1Scale;
+import org.orekit.time.clocks.QuadraticClockModel;
+import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
 
 /** Class modeling a ground station that can perform some measurements.
@@ -142,6 +144,29 @@ public class GroundStation extends MeasurementObject implements Observer {
     }
 
     /**
+     * Build a ground station ignoring {@link StationDisplacement station displacements}.
+     * <p>
+     * The initial values for the pole and prime meridian parametric linear models
+     * ({@link #getPrimeMeridianOffsetDriver()}, {@link #getPrimeMeridianDriftDriver()},
+     * {@link #getPolarOffsetXDriver()}, {@link #getPolarDriftXDriver()}, {@link #getPolarOffsetXDriver()},
+     * {@link #getPolarDriftXDriver()}) are set to 0. The initial values for the station offset model
+     * ({@link #getClockOffsetDriver()}, {@link #getEastOffsetDriver()}, {@link #getNorthOffsetDriver()},
+     * {@link #getZenithOffsetDriver()}) are set to 0. This implies that as long as these values are not changed, the
+     * offset frame is the same as the {@link #getBaseFrame() base frame}. As soon as some of these models are changed,
+     * the offset frame moves away from the {@link #getBaseFrame() base frame}.
+     * </p>
+     *
+     * @param baseFrame base frame associated with the station, without *any* parametric model
+     *                  (no station offset, no polar motion, no meridian shift)
+     * @param clock         new quadratic clock model with user-supplied displacements
+     * @see #GroundStation(TopocentricFrame, EOPHistory, StationDisplacement...)
+     * @since 13.0
+     */
+    public GroundStation(final TopocentricFrame baseFrame, final QuadraticClockModel clock) {
+        this(baseFrame, FramesFactory.findEOP(baseFrame), clock);
+    }
+
+    /**
      * Simple constructor.
      * <p>
      * The initial values for the pole and prime meridian parametric linear models
@@ -163,7 +188,33 @@ public class GroundStation extends MeasurementObject implements Observer {
      */
     public GroundStation(final TopocentricFrame baseFrame, final EOPHistory eopHistory,
                          final StationDisplacement... displacements) {
-        super(baseFrame.getName());
+        this(baseFrame, eopHistory, createEmptyQuadraticClock(baseFrame.getName()), displacements);
+    }
+
+     /**
+     * Simple constructor.
+     * <p>
+     * The initial values for the pole and prime meridian parametric linear models
+     * ({@link #getPrimeMeridianOffsetDriver()}, {@link #getPrimeMeridianDriftDriver()},
+     * {@link #getPolarOffsetXDriver()}, {@link #getPolarDriftXDriver()}, {@link #getPolarOffsetXDriver()},
+     * {@link #getPolarDriftXDriver()}) are set to 0. The initial values for the station offset model
+     * ({@link #getClockOffsetDriver()}, {@link #getEastOffsetDriver()}, {@link #getNorthOffsetDriver()},
+     * {@link #getZenithOffsetDriver()}, {@link #getClockOffsetDriver()}) are set to 0. This implies that as long as
+     * these values are not changed, the offset frame is the same as the {@link #getBaseFrame() base frame}. As soon as
+     * some of these models are changed, the offset frame moves away from the {@link #getBaseFrame() base frame}.
+     * </p>
+     *
+     * @param baseFrame     base frame associated with the station, without *any* parametric model (no station offset,
+     *                      no polar motion, no meridian shift)
+     * @param eopHistory    EOP history associated with Earth frames
+     * @param clock         new quadratic clock model with user-supplied displacements
+     * @param displacements ground station displacement model (tides, ocean loading, atmospheric loading, thermal
+     *                      effects...)
+     * @since 12.1
+     */
+    public GroundStation(final TopocentricFrame baseFrame, final EOPHistory eopHistory,
+                         final QuadraticClockModel clock, final StationDisplacement... displacements) {
+        super(baseFrame.getName(), clock);
         this.baseFrame = baseFrame;
 
         if (eopHistory == null) {
@@ -310,6 +361,12 @@ public class GroundStation extends MeasurementObject implements Observer {
      */
     public ParameterDriver getPolarDriftYDriver() {
         return estimatedEarthFrameProvider.getPolarDriftYDriver();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final PVCoordinatesProvider getPVCoordinatesProvider() {
+        return baseFrame;
     }
 
     /** Get the base frame associated with the station.

@@ -74,16 +74,7 @@ abstract class MeasurementObject {
      * @param name name of MeasurementObject
      */
     protected MeasurementObject(final String name) {
-
-        this(name, new QuadraticClockModel(new ParameterDriver(name + CLOCK_STRING + OFFSET_SUFFIX,
-                                                    0.0, CLOCK_OFFSET_SCALE,
-                                                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY),
-                                           new ParameterDriver(name + CLOCK_STRING + DRIFT_SUFFIX,
-                                                    0.0, CLOCK_OFFSET_SCALE,
-                                                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY),
-                                           new ParameterDriver(name + CLOCK_STRING + ACCELERATION_SUFFIX,
-                                                    0.0, CLOCK_OFFSET_SCALE,
-                                                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)));
+        this(name, createEmptyQuadraticClock(name));
     }
 
     /** Simple constructor.
@@ -129,6 +120,22 @@ abstract class MeasurementObject {
      */
     public final ParameterDriver getClockAccelerationDriver() {
         return quadraticClockModel.getClockAccelerationDriver();
+    }
+
+    /** Creates an quadratic clock with zero displacement.
+     * @param name name of object that is holding the clock
+     * @return new quadratic clock model
+     */
+    protected static QuadraticClockModel createEmptyQuadraticClock(final String name) {
+        return new QuadraticClockModel(new ParameterDriver(name + CLOCK_STRING + OFFSET_SUFFIX,
+                                                    0.0, CLOCK_OFFSET_SCALE,
+                                                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY),
+                                           new ParameterDriver(name + CLOCK_STRING + DRIFT_SUFFIX,
+                                                    0.0, CLOCK_OFFSET_SCALE,
+                                                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY),
+                                           new ParameterDriver(name + CLOCK_STRING + ACCELERATION_SUFFIX,
+                                                    0.0, CLOCK_OFFSET_SCALE,
+                                                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
     }
 
     /** Get a quadratic clock model valid at some date.
