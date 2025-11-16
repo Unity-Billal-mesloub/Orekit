@@ -23,6 +23,9 @@
         <action dev="rafa" type="update" issue="1781">
             Updated LambertSolver to one based on Izzo's solver.
         </action>
+        <action dev="serrof" type="add" issue="1851">
+            Add (Field)AdaptableInterval based on Keplerian period.
+        </action>
         <action dev="serrof" type="add" issue="1848">
             Add CartesianToleranceProvider with given relative tolerance.
         </action>
