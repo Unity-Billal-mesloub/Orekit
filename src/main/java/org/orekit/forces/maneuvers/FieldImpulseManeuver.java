@@ -39,8 +39,8 @@ import org.orekit.utils.FieldPVCoordinates;
  * that can be provided to any {@link org.orekit.propagation.FieldPropagator
  * Propagator} and mirrors the standard version
  * {@link org.orekit.forces.maneuvers.ImpulseManeuver}.</p>
- * <p>The maneuver is executed when an underlying is triggered, in which case this class will generate a {@link
- * Action#RESET_STATE RESET_STATE} event. By default, the detection settings are those of the trigger.
+ * <p>The maneuver is executed when an underlying event is triggered and the handler returns anything but {@linkAction#CONTINUE CONTINUE},
+ * in which case this class will generate a {@linkAction#RESET_STATE RESET_STATE} event.
  * In the simple cases, the underlying event detector may be a basic
  * {@link org.orekit.propagation.events.FieldDateDetector date event}, but it
  * can also be a more elaborate {@link
@@ -235,8 +235,8 @@ public class FieldImpulseManeuver<T extends CalculusFieldElement<T>> extends Abs
         public Action eventOccurred(final FieldSpacecraftState<T> s,
                                     final FieldEventDetector<T> detector,
                                     final boolean increasing) {
-            getDetector().getHandler().eventOccurred(s, getDetector(), increasing); // Action ignored but method still called
-            return Action.RESET_STATE;
+            final Action action = getDetector().getHandler().eventOccurred(s, getDetector(), increasing);
+            return action == Action.CONTINUE ? action : Action.RESET_STATE;
         }
 
         /** {@inheritDoc} */

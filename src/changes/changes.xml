@@ -41,6 +41,9 @@
         <action dev="luc" type="update" issue="issue-1845">
           Added toRawElements to AttitudeElementsType and RateElementsType.
         </action>
+        <action dev="serrof" type="update" issue="1843">
+            Only trigger impulsive maneuver when Action is not CONTINUE.
+        </action>
         <action dev="serrof" type="update" issue="1842">
             Refactored counting handlers.
         </action>
