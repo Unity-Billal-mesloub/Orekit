@@ -60,6 +60,8 @@ import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.Constants;
 import org.orekit.utils.TimeStampedPVCoordinates;
 
+import static org.mockito.Mockito.mock;
+
 class ImpulseManeuverTest {
 
     @ParameterizedTest
@@ -83,9 +85,13 @@ class ImpulseManeuverTest {
         final NodeDetector trigger = new NodeDetector(initialOrbit, FramesFactory.getEME2000());
         propagator.addEventDetector(new ImpulseManeuver(trigger.withHandler((s, detector, increasing) -> action),
                                                         new Vector3D(dv, Vector3D.PLUS_J), 400.0));
-        SpacecraftState propagated = propagator.propagate(initialOrbit.getDate().shiftedBy(8000));
-        Assertions.assertEquals(0.0028257, propagated.getOrbit().getI(), 1.0e-6);
-        Assertions.assertEquals(0.442476 + 6 * FastMath.PI, propagated.getOrbit().getLv(), 1.0e-6);
+        final SpacecraftState propagated = propagator.propagate(initialOrbit.getDate().shiftedBy(8000));
+        if (action == Action.CONTINUE) {
+            Assertions.assertEquals(initialOrbit.getI(), propagated.getOrbit().getI());
+        } else {
+            Assertions.assertEquals(0.0028257, propagated.getOrbit().getI(), 1.0e-6);
+            Assertions.assertEquals(0.442476 + 6 * FastMath.PI, propagated.getOrbit().getLv(), 1.0e-6);
+        }
     }
 
     @Test
@@ -478,26 +484,30 @@ class ImpulseManeuverTest {
     void testInit() {
         // GIVEN
         final AbsoluteDate date = AbsoluteDate.ARBITRARY_EPOCH;
-        final SpacecraftState mockedState = Mockito.mock(SpacecraftState.class);
+        final SpacecraftState mockedState = mock();
         Mockito.when(mockedState.getDate()).thenReturn(date);
-        final ImpulseProvider impulseProvider = ImpulseProvider.of(Vector3D.PLUS_I);
+        final ImpulseProvider impulseProvider = mock();
         final ImpulseManeuver maneuver = new ImpulseManeuver(new DateDetector(), null, impulseProvider,
                 1, Control3DVectorCostType.NONE);
         // WHEN
         maneuver.init(mockedState, date);
+        // THEN
+        Mockito.verify(impulseProvider).init(mockedState, date);
     }
 
     @Test
     void testFinish() {
         // GIVEN
         final AbsoluteDate date = AbsoluteDate.ARBITRARY_EPOCH;
-        final SpacecraftState mockedState = Mockito.mock(SpacecraftState.class);
+        final SpacecraftState mockedState = mock();
         Mockito.when(mockedState.getDate()).thenReturn(date);
-        final ImpulseProvider impulseProvider = ImpulseProvider.of(Vector3D.PLUS_I);
+        final ImpulseProvider impulseProvider = mock();
         final ImpulseManeuver maneuver = new ImpulseManeuver(new DateDetector(), null, impulseProvider,
                 1, Control3DVectorCostType.NONE);
         // WHEN
         maneuver.finish(mockedState);
+        // THEN
+        Mockito.verify(impulseProvider).finish(mockedState);
     }
 
     @Test
@@ -552,7 +562,7 @@ class ImpulseManeuverTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         Utils.setDataRoot("regular-data");
     }
 

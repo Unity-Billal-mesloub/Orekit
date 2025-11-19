@@ -204,16 +204,18 @@ class FieldImpulseManeuverTest {
         final Orbit orbit = createOrbit();
         final FieldCountingHandler<Binary64> handler = new FieldCountingHandler<Binary64>(0, action) {
             @Override
-            protected boolean doesCount(FieldSpacecraftState<Binary64> state, FieldEventDetector<Binary64> detector, boolean increasing) {
-                return true;
+            protected boolean doesCount(final FieldSpacecraftState<Binary64> state, final FieldEventDetector<Binary64> detector,
+                                        final boolean increasing) {
+                return super.doesCount(state, detector, increasing);
             }
         };
         final FieldImpulseManeuver<Binary64> fieldImpulseManeuver = new FieldImpulseManeuver<>(fieldDateDetector.withHandler(handler),
                 FieldVector3D.getZero(field), Binary64.ONE);
         // WHEN
-        fieldImpulseManeuver.getHandler().eventOccurred(new FieldSpacecraftState<>(new FieldCartesianOrbit<>(field, orbit)),
+        final Action maneuverAction = fieldImpulseManeuver.getHandler().eventOccurred(new FieldSpacecraftState<>(new FieldCartesianOrbit<>(field, orbit)),
                 fieldImpulseManeuver, true);
         // THEN
+        Assertions.assertEquals(action == Action.CONTINUE ? action : Action.RESET_STATE, maneuverAction);
         Assertions.assertEquals(1, handler.getCount());
     }
 
