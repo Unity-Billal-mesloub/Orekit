@@ -147,20 +147,26 @@ public class FieldEventsLogger<T extends CalculusFieldElement<T>> {
         /** Reset state if any, otherwise event state. */
         private final FieldSpacecraftState<T> resetState;
 
+        /** Action registered by event handler. */
+        private final Action action;
+
         /** Constructor.
          * @param detectorN detector for event that was triggered
          * @param stateN state at event trigger date
          * @param resetStateN reset state if any, otherwise same as event state
          * @param increasingN indicator if the event switching function was increasing
          * or decreasing at event occurrence date
-         * @since 13.1
+         * @param actionN action from handler
+         * @since 14.0
          */
         private FieldLoggedEvent(final FieldEventDetector<T> detectorN, final FieldSpacecraftState<T> stateN,
-                                 final FieldSpacecraftState<T> resetStateN, final boolean increasingN) {
+                                 final FieldSpacecraftState<T> resetStateN, final boolean increasingN,
+                                 final Action actionN) {
             detector = detectorN;
             state      = stateN;
             resetState = resetStateN;
             increasing = increasingN;
+            action = actionN;
         }
 
         /** Get the event detector triggered.
@@ -195,6 +201,13 @@ public class FieldEventsLogger<T extends CalculusFieldElement<T>> {
             return increasing;
         }
 
+        /** Getter for the action from the handler.
+         * @return action
+         * @since 14.0
+         */
+        public Action getAction() {
+            return action;
+        }
     }
 
     /** Internal wrapper for events detectors. */
@@ -219,10 +232,11 @@ public class FieldEventsLogger<T extends CalculusFieldElement<T>> {
          * @param state state at event trigger date
          * @param resetState reset state if any, otherwise same as event state and null if not logged
          * @param increasing indicator if the event switching function was increasing
+         * @param action action from handler
          */
         void logEvent(final FieldSpacecraftState<T> state, final FieldSpacecraftState<T> resetState,
-                      final boolean increasing) {
-            log.add(new FieldLoggedEvent<>(wrappedDetector, state, resetState, increasing));
+                      final boolean increasing, final Action action) {
+            log.add(new FieldLoggedEvent<>(wrappedDetector, state, resetState, increasing, action));
         }
 
         /** {@inheritDoc} */
@@ -244,7 +258,8 @@ public class FieldEventsLogger<T extends CalculusFieldElement<T>> {
                                             final FieldEventDetector<T> d,
                                             final boolean increasing) {
                     final Action action = handler.eventOccurred(s, getDetector(), increasing);
-                    logEvent(s, logResetStates ? resetState(getDetector(), s) : null, increasing);
+                    final boolean resettingState = action == Action.RESET_STATE;
+                    logEvent(s, logResetStates && resettingState ? resetState(getDetector(), s) : null, increasing, action);
                     return action;
                 }
 

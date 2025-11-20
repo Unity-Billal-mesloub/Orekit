@@ -34,6 +34,8 @@ import org.orekit.TestUtils;
 import org.orekit.Utils;
 import org.orekit.bodies.CelestialBodyFactory;
 import org.orekit.bodies.OneAxisEllipsoid;
+import org.orekit.errors.OrekitException;
+import org.orekit.errors.OrekitMessages;
 import org.orekit.frames.FramesFactory;
 import org.orekit.orbits.FieldCartesianOrbit;
 import org.orekit.orbits.FieldEquinoctialOrbit;
@@ -101,7 +103,8 @@ class FieldEventsLoggerTest {
         Assertions.assertEquals(loggedEvents.size(), counterHandler.getCount());
         final FieldEventsLogger.FieldLoggedEvent<Binary64> event = loggedEvents.get(0);
         Assertions.assertEquals(mockedState, event.getState());
-        Assertions.assertEquals(logReset ? mockedState : null, event.getResetState());
+        Assertions.assertNull(event.getResetState());
+        Assertions.assertEquals(action, event.getAction());
     }
 
     @Test
@@ -125,6 +128,37 @@ class FieldEventsLoggerTest {
             Assertions.assertNotEquals(fieldState, state);
         } else {
             Assertions.assertEquals(fieldState, state);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testMonitorDetectorHandlerEventOccurredReset() {
+        // GIVEN
+        final Binary64Field field = Binary64Field.getInstance();
+        final FieldDateDetector<Binary64> dateDetector = new FieldDateDetector<>(field).withHandler(new FailingResetHandler());
+        final boolean logResetStates = false;
+        final FieldEventsLogger<Binary64> eventsLogger = new FieldEventsLogger<>(logResetStates, new ArrayList<>());
+        final FieldEventDetector<Binary64> detector = eventsLogger.monitorDetector(dateDetector);
+        final FieldSpacecraftState<Binary64> mockedState = mock();
+        when(mockedState.getDate()).thenReturn(FieldAbsoluteDate.getArbitraryEpoch(field));
+        // WHEN
+        final Action action = detector.getHandler().eventOccurred(mockedState, dateDetector, true);
+        // THEN
+        Assertions.assertEquals(Action.RESET_STATE, action);
+        Assertions.assertNull(eventsLogger.getLoggedEvents().get(0).getResetState());
+    }
+
+    private static class FailingResetHandler implements FieldEventHandler<Binary64> {
+
+        @Override
+        public Action eventOccurred(FieldSpacecraftState<Binary64> s, FieldEventDetector<Binary64> detector, boolean increasing) {
+            return Action.RESET_STATE;
+        }
+
+        @Override
+        public FieldSpacecraftState<Binary64> resetState(FieldEventDetector<Binary64> detector, FieldSpacecraftState<Binary64> oldState) {
+            throw new OrekitException(OrekitMessages.INTERNAL_ERROR);
         }
     }
 

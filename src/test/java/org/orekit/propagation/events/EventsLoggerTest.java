@@ -31,6 +31,7 @@ import org.orekit.Utils;
 import org.orekit.bodies.CelestialBodyFactory;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
+import org.orekit.errors.OrekitMessages;
 import org.orekit.frames.FramesFactory;
 import org.orekit.orbits.EquinoctialOrbit;
 import org.orekit.orbits.Orbit;
@@ -106,7 +107,8 @@ class EventsLoggerTest {
         Assertions.assertEquals(loggedEvents.size(), counterHandler.getCount());
         final EventsLogger.LoggedEvent event = loggedEvents.get(0);
         Assertions.assertEquals(mockedState, event.getState());
-        Assertions.assertEquals(logReset ? mockedState : null, event.getResetState());
+        Assertions.assertNull(event.getResetState());
+        Assertions.assertEquals(action, event.getAction());
     }
 
     @ParameterizedTest
@@ -148,6 +150,35 @@ class EventsLoggerTest {
                 return oldState.withMass(oldState.getMass());
             }
             return oldState;
+        }
+    }
+
+    @Test
+    void testMonitorDetectorHandlerEventOccurredReset() {
+        // GIVEN
+        final DateDetector dateDetector = new DateDetector().withHandler(new FailingResetHandler());
+        final boolean logResetStates = false;
+        final EventsLogger eventsLogger = new EventsLogger(logResetStates, new ArrayList<>());
+        final EventDetector detector = eventsLogger.monitorDetector(dateDetector);
+        final SpacecraftState mockedState = mock();
+        when(mockedState.getDate()).thenReturn(AbsoluteDate.ARBITRARY_EPOCH);
+        // WHEN
+        final Action action = detector.getHandler().eventOccurred(mockedState, dateDetector, true);
+        // THEN
+        Assertions.assertEquals(Action.RESET_STATE, action);
+        Assertions.assertNull(eventsLogger.getLoggedEvents().get(0).getResetState());
+    }
+
+    private static class FailingResetHandler implements EventHandler {
+
+        @Override
+        public Action eventOccurred(SpacecraftState s, EventDetector detector, boolean increasing) {
+            return Action.RESET_STATE;
+        }
+
+        @Override
+        public SpacecraftState resetState(EventDetector detector, SpacecraftState oldState) {
+            throw new OrekitException(OrekitMessages.INTERNAL_ERROR);
         }
     }
 
