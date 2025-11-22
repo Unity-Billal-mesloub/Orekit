@@ -23,6 +23,9 @@
         <action dev="luc" type="update" issue="issue-1857">
           Fixed missing drivers in GNSSPropagatorBuilder.
         </action>
+        <action dev="serrof" type="add" issue="1856">
+            Add circularizing impulsive maneuver.
+        </action>
         <action dev="luc" type="update" issue="issue-1850">
           Revamped GNSSPropagatorBuilder as a regular implementation of PropagatorBuilder.
         </action>
