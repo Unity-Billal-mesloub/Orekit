@@ -19,7 +19,7 @@
  * This package provides routines related to Lambert problems.
  *
  * @author Romain Serra
- * @since 12.2
+ * @since 13.1
  *
  */
 package org.orekit.control.heuristics.lambert;
