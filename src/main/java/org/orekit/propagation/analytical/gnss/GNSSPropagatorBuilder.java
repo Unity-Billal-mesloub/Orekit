@@ -62,6 +62,7 @@ public class GNSSPropagatorBuilder extends AbstractAnalyticalPropagatorBuilder<G
               Propagator.DEFAULT_MASS);
         this.orbitalElements = orbitalElements;
         this.bodyFixed       = bodyFixed;
+        addSupportedParameters(orbitalElements.getParametersDrivers());
     }
 
     /**  {@inheritDoc} */
