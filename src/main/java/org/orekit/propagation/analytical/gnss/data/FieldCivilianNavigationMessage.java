@@ -36,12 +36,6 @@ public abstract class FieldCivilianNavigationMessage<T extends CalculusFieldElem
     /** Indicator for CNV 2 messages. */
     private final boolean cnv2;
 
-    /** Change rate in semi-major axis (m/s). */
-    private T aDot;
-
-    /** Change rate in Δn₀. */
-    private T deltaN0Dot;
-
     /** The user SV accuracy (m). */
     private T svAccuracy;
 
@@ -90,8 +84,6 @@ public abstract class FieldCivilianNavigationMessage<T extends CalculusFieldElem
     protected FieldCivilianNavigationMessage(final Field<T> field, final O original) {
         super(field, original);
         this.cnv2 = original.isCnv2();
-        setADot(field.getZero().newInstance(original.getADot()));
-        setDeltaN0Dot(field.getZero().newInstance(original.getDeltaN0Dot()));
         setSvAccuracy(field.getZero().newInstance(original.getSvAccuracy()));
         setSvHealth(original.getSvHealth());
         setIscL1CA(field.getZero().newInstance(original.getIscL1CA()));
@@ -116,8 +108,6 @@ public abstract class FieldCivilianNavigationMessage<T extends CalculusFieldElem
                                                                                  final FieldCivilianNavigationMessage<V, O> original) {
         super(converter, original);
         this.cnv2 = original.isCnv2();
-        setADot(converter.apply(original.getADot()));
-        setDeltaN0Dot(converter.apply(original.getDeltaN0Dot()));
         setSvAccuracy(converter.apply(original.getSvAccuracy()));
         setSvHealth(original.getSvHealth());
         setIscL1CA(converter.apply(original.getIscL1CA()));
@@ -133,39 +123,17 @@ public abstract class FieldCivilianNavigationMessage<T extends CalculusFieldElem
         setFlags(original.getFlags());
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public boolean isCivilianMessage() {
+        return true;
+    }
+
     /** Check it message is a CNV2 message.
      * @return true if message is a CNV2 message
      */
     public boolean isCnv2() {
         return cnv2;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public T getADot() {
-        return aDot;
-    }
-
-    /**
-     * Setter for the change rate in semi-major axis.
-     * @param value the change rate in semi-major axis
-     */
-    public void setADot(final T value) {
-        this.aDot = value;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public T getDeltaN0Dot() {
-        return deltaN0Dot;
-    }
-
-    /**
-     * Setter for change rate in Δn₀.
-     * @param deltaN0Dot change rate in Δn₀
-     */
-    public void setDeltaN0Dot(final T deltaN0Dot) {
-        this.deltaN0Dot = deltaN0Dot;
     }
 
     /**

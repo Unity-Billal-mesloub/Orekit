@@ -88,7 +88,7 @@ class GnssGradientConverterTest {
     @Test
     void testInitialStateStmNoSelectedParameters() {
         final FieldGnssPropagator<Gradient> gPropagator = new GnssGradientConverter(propagator).getPropagator();
-        Assertions.assertEquals(9, gPropagator.getParametersDrivers().size());
+        Assertions.assertEquals(12, gPropagator.getParametersDrivers().size());
         Assertions.assertEquals(0, gPropagator.getParametersDrivers().stream().filter(ParameterDriver::isSelected).count());
         Assertions.assertEquals(6, gPropagator.getInitialState().getOrbit().getA().getFreeParameters());
         checkUnitaryInitialSTM(gPropagator.getInitialState());
@@ -98,9 +98,9 @@ class GnssGradientConverterTest {
     void testInitialStateStmAllParametersSelected() {
         propagator.getOrbitalElements().getParametersDrivers().forEach(p -> p.setSelected(true));
         final FieldGnssPropagator<Gradient> gPropagator = new GnssGradientConverter(propagator).getPropagator();
-        Assertions.assertEquals(9, gPropagator.getParametersDrivers().size());
-        Assertions.assertEquals( 9, gPropagator.getParametersDrivers().stream().filter(ParameterDriver::isSelected).count());
-        Assertions.assertEquals(15, gPropagator.getInitialState().getOrbit().getA().getFreeParameters());
+        Assertions.assertEquals(12, gPropagator.getParametersDrivers().size());
+        Assertions.assertEquals(12, gPropagator.getParametersDrivers().stream().filter(ParameterDriver::isSelected).count());
+        Assertions.assertEquals(18, gPropagator.getInitialState().getOrbit().getA().getFreeParameters());
         checkUnitaryInitialSTM(gPropagator.getInitialState());
     }
 
@@ -132,7 +132,7 @@ class GnssGradientConverterTest {
                                                       context.getFrames().getITRF(IERSConventions.IERS_2010, true));
 
         // we want to compute the partial derivatives with respect to Crs and Crc parameters
-        Assertions.assertEquals(9, propagator.getOrbitalElements().getParameters().length);
+        Assertions.assertEquals(12, propagator.getOrbitalElements().getParameters().length);
         propagator.getOrbitalElements().getParameterDriver(CommonGnssData.RADIUS_SINE).setSelected(true);
         propagator.getOrbitalElements().getParameterDriver(CommonGnssData.RADIUS_COSINE).setSelected(true);
         final DoubleArrayDictionary initialJacobianColumns = new DoubleArrayDictionary();
