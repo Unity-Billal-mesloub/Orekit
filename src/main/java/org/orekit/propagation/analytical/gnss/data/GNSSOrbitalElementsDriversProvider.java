@@ -331,6 +331,26 @@ public abstract class GNSSOrbitalElementsDriversProvider
         return Arrays.asList(array);
     }
 
+    /** Copy non-Keplerian elements.
+     * @since 14.0
+     */
+    protected void copyNonKeplerian(final GNSSOrbitalElementsDriversProvider original) {
+        setPRN(original.getPRN());
+        setWeek(original.getWeek());
+        setTime(original.getTime());
+        setADot(original.getADot());
+        setDeltaN0(original.getDeltaN0());
+        setDeltaN0Dot(original.getDeltaN0Dot());
+        setIDot(original.getIDot());
+        setOmegaDot(original.getOmegaDot());
+        setCuc(original.getCuc());
+        setCus(original.getCus());
+        setCrc(original.getCrc());
+        setCrs(original.getCrs());
+        setCic(original.getCic());
+        setCis(original.getCis());
+    }
+
     /** Get the mean angular velocity of the Earth of the GNSS model.
      * @return mean angular velocity of the Earth of the GNSS model
      */

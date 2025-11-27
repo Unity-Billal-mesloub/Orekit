@@ -126,20 +126,7 @@ public abstract class GNSSOrbitalElements<O extends GNSSOrbitalElements<O>>
              original.getTimeScales(), original.getSystem());
 
         // non-Keplerian parameters
-        setPRN(original.getPRN());
-        setWeek(original.getWeek());
-        setTime(original.getTime());
-        setADot(original.getADot());
-        setDeltaN0(original.getDeltaN0());
-        setDeltaN0Dot(original.getDeltaN0Dot());
-        setIDot(original.getIDot());
-        setOmegaDot(original.getOmegaDot());
-        setCuc(original.getCuc());
-        setCus(original.getCus());
-        setCrc(original.getCrc());
-        setCrs(original.getCrs());
-        setCic(original.getCic());
-        setCis(original.getCis());
+        copyNonKeplerian(original);
 
         // Keplerian orbital elements
         setSma(original.getSma().getReal());
