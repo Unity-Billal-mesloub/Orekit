@@ -435,7 +435,7 @@ class GPSPropagatorTest {
                               context.getFrames().getITRF(IERSConventions.IERS_2010, false));
 
         // we want to compute the partial derivatives with respect to Crs and Crc parameters
-        Assertions.assertEquals(9, propagator.getOrbitalElements().getParameters().length);
+        Assertions.assertEquals(12, propagator.getOrbitalElements().getParameters().length);
         propagator.getOrbitalElements().getParameterDriver(CommonGnssData.RADIUS_SINE).setSelected(true);
         propagator.getOrbitalElements().getParameterDriver(CommonGnssData.RADIUS_COSINE).setSelected(true);
         final DoubleArrayDictionary initialJacobianColumns = new DoubleArrayDictionary();

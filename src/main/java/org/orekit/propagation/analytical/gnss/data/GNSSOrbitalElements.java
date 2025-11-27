@@ -125,18 +125,8 @@ public abstract class GNSSOrbitalElements<O extends GNSSOrbitalElements<O>>
         this(original.getMu().getReal(), original.getAngularVelocity(), original.getWeeksInCycle(),
              original.getTimeScales(), original.getSystem());
 
-        // non-Keperian parameters
-        setPRN(original.getPRN());
-        setWeek(original.getWeek());
-        setTime(original.getTime());
-        setIDot(original.getIDot());
-        setOmegaDot(original.getOmegaDot());
-        setCuc(original.getCuc());
-        setCus(original.getCus());
-        setCrc(original.getCrc());
-        setCrs(original.getCrs());
-        setCic(original.getCic());
-        setCis(original.getCis());
+        // non-Keplerian parameters
+        copyNonKeplerian(original);
 
         // Keplerian orbital elements
         setSma(original.getSma().getReal());
@@ -199,17 +189,6 @@ public abstract class GNSSOrbitalElements<O extends GNSSOrbitalElements<O>>
         getSmaDriver().setValue(sma);
     }
 
-    /** Getter for the change rate in semi-major axis.
-     * <p>
-     * This value is non-zero only in civilian navigation messages
-     * </p>
-     * @return the change rate in semi-major axis
-     * @since 13.0
-     */
-    public double getADot() {
-        return 0;
-    }
-
     /** Get the computed mean motion n₀.
      * @return the computed mean motion n₀ (rad/s)
      * @since 13.0
@@ -217,28 +196,6 @@ public abstract class GNSSOrbitalElements<O extends GNSSOrbitalElements<O>>
     public double getMeanMotion0() {
         final double absA = FastMath.abs(getSma());
         return FastMath.sqrt(getMu() / absA) / absA;
-    }
-
-    /** Getter for the delta of satellite mean motion.
-     * <p>
-     * This value is non-zero only in navigation messages
-     * </p>
-     * @return delta of satellite mean motion
-     * @since 13.0
-     */
-    public double getDeltaN0() {
-        return 0;
-    }
-
-    /** Getter for change rate in Δn₀.
-     * <p>
-     * This value is non-zero only in civilian navigation messages
-     * </p>
-     * @return change rate in Δn₀
-     * @since 13.0
-     */
-    public double getDeltaN0Dot() {
-        return 0;
     }
 
     /** Get the driver for the eccentricity.

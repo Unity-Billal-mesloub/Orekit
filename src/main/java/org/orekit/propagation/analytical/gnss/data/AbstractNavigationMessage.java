@@ -37,9 +37,6 @@ import org.orekit.time.TimeScales;
 public abstract class AbstractNavigationMessage<O extends AbstractNavigationMessage<O>>
     extends AbstractAlmanac<O> implements NavigationMessage {
 
-    /** Mean Motion Difference from Computed Value. */
-    private double deltaN0;
-
     /** Time of clock epoch. */
     private AbsoluteDate epochToc;
 
@@ -79,7 +76,6 @@ public abstract class AbstractNavigationMessage<O extends AbstractNavigationMess
     protected <T extends CalculusFieldElement<T>,
                A extends AbstractNavigationMessage<A>> AbstractNavigationMessage(final FieldAbstractNavigationMessage<T, A> original) {
         super(original);
-        setDeltaN0(original.getDeltaN0().getReal());
         setEpochToc(original.getEpochToc().toAbsoluteDate());
         setTransmissionTime(original.getTransmissionTime().getReal());
         this.type = original.getNavigationMessageType();
@@ -114,20 +110,6 @@ public abstract class AbstractNavigationMessage<O extends AbstractNavigationMess
      */
     public void setSqrtA(final double sqrtA) {
         getSmaDriver().setValue(sqrtA * sqrtA);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDeltaN0() {
-        return deltaN0;
-    }
-
-    /**
-     * Setter for the delta of satellite mean motion.
-     * @param deltaN0 the value to set
-     */
-    public void setDeltaN0(final double deltaN0) {
-        this.deltaN0 = deltaN0;
     }
 
     /**
