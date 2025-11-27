@@ -48,6 +48,21 @@ public abstract class GNSSOrbitalElementsDriversProvider
     /** Name for time parameter. */
     public static final String TIME = "GnssTime";
 
+    /** Name for change rate in semi-major axis parameter.
+     * @since 14.0
+     */
+    private static final String A_DOT = "GnssADot";
+
+    /** Name for delta of satellite mean motion.
+     * @since 14.0
+     */
+    private static final String DELTA_N0 = "GnssDeltaN0";
+
+    /** Name for change rate in Δn₀.
+     * @since 14.0
+     */
+    private static final String DELTA_N0_DOT = "GnssDeltaN0Dot";
+
     /** Name for inclination rate parameter. */
     public static final String INCLINATION_RATE = "GnssInclinationRate";
 
@@ -75,8 +90,23 @@ public abstract class GNSSOrbitalElementsDriversProvider
     /** Index of time in the list returned by {@link #getParametersDrivers()}. */
     public static final int TIME_INDEX = 0;
 
+    /** Index of change rate in semi-major axis parameter in the list returned by {@link #getParametersDrivers()}.
+     * @since 14.0
+     */
+    private static final int A_DOT_INDEX = TIME_INDEX + 1;
+
+    /** Index of delta of satellite mean motion in the list returned by {@link #getParametersDrivers()}.
+     * @since 14.0
+     */
+    private static final int DELTA_N0_INDEX = A_DOT_INDEX + 1;
+
+    /** Index of change rate in Δn₀ in the list returned by {@link #getParametersDrivers()}.
+     * @since 14.0
+     */
+    private static final int DELTA_N0_DOT_INDEX = DELTA_N0_INDEX + 1;
+
     /** Index of inclination rate in the list returned by {@link #getParametersDrivers()}. */
-    public static final int I_DOT_INDEX = TIME_INDEX + 1;
+    public static final int I_DOT_INDEX = DELTA_N0_DOT_INDEX + 1;
 
     /** Index of longitude rate in the list returned by {@link #getParametersDrivers()}. */
     public static final int OMEGA_DOT_INDEX = I_DOT_INDEX + 1;
@@ -126,6 +156,21 @@ public abstract class GNSSOrbitalElementsDriversProvider
     /** Reference time. */
     private final ParameterDriver timeDriver;
 
+    /** Change rate in semi-major axis (m/s).
+     * @since 14.0
+     */
+    private final ParameterDriver aDotDriver;
+
+    /** Delta of satellite mean motion.
+     * @since 14.0
+     */
+    private final ParameterDriver deltaN0Driver;
+
+    /** Change rate in Δn₀.
+     * @since 14.0
+     */
+    private final ParameterDriver deltaN0DotDriver;
+
     /** Inclination rate (rad/s). */
     private final ParameterDriver iDotDriver;
 
@@ -168,15 +213,18 @@ public abstract class GNSSOrbitalElementsDriversProvider
         this.system          = system;
         this.timeScales      = timeScales;
 
-        this.timeDriver = createDriver(TIME);
-        this.iDotDriver = createDriver(INCLINATION_RATE);
-        this.domDriver  = createDriver(LONGITUDE_RATE);
-        this.cucDriver  = createDriver(LATITUDE_COSINE);
-        this.cusDriver  = createDriver(LATITUDE_SINE);
-        this.crcDriver  = createDriver(RADIUS_COSINE);
-        this.crsDriver  = createDriver(RADIUS_SINE);
-        this.cicDriver  = createDriver(INCLINATION_COSINE);
-        this.cisDriver  = createDriver(INCLINATION_SINE);
+        this.timeDriver       = createDriver(TIME);
+        this.aDotDriver       = createDriver(A_DOT);
+        this.deltaN0Driver    = createDriver(DELTA_N0);
+        this.deltaN0DotDriver = createDriver(DELTA_N0_DOT);
+        this.iDotDriver       = createDriver(INCLINATION_RATE);
+        this.domDriver        = createDriver(LONGITUDE_RATE);
+        this.cucDriver        = createDriver(LATITUDE_COSINE);
+        this.cusDriver        = createDriver(LATITUDE_SINE);
+        this.crcDriver        = createDriver(RADIUS_COSINE);
+        this.crsDriver        = createDriver(RADIUS_SINE);
+        this.cicDriver        = createDriver(INCLINATION_COSINE);
+        this.cisDriver        = createDriver(INCLINATION_SINE);
 
         // automatically update date when time driver is updated
         timeDriver.addObserver(new ParameterObserver() {
@@ -203,6 +251,9 @@ public abstract class GNSSOrbitalElementsDriversProvider
      */
     protected void copySelectionSettings(final GNSSOrbitalElementsDriversProvider original) {
         timeDriver.setSelected(original.timeDriver.isSelected());
+        aDotDriver.setSelected(original.aDotDriver.isSelected());
+        deltaN0Driver.setSelected(original.deltaN0Driver.isSelected());
+        deltaN0DotDriver.setSelected(original.deltaN0DotDriver.isSelected());
         iDotDriver.setSelected(original.iDotDriver.isSelected());
         domDriver.setSelected(original.domDriver.isSelected());
         cucDriver.setSelected(original.cucDriver.isSelected());
@@ -243,8 +294,11 @@ public abstract class GNSSOrbitalElementsDriversProvider
 
     /** {@inheritDoc}
      * <p>
-     * Only the 9 non-Keplerian evolution parameters are listed here,
+     * Only the 12 non-Keplerian evolution parameters are listed here,
      * i.e. {@link #getTimeDriver()} (at index {@link #TIME_INDEX}),
+     * {@link #getADotDriver()}  (at index {@link #A_DOT_INDEX}),
+     * {@link #getDeltaN0Driver()} (at index {@link #DELTA_N0_INDEX}),
+     * {@link #getDeltaN0DotDriver()} (at index {@link #DELTA_N0_DOT_INDEX}),
      * {@link #getIDotDriver()} (at index {@link #I_DOT_INDEX}),
      * {@link #getOmegaDotDriver()} (at index {@link #OMEGA_DOT_INDEX}),
      * {@link #getCucDriver()} (at index {@link #CUC_INDEX}),
@@ -262,15 +316,18 @@ public abstract class GNSSOrbitalElementsDriversProvider
     public List<ParameterDriver> getParametersDrivers() {
         // ensure the parameters are really at the advertised indices
         final ParameterDriver[] array = new ParameterDriver[SIZE];
-        array[TIME_INDEX]      = getTimeDriver();
-        array[I_DOT_INDEX]     = getIDotDriver();
-        array[OMEGA_DOT_INDEX] = getOmegaDotDriver();
-        array[CUC_INDEX]       = getCucDriver();
-        array[CUS_INDEX]       = getCusDriver();
-        array[CRC_INDEX]       = getCrcDriver();
-        array[CRS_INDEX]       = getCrsDriver();
-        array[CIC_INDEX]       = getCicDriver();
-        array[CIS_INDEX]       = getCisDriver();
+        array[TIME_INDEX]          = getTimeDriver();
+        array[A_DOT_INDEX]         = getADotDriver();
+        array[DELTA_N0_INDEX]      = getDeltaN0Driver();
+        array[DELTA_N0_DOT_INDEX]  = getDeltaN0DotDriver();
+        array[I_DOT_INDEX]         = getIDotDriver();
+        array[OMEGA_DOT_INDEX]     = getOmegaDotDriver();
+        array[CUC_INDEX]           = getCucDriver();
+        array[CUS_INDEX]           = getCusDriver();
+        array[CRC_INDEX]           = getCrcDriver();
+        array[CRS_INDEX]           = getCrsDriver();
+        array[CIC_INDEX]           = getCicDriver();
+        array[CIS_INDEX]           = getCisDriver();
         return Arrays.asList(array);
     }
 
@@ -343,6 +400,85 @@ public abstract class GNSSOrbitalElementsDriversProvider
      */
     public void setTime(final double time) {
         getTimeDriver().setValue(time);
+    }
+
+    /** Check if elements correspond to a civilian message.
+     * @since 14.0
+     */
+    public boolean isCivilianMessage() {
+        return false;
+    }
+
+    /** Get driver for the change rate in semi-major axis.
+     * @return driver for the change rate in semi-major axis
+     * @since 14.0
+     */
+    public ParameterDriver getADotDriver() {
+        return aDotDriver;
+    }
+
+    /** Get change rate in semi-major axis.
+     * @return the change rate in semi-major axis
+     * @since 14.0
+     */
+    public double getADot() {
+        return getADotDriver().getValue();
+    }
+
+    /** Set change rate in semi-major axis.
+     * @param aDot change rate in semi-major axis
+     * @since 14.0
+     */
+    public void setADot(final double aDot) {
+        getADotDriver().setValue(aDot);
+    }
+
+    /** Get the driver for delta of satellite mean motion.
+     * @return driver for delta of satellite mean motion
+     * @since 14.0
+     */
+    public ParameterDriver getDeltaN0Driver() {
+        return deltaN0Driver;
+    }
+
+    /** Get the delta of satellite mean motion.
+     * @return the delta of satellite mean motion
+     * @since 14.0
+     */
+    public double getDeltaN0() {
+        return getDeltaN0Driver().getValue();
+    }
+
+    /** Set the delta of satellite mean motion.
+     * @param deltaN0 the value to set
+     * @since 14.0
+     */
+    public void setDeltaN0(final double deltaN0) {
+        getDeltaN0Driver().setValue(deltaN0);
+    }
+
+    /** Get the driver for change rate in Δn₀.
+     * @return driver for change rate in Δn₀
+     * @since 14.0
+     */
+    public ParameterDriver getDeltaN0DotDriver() {
+        return deltaN0DotDriver;
+    }
+
+    /** Get the change rate in Δn₀.
+     * @return change rate in Δn₀
+     * @since 14.0
+     */
+    public double getDeltaN0Dot() {
+        return getDeltaN0DotDriver().getValue();
+    }
+
+    /** Set the change rate in Δn₀.
+     * @param deltaN0Dot change rate in Δn₀
+     * @since 14.0
+     */
+    public void setDeltaN0Dot(final double deltaN0Dot) {
+        getDeltaN0DotDriver().setValue(deltaN0Dot);
     }
 
     /** Get the driver for the rate of inclination angle.

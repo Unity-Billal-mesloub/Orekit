@@ -103,6 +103,9 @@ public abstract class FieldGnssOrbitalElements<T extends CalculusFieldElement<T>
         setPRN(original.getPRN());
         setWeek(original.getWeek());
         setTime(original.getTime());
+        setADot(original.getADot());
+        setDeltaN0(original.getDeltaN0());
+        setDeltaN0Dot(original.getDeltaN0Dot());
         setIDot(original.getIDot());
         setOmegaDot(original.getOmegaDot());
         setCuc(original.getCuc());
@@ -141,6 +144,9 @@ public abstract class FieldGnssOrbitalElements<T extends CalculusFieldElement<T>
         setPRN(original.getPRN());
         setWeek(original.getWeek());
         setTime(original.getTime());
+        setADot(original.getADot());
+        setDeltaN0(original.getDeltaN0());
+        setDeltaN0Dot(original.getDeltaN0Dot());
         setIDot(original.getIDot());
         setOmegaDot(original.getOmegaDot());
         setCuc(original.getCuc());
@@ -213,17 +219,6 @@ public abstract class FieldGnssOrbitalElements<T extends CalculusFieldElement<T>
         this.sma = sma;
     }
 
-    /** Getter for the change rate in semi-major axis.
-     * <p>
-     * This value is non-zero only in civilian navigation messages
-     * </p>
-     * @return the change rate in semi-major axis
-     * @since 13.0
-     */
-    public T getADot() {
-        return mu.getField().getZero();
-    }
-
     /** Get the computed mean motion n₀.
      * @return the computed mean motion n₀ (rad/s)
      * @since 13.0
@@ -231,28 +226,6 @@ public abstract class FieldGnssOrbitalElements<T extends CalculusFieldElement<T>
     public T getMeanMotion0() {
         final T invA = FastMath.abs(getSma()).reciprocal();
         return FastMath.sqrt(getMu().multiply(invA)).multiply(invA);
-    }
-
-    /** Getter for the delta of satellite mean motion.
-     * <p>
-     * This value is non-zero only in navigation messages
-     * </p>
-     * @return delta of satellite mean motion
-     * @since 13.0
-     */
-    public T getDeltaN0() {
-        return mu.getField().getZero();
-    }
-
-    /** Getter for change rate in Δn₀.
-     * <p>
-     * This value is non-zero only in civilian navigation messages
-     * </p>
-     * @return change rate in Δn₀
-     * @since 13.0
-     */
-    public T getDeltaN0Dot() {
-        return mu.getField().getZero();
     }
 
     /** Get eccentricity.

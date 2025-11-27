@@ -186,6 +186,7 @@ public class NavigationFileParserTest {
         Assertions.assertEquals(0.000000000000e+00,  gps.getSvHealth(), 1.0e-15);
         Assertions.assertEquals(0.000000000000e+00,  gps.getTGD(), 1.0e-15);
         Assertions.assertEquals(389,                 gps.getIODC());
+        Assertions.assertFalse(gps.isCivilianMessage());
 
         // check weeks reference in Rinex navigation are aligned with GPS weeks
         final AbsoluteDate obsRebuiltDate = new GNSSDate(gps.getWeek(), gps.getTime(), SatelliteSystem.GPS).
@@ -263,6 +264,7 @@ public class NavigationFileParserTest {
         Assertions.assertEquals(259206.0, list.get(0).getTransmissionTime(), 1.0e-10);
         Assertions.assertEquals(2230, list.get(0).getWeek());
         Assertions.assertEquals(0.0, list.get(1).getEpochToc().durationFrom(new AbsoluteDate(2022, 10, 5, 3, 30, 0, TimeScalesFactory.getGPS())), Double.MIN_VALUE);
+        Assertions.assertTrue(list.get(0).isCivilianMessage());
 
     }
 
@@ -390,6 +392,7 @@ public class NavigationFileParserTest {
         Assertions.assertEquals(0,                   bdt.getSatH1());
         Assertions.assertEquals(1.500000000000e-09,  bdt.getTGD1(), 1.0e-15);
         Assertions.assertEquals(-1.370000000000e-08, bdt.getTGD2(), 1.0e-15);
+        Assertions.assertFalse(bdt.isCivilianMessage());
 
         // check weeks reference in Rinex navigation are aligned with Beidou weeks (not GPS weeks as other systems)
         final AbsoluteDate obsRebuiltDate = new GNSSDate(bdt.getWeek(), bdt.getTime(), SatelliteSystem.BEIDOU).getDate();
@@ -484,6 +487,7 @@ public class NavigationFileParserTest {
         Assertions.assertEquals(16, list.get(0).getIODC());
         Assertions.assertEquals(259200.0, list.get(0).getTransmissionTime(), 1.0e-10);
         Assertions.assertEquals(16, list.get(0).getIODE());
+        Assertions.assertTrue(list.get(0).isCivilianMessage());
 
         Assertions.assertEquals(0.0, list.get(1).getEpochToc().durationFrom(new AbsoluteDate(2022, 10, 5, 1, 0, 0, TimeScalesFactory.getBDT())), Double.MIN_VALUE);
         Assertions.assertTrue(list.get(1).getRadioWave().closeTo(PredefinedGnssSignal.B1C, 1.0e-6));
@@ -782,6 +786,7 @@ public class NavigationFileParserTest {
         Assertions.assertEquals(1.688022166491e-09,  list.get(0).getIscL5Q5(), 1.0e-20);
         Assertions.assertEquals(255606.0, list.get(0).getTransmissionTime(), 1.0e-10);
         Assertions.assertEquals(2230, list.get(0).getWeek());
+        Assertions.assertTrue(list.get(0).isCivilianMessage());
         Assertions.assertEquals(0.0, list.get(1).getEpochToc().durationFrom(new AbsoluteDate(2022, 10, 5, 1, 0, 0, TimeScalesFactory.getGPS())), Double.MIN_VALUE);
 
     }

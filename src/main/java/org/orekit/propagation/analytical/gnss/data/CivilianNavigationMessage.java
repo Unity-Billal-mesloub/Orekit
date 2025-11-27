@@ -31,12 +31,6 @@ public abstract class CivilianNavigationMessage<O extends CivilianNavigationMess
     /** Indicator for CNV 2 messages. */
     private final boolean cnv2;
 
-    /** Change rate in semi-major axis (m/s). */
-    private double aDot;
-
-    /** Change rate in Δn₀. */
-    private double deltaN0Dot;
-
     /** The user SV accuracy (m). */
     private double svAccuracy;
 
@@ -107,8 +101,6 @@ public abstract class CivilianNavigationMessage<O extends CivilianNavigationMess
                A extends CivilianNavigationMessage<A>> CivilianNavigationMessage(final FieldCivilianNavigationMessage<T, A> original) {
         super(original);
         this.cnv2 = original.isCnv2();
-        setADot(original.getADot().getReal());
-        setDeltaN0Dot(original.getDeltaN0Dot().getReal());
         setSvAccuracy(original.getSvAccuracy().getReal());
         setSvHealth(original.getSvHealth());
         setIscL1CA(original.getIscL1CA().getReal());
@@ -133,30 +125,8 @@ public abstract class CivilianNavigationMessage<O extends CivilianNavigationMess
 
     /** {@inheritDoc} */
     @Override
-    public double getADot() {
-        return aDot;
-    }
-
-    /**
-     * Setter for the change rate in semi-major axis.
-     * @param value the change rate in semi-major axis
-     */
-    public void setADot(final double value) {
-        this.aDot = value;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public double getDeltaN0Dot() {
-        return deltaN0Dot;
-    }
-
-    /**
-     * Setter for change rate in Δn₀.
-     * @param deltaN0Dot change rate in Δn₀
-     */
-    public void setDeltaN0Dot(final double deltaN0Dot) {
-        this.deltaN0Dot = deltaN0Dot;
+    public boolean isCivilianMessage() {
+        return true;
     }
 
     /**

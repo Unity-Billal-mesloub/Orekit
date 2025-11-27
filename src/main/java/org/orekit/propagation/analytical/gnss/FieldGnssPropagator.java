@@ -212,7 +212,7 @@ public class FieldGnssPropagator<T extends CalculusFieldElement<T>> extends Fiel
         // Semi-major axis
         final FieldUnivariateDerivative2<T> ak = tk.multiply(orbitalElements.getADot()).add(orbitalElements.getSma());
         // Mean motion
-        final FieldUnivariateDerivative2<T> nA = tk.multiply(orbitalElements.getDeltaN0Dot().multiply(0.5)).
+        final FieldUnivariateDerivative2<T> nA = tk.multiply(orbitalElements.getDeltaN0Dot() * 0.5).
                                                  add(orbitalElements.getDeltaN0()).
                                                  add(orbitalElements.getMeanMotion0());
         // Mean anomaly
