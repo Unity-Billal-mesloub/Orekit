@@ -332,6 +332,7 @@ public abstract class GNSSOrbitalElementsDriversProvider
     }
 
     /** Copy non-Keplerian elements.
+     * @param original original instance to copy from
      * @since 14.0
      */
     protected void copyNonKeplerian(final GNSSOrbitalElementsDriversProvider original) {
