@@ -128,20 +128,7 @@ public abstract class FieldGnssOrbitalElements<T extends CalculusFieldElement<T>
         mu = converter.apply(original.getMu());
 
         // non-Keplerian parameters
-        setPRN(original.getPRN());
-        setWeek(original.getWeek());
-        setTime(original.getTime());
-        setADot(original.getADot());
-        setDeltaN0(original.getDeltaN0());
-        setDeltaN0Dot(original.getDeltaN0Dot());
-        setIDot(original.getIDot());
-        setOmegaDot(original.getOmegaDot());
-        setCuc(original.getCuc());
-        setCus(original.getCus());
-        setCrc(original.getCrc());
-        setCrs(original.getCrs());
-        setCic(original.getCic());
-        setCis(original.getCis());
+        copyNonKeplerian(original);
 
         // Keplerian orbital elements
         setGnssDate(new GNSSDate(original.getWeek(), original.getTime(), original.getSystem(), original.getTimeScales()));
