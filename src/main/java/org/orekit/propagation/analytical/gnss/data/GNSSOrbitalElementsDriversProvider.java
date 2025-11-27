@@ -51,17 +51,17 @@ public abstract class GNSSOrbitalElementsDriversProvider
     /** Name for change rate in semi-major axis parameter.
      * @since 14.0
      */
-    private static final String A_DOT = "GnssADot";
+    public static final String A_DOT = "GnssADot";
 
     /** Name for delta of satellite mean motion.
      * @since 14.0
      */
-    private static final String DELTA_N0 = "GnssDeltaN0";
+    public static final String DELTA_N0 = "GnssDeltaN0";
 
     /** Name for change rate in Δn₀.
      * @since 14.0
      */
-    private static final String DELTA_N0_DOT = "GnssDeltaN0Dot";
+    public static final String DELTA_N0_DOT = "GnssDeltaN0Dot";
 
     /** Name for inclination rate parameter. */
     public static final String INCLINATION_RATE = "GnssInclinationRate";
@@ -403,6 +403,7 @@ public abstract class GNSSOrbitalElementsDriversProvider
     }
 
     /** Check if elements correspond to a civilian message.
+     * @return true if elements correspond to a civilian message
      * @since 14.0
      */
     public boolean isCivilianMessage() {
