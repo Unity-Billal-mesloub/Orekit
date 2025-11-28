@@ -105,36 +105,6 @@ public interface CartesianToleranceProvider {
     }
 
     /**
-     * Build a provider based on expected errors for position, velocity and mass respectively
-     * as well as relative tolerance applied to all.
-     *
-     * <p>
-     * The tolerances are only <em>orders of magnitude</em>, and integrator tolerances
-     * are only local estimates, not global ones. So some care must be taken when using
-     * these tolerances. Setting 1mm as a position error does NOT mean the tolerances
-     * will guarantee a 1mm error position after several orbits integration.
-     * </p>
-     *
-     * @param dP expected position error
-     * @param dV expected velocity error
-     * @param dM expected mass error
-     * @param relativeTolerance relative tolerance
-     * @return tolerance provider
-     * @since 14.0
-     */
-    static CartesianToleranceProvider of(final double dP, final double dV, final double dM, final double relativeTolerance) {
-        return (position, velocity) -> {
-            final double[] absTol = new double[7];
-            final double[] relTol = absTol.clone();
-            Arrays.fill(absTol, 0, 3, dP);
-            Arrays.fill(absTol, 3, 6, dV);
-            absTol[6] = dM;
-            Arrays.fill(relTol, 0, 7, relativeTolerance);
-            return new double[][] { absTol, relTol };
-        };
-    }
-
-    /**
      * Build a provider based on expected errors for position, velocity and mass respectively.
      * The relative tolerance is inferred from these values.
      *
