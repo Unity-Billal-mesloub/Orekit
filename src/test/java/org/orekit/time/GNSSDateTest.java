@@ -77,6 +77,7 @@ public class GNSSDateTest {
         Assertions.assertEquals(1000 * refSeconds, GNSSDate.getMilliInWeek(), 1.0e-15);
         Assertions.assertEquals(refSeconds, GNSSDate.getSecondsInWeek(), 1.0e-15);
         Assertions.assertEquals(0, GNSSDate.getDate().durationFrom(ref), 1.0e-15);
+        Assertions.assertEquals(system, GNSSDate.getSystem());
     }
 
     @Test

@@ -62,6 +62,11 @@ public class GNSSDate implements Serializable, TimeStamped {
     /** Number of seconds since week start. */
     private final TimeOffset secondsInWeek;
 
+    /** Satellite system.
+     * @since 14.0
+     */
+    private final SatelliteSystem system;
+
     /** Corresponding date. */
     private final transient AbsoluteDate date;
 
@@ -203,6 +208,7 @@ public class GNSSDate implements Serializable, TimeStamped {
 
         this.weekNumber    = w;
         this.secondsInWeek = secondsInWeek;
+        this.system        = system;
 
         date = new AbsoluteDate(dc, new TimeComponents(secondsInDay), getTimeScale(system, timeScales));
 
@@ -270,6 +276,7 @@ public class GNSSDate implements Serializable, TimeStamped {
 
         this.weekNumber    = w;
         this.secondsInWeek = secondsInWeek;
+        this.system        = system;
 
         date = new AbsoluteDate(dc, new TimeComponents(secondsInDay), getTimeScale(system, timeScales));
 
@@ -305,8 +312,17 @@ public class GNSSDate implements Serializable, TimeStamped {
         this.weekNumber  = (int) FastMath.floor(date.durationFrom(epoch) / WEEK_S);
         final AbsoluteDate weekStart = new AbsoluteDate(epoch, WEEK_S * weekNumber);
         this.secondsInWeek = date.accurateDurationFrom(weekStart);
+        this.system        = system;
         this.date          = date;
 
+    }
+
+    /** Get satellite system.
+     * @return satellite system
+     * @since 14.0
+     */
+    public SatelliteSystem getSystem() {
+        return system;
     }
 
     /** Set a reference date for ensuring continuity across GNSS week rollover.
