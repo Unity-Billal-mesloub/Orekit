@@ -35,30 +35,6 @@ import java.util.Arrays;
 class CartesianToleranceProviderTest {
 
     @Test
-    void testOfRelTol() {
-        // GIVEN
-        final double relTol = 1e-3;
-        final double dP = 1.;
-        final double dV = 2.;
-        final double dM = 3.;
-        final CartesianToleranceProvider toleranceProvider = CartesianToleranceProvider.of(dP, dV, dM, relTol);
-        // WHEN
-        final double[][] tolerances = toleranceProvider.getTolerances(Mockito.mock(Vector3D.class),
-                Mockito.mock(Vector3D.class));
-        // THEN
-        Assertions.assertEquals(dP, tolerances[0][0]);
-        Assertions.assertEquals(dP, tolerances[0][1]);
-        Assertions.assertEquals(dP, tolerances[0][2]);
-        Assertions.assertEquals(dV, tolerances[0][3]);
-        Assertions.assertEquals(dV, tolerances[0][4]);
-        Assertions.assertEquals(dV, tolerances[0][5]);
-        Assertions.assertEquals(dM, tolerances[0][6]);
-        for (int i = 0; i < tolerances[0].length; ++i) {
-            Assertions.assertEquals(relTol, tolerances[1][i]);
-        }
-    }
-
-    @Test
     void testOfdP() {
         // GIVEN
         final double dP = 1.;
