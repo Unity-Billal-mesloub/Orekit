@@ -106,12 +106,12 @@ public abstract class GNSSOrbitalElements<O extends GNSSOrbitalElements<O>>
         this.mu         = mu;
 
         // fields controlled by parameter drivers for Keplerian orbital elements
-        this.smaDriver  = createDriver(SEMI_MAJOR_AXIS);
-        this.eccDriver  = createDriver(ECCENTRICITY);
-        this.i0Driver   = createDriver(INCLINATION);
-        this.aopDriver  = createDriver(ARGUMENT_OF_PERIGEE);
-        this.om0Driver  = createDriver(NODE_LONGITUDE);
-        this.anomDriver = createDriver(MEAN_ANOMALY);
+        this.smaDriver  = createDriver(SEMI_MAJOR_AXIS,       0);
+        this.eccDriver  = createDriver(ECCENTRICITY,        -24);
+        this.i0Driver   = createDriver(INCLINATION,         -24);
+        this.aopDriver  = createDriver(ARGUMENT_OF_PERIGEE, -24);
+        this.om0Driver  = createDriver(NODE_LONGITUDE,      -24);
+        this.anomDriver = createDriver(MEAN_ANOMALY,        -24);
 
     }
 
