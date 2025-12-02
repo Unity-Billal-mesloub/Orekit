@@ -213,18 +213,18 @@ public abstract class GNSSOrbitalElementsDriversProvider
         this.system          = system;
         this.timeScales      = timeScales;
 
-        this.timeDriver       = createDriver(TIME);
-        this.aDotDriver       = createDriver(A_DOT);
-        this.deltaN0Driver    = createDriver(DELTA_N0);
-        this.deltaN0DotDriver = createDriver(DELTA_N0_DOT);
-        this.iDotDriver       = createDriver(INCLINATION_RATE);
-        this.domDriver        = createDriver(LONGITUDE_RATE);
-        this.cucDriver        = createDriver(LATITUDE_COSINE);
-        this.cusDriver        = createDriver(LATITUDE_SINE);
-        this.crcDriver        = createDriver(RADIUS_COSINE);
-        this.crsDriver        = createDriver(RADIUS_SINE);
-        this.cicDriver        = createDriver(INCLINATION_COSINE);
-        this.cisDriver        = createDriver(INCLINATION_SINE);
+        this.timeDriver       = createDriver(TIME,               -10);
+        this.aDotDriver       = createDriver(A_DOT,              -10);
+        this.deltaN0Driver    = createDriver(DELTA_N0,           -36);
+        this.deltaN0DotDriver = createDriver(DELTA_N0_DOT,       -46);
+        this.iDotDriver       = createDriver(INCLINATION_RATE,   -34);
+        this.domDriver        = createDriver(LONGITUDE_RATE,     -34);
+        this.cucDriver        = createDriver(LATITUDE_COSINE,    -24);
+        this.cusDriver        = createDriver(LATITUDE_SINE,      -24);
+        this.crcDriver        = createDriver(RADIUS_COSINE,        0);
+        this.crsDriver        = createDriver(RADIUS_SINE,          0);
+        this.cicDriver        = createDriver(INCLINATION_COSINE, -24);
+        this.cisDriver        = createDriver(INCLINATION_SINE,   -24);
 
         // automatically update date when time driver is updated
         timeDriver.addObserver(new ParameterObserver() {
@@ -271,10 +271,12 @@ public abstract class GNSSOrbitalElementsDriversProvider
 
     /** Create parameter driver.
      * @param name name of the driver
+     * @param scalePower power of two of the scale parameter
      * @return build driver
      */
-    protected static ParameterDriver createDriver(final String name) {
-        return new ParameterDriver(name, 0, FastMath.scalb(1.0, -30),
+    protected static ParameterDriver createDriver(final String name,
+                                                  final int scalePower) {
+        return new ParameterDriver(name, 0, FastMath.scalb(1.0, scalePower),
                                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 
