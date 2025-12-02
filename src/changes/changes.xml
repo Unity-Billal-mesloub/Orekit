@@ -176,6 +176,9 @@
         <action dev="serrof" type="add" issue="1517">
             Add analytical ephemerides for the Moon.
         </action>
+        <action dev="serrof" type="update" issue="1462">
+            Add option to use other atmospheric model for derivatives computation.
+        </action>
         <action dev="serrof" type="update" issue="1244">
             Add abstract classes for detectors based on body shape.
         </action>
