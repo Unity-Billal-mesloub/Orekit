@@ -93,17 +93,17 @@ public abstract class GNSSOrbitalElementsDriversProvider
     /** Index of change rate in semi-major axis parameter in the list returned by {@link #getParametersDrivers()}.
      * @since 14.0
      */
-    private static final int A_DOT_INDEX = TIME_INDEX + 1;
+    public static final int A_DOT_INDEX = TIME_INDEX + 1;
 
     /** Index of delta of satellite mean motion in the list returned by {@link #getParametersDrivers()}.
      * @since 14.0
      */
-    private static final int DELTA_N0_INDEX = A_DOT_INDEX + 1;
+    public static final int DELTA_N0_INDEX = A_DOT_INDEX + 1;
 
     /** Index of change rate in Δn₀ in the list returned by {@link #getParametersDrivers()}.
      * @since 14.0
      */
-    private static final int DELTA_N0_DOT_INDEX = DELTA_N0_INDEX + 1;
+    public static final int DELTA_N0_DOT_INDEX = DELTA_N0_INDEX + 1;
 
     /** Index of inclination rate in the list returned by {@link #getParametersDrivers()}. */
     public static final int I_DOT_INDEX = DELTA_N0_DOT_INDEX + 1;
