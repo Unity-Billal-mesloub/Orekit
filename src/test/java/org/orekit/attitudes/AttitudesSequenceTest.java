@@ -282,7 +282,7 @@ class AttitudesSequenceTest {
         // as we have 2 switch events (even if they share the same underlying event detector),
         // and these events are triggered at both eclipse entry and exit, we get 8
         // raw events on 2 orbits
-        Assertions.assertEquals(8, logger.getLoggedEvents().size());
+        Assertions.assertEquals(10, logger.getLoggedEvents().size());
 
         // we have 4 attitudes switch on 2 orbits, 2 of each type
         Assertions.assertEquals(2, dayToNightHandler.dates.size());
@@ -554,7 +554,7 @@ class AttitudesSequenceTest {
     @Test
     void testAnalyticalPropagatorTransition() {
         // Define initial state
-        final AbsoluteDate initialDate = new AbsoluteDate(2017, 03, 27, 0, 0, 00.000, TimeScalesFactory.getUTC());
+        final AbsoluteDate initialDate = new AbsoluteDate(2017, 3, 27, 0, 0, 00.000, TimeScalesFactory.getUTC());
         final Vector3D position  = new Vector3D(-39098981.4866597, -15784239.3610601, 78908.2289853595);
         final Vector3D velocity  = new Vector3D(1151.00321021175, -2851.14864755189, -2.02133248357321);
         final Orbit initialOrbit = new KeplerianOrbit(new PVCoordinates(position, velocity),

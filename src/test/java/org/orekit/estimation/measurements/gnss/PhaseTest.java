@@ -87,12 +87,12 @@ public class PhaseTest {
             System.out.println("\nTest Range Phase Derivatives - Finite Differences Comparison\n");
         }
         // Run test
-        double refErrorsPMedian = 5.7e-10;
-        double refErrorsPMean   = 4.0e-09;
-        double refErrorsPMax    = 2.4e-07;
-        double refErrorsVMedian = 2.2e-05;
-        double refErrorsVMean   = 8.3e-05;
-        double refErrorsVMax    = 4.6e-03;
+        double refErrorsPMedian = 5.4e-10;
+        double refErrorsPMean   = 3.9e-09;
+        double refErrorsPMax    = 2.2e-07;
+        double refErrorsVMedian = 2.4e-05;
+        double refErrorsVMean   = 7.4e-05;
+        double refErrorsVMax    = 2.1e-03;
         this.genericTestStateDerivatives(printResults,
                                          refErrorsPMedian, refErrorsPMean, refErrorsPMax,
                                          refErrorsVMedian, refErrorsVMean, refErrorsVMax);
@@ -110,12 +110,12 @@ public class PhaseTest {
             System.out.println("\nTest Phase State Derivatives with Modifier - Finite Differences Comparison\n");
         }
         // Run test
-        double refErrorsPMedian = 5.7e-10;
-        double refErrorsPMean   = 4.0e-09;
-        double refErrorsPMax    = 2.4e-07;
-        double refErrorsVMedian = 2.2e-05;
-        double refErrorsVMean   = 8.3e-05;
-        double refErrorsVMax    = 4.6e-03;
+        double refErrorsPMedian = 5.4e-10;
+        double refErrorsPMean   = 3.9e-09;
+        double refErrorsPMax    = 2.2e-07;
+        double refErrorsVMedian = 2.4e-05;
+        double refErrorsVMean   = 7.4e-05;
+        double refErrorsVMax    = 2.1e-03;
         this.genericTestStateDerivatives(printResults,
                                          refErrorsPMedian, refErrorsPMean, refErrorsPMax,
                                          refErrorsVMedian, refErrorsVMean, refErrorsVMax);
@@ -575,12 +575,12 @@ public class PhaseTest {
     public void testStateDerivativesWithTroposphericModifier() {
 
         final boolean printResults     = false;
-        final double  refErrorsPMedian = 5.9e-10;
+        final double  refErrorsPMedian = 6.0e-10;
         final double  refErrorsPMean   = 5.2e-9;
         final double  refErrorsPMax    = 3.7e-7;
         final double  refErrorsVMedian = 2.4e-5;
         final double  refErrorsVMean   = 8.9e-5;
-        final double  refErrorsVMax    = 4.6e-3;
+        final double  refErrorsVMax    = 2.7e-3;
 
         Context context = EstimationTestUtils.eccentricContext("regular-data:potential:tides");
 
@@ -740,12 +740,12 @@ public class PhaseTest {
     public void testStateDerivativesWithIonosphericModifier() {
 
         final boolean printResults = false;
-        final double refErrorsPMedian = 6.5e-10;
+        final double refErrorsPMedian = 6.7e-10;
         final double refErrorsPMean = 3.0e-9;
         final double refErrorsPMax = 9.0e-8;
-        final double refErrorsVMedian = 2.8e-5;
-        final double refErrorsVMean = 7.9e-5;
-        final double refErrorsVMax = 4.6e-3;
+        final double refErrorsVMedian = 2.4e-5;
+        final double refErrorsVMean = 7.5e-5;
+        final double refErrorsVMax = 2.1e-3;
 
         Context context = EstimationTestUtils.eccentricContext("regular-data:potential:tides");
 

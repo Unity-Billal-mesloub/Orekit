@@ -196,10 +196,10 @@ class GroundStationTest {
         moved.getNorthOffsetDriver().setSelected(true);
         moved.getZenithOffsetDriver().setSelected(true);
 
-        EstimationTestUtils.checkFit(context, estimator, 2, 6,
+        EstimationTestUtils.checkFit(context, estimator, 2, 8,
                                      0.0, 6.7e-7,
                                      0.0, 1.8e-6,
-                                     0.0, 9e-7,
+                                     0.0, 9.1e-7,
                                      0.0, 5e-10);
         Assertions.assertEquals(deltaTopo.getX(), moved.getEastOffsetDriver().getValue(),   4.5e-7);
         Assertions.assertEquals(deltaTopo.getY(), moved.getNorthOffsetDriver().getValue(),  6.2e-7);

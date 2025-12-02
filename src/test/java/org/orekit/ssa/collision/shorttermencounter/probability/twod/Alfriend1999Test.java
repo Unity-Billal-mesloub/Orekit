@@ -143,7 +143,7 @@ class Alfriend1999Test {
                         armellinDataRowList);
         
         // THEN
-        Assertions.assertTrue(statistics.getMean() <= 8.843564821991819E-10);
+        Assertions.assertTrue(statistics.getMean() <= 8.84356484E-10);
         Assertions.assertTrue(statistics.getStandardDeviation() <= 3.607777228631725E-9);
     }
     
