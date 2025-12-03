@@ -361,22 +361,7 @@ public class BatchLSEstimator {
      */
     public Propagator[] estimate() {
 
-        // set reference date for all parameters that lack one (including the not estimated parameters)
-        for (final ParameterDriver driver : getOrbitalParametersDrivers(false).getDrivers()) {
-            if (driver.getReferenceDate() == null) {
-                driver.setReferenceDate(builders[0].getInitialOrbitDate());
-            }
-        }
-        for (final ParameterDriver driver : getPropagatorParametersDrivers(false).getDrivers()) {
-            if (driver.getReferenceDate() == null) {
-                driver.setReferenceDate(builders[0].getInitialOrbitDate());
-            }
-        }
-        for (final ParameterDriver driver : getMeasurementsParametersDrivers(false).getDrivers()) {
-            if (driver.getReferenceDate() == null) {
-                driver.setReferenceDate(builders[0].getInitialOrbitDate());
-            }
-        }
+        setReferenceDatesInDrivers();
 
         // get all estimated parameters
         final ParameterDriversList estimatedOrbitalParameters      = getOrbitalParametersDrivers(true);
@@ -463,6 +448,32 @@ public class BatchLSEstimator {
 
         } catch (MathRuntimeException mrte) {
             throw new OrekitException(mrte);
+        }
+    }
+
+    /**
+     * Method setting reference dates for drivers (including the not estimated parameters).
+     * @since 13.1.3
+     */
+    private void setReferenceDatesInDrivers() {
+        for (final PropagatorBuilder builder : builders) {
+            builder.getOrbitalParametersDrivers().getDrivers().stream()
+                    .flatMap(delegatingDriver -> delegatingDriver.getRawDrivers().stream())
+                    .filter(driver -> driver.getReferenceDate() == null)
+                    .forEach(driver -> driver.setReferenceDate(builders[0].getInitialOrbitDate()));
+        }
+        for (final PropagatorBuilder builder : builders) {
+            builder.getPropagationParametersDrivers().getDrivers().stream()
+                    .flatMap(delegatingDriver -> delegatingDriver.getRawDrivers().stream())
+                    .filter(driver -> driver.getReferenceDate() == null)
+                    .forEach(driver -> driver.setReferenceDate(builders[0].getInitialOrbitDate()));
+        }
+        for (final  ObservedMeasurement<?> measurement : measurements) {
+            for (final ParameterDriver driver : measurement.getParametersDrivers()) {
+                if (driver.getReferenceDate() == null) {
+                    driver.setReferenceDate(builders[0].getInitialOrbitDate());
+                }
+            }
         }
     }
 

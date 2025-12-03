@@ -23,6 +23,9 @@
       <action dev="evan" type="fix" issue="1854">
           Fixed regression on performance with OCM.
       </action>
+      <action dev="serrof" type="fix" issue="710">
+          Fixed performance issue with many unselected measurement parameters in least-squares.
+      </action>
     </release>
     <release version="13.1.2" date="2025-09-25" description="Orekit 13.1.2 is a patch release. It fixes various bugs including a couple of urgent ones">
         <action dev="luc" type="fix" issue="1831">

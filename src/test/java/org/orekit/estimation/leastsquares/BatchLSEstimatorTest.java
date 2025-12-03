@@ -19,11 +19,16 @@ package org.orekit.estimation.leastsquares;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.linear.RealMatrix;
+import org.hipparchus.optim.nonlinear.vector.leastsquares.GaussNewtonOptimizer;
 import org.hipparchus.optim.nonlinear.vector.leastsquares.LeastSquaresProblem.Evaluation;
 import org.hipparchus.optim.nonlinear.vector.leastsquares.LevenbergMarquardtOptimizer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.orekit.TestUtils;
 import org.orekit.attitudes.LofOffset;
+import org.orekit.bodies.GeodeticPoint;
+import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
 import org.orekit.errors.OrekitMessages;
 import org.orekit.estimation.Context;
@@ -34,6 +39,7 @@ import org.orekit.estimation.measurements.EstimationsProvider;
 import org.orekit.estimation.measurements.GroundStation;
 import org.orekit.estimation.measurements.InterSatellitesRangeMeasurementCreator;
 import org.orekit.estimation.measurements.MultiplexedMeasurement;
+import org.orekit.estimation.measurements.ObservableSatellite;
 import org.orekit.estimation.measurements.ObservedMeasurement;
 import org.orekit.estimation.measurements.PVMeasurementCreator;
 import org.orekit.estimation.measurements.Range;
@@ -42,8 +48,12 @@ import org.orekit.estimation.measurements.RangeRateMeasurementCreator;
 import org.orekit.estimation.measurements.modifiers.PhaseCentersRangeModifier;
 import org.orekit.forces.gravity.NewtonianAttraction;
 import org.orekit.forces.radiation.RadiationSensitive;
+import org.orekit.frames.Frame;
+import org.orekit.frames.FramesFactory;
 import org.orekit.frames.LOFType;
+import org.orekit.frames.TopocentricFrame;
 import org.orekit.gnss.antenna.FrequencyPattern;
+import org.orekit.models.earth.ReferenceEllipsoid;
 import org.orekit.orbits.CartesianOrbit;
 import org.orekit.orbits.KeplerianOrbit;
 import org.orekit.orbits.Orbit;
@@ -52,6 +62,7 @@ import org.orekit.orbits.PositionAngleType;
 import org.orekit.propagation.BoundedPropagator;
 import org.orekit.propagation.EphemerisGenerator;
 import org.orekit.propagation.Propagator;
+import org.orekit.propagation.conversion.KeplerianPropagatorBuilder;
 import org.orekit.propagation.conversion.NumericalPropagatorBuilder;
 import org.orekit.propagation.numerical.NumericalPropagator;
 import org.orekit.time.AbsoluteDate;
@@ -1210,6 +1221,37 @@ class BatchLSEstimatorTest {
         return multiplexed;
     }
 
+    @Test
+    @Timeout(20)
+    void testIssue710() {
+        // GIVEN
+        EstimationTestUtils.eccentricContext("regular-data:potential:tides");
+        final Orbit initialGuess = TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH);
+        final KeplerianPropagatorBuilder propagatorBuilder = new KeplerianPropagatorBuilder(OrbitType.CARTESIAN.convertType(initialGuess),
+                PositionAngleType.MEAN, 1.);
+        final BatchLSEstimator estimator = new BatchLSEstimator(new GaussNewtonOptimizer(), propagatorBuilder);
+        estimator.setMaxEvaluations(100);
+        estimator.setMaxIterations(100);
+        estimator.setParametersConvergenceThreshold(1e-1);
+        final Frame earthFixedFrame = FramesFactory.getGTOD(true);
+        final OneAxisEllipsoid ellipsoid = ReferenceEllipsoid.getWgs84(earthFixedFrame);
+        final ObservableSatellite observableSatellite = new ObservableSatellite(0);
+        for (int i = 0; i < 10000; i++) {
+            final Orbit shifted = initialGuess.shiftedBy(i * 10);
+            final Vector3D position = shifted.getPosition();
+            final GeodeticPoint geodeticPoint = ellipsoid.transform(position, shifted.getFrame(), shifted.getDate());
+            final GeodeticPoint onGroundPoint = new GeodeticPoint(geodeticPoint.getLatitude(), geodeticPoint.getLongitude(), 0.);
+            final TopocentricFrame topocentricFrame = new TopocentricFrame(ellipsoid, onGroundPoint, String.valueOf(i));
+            final GroundStation station = new GroundStation(topocentricFrame);
+            final double rangeValue = topocentricFrame.getRange(position, shifted.getFrame(), shifted.getDate());
+            final Range range = new Range(station, true, shifted.getDate(), rangeValue, 100., 1., observableSatellite);
+            estimator.addMeasurement(range);
+        }
+        // WHEN
+        estimator.estimate();
+        // THEN
+        Assertions.assertNotNull(estimator.getOptimum());
+    }
 }
 
 
