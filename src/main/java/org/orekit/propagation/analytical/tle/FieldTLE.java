@@ -36,7 +36,6 @@ import org.orekit.errors.OrekitMessages;
 import org.orekit.orbits.FieldKeplerianOrbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.propagation.FieldSpacecraftState;
-import org.orekit.propagation.analytical.tle.generation.TleGenerationAlgorithm;
 import org.orekit.propagation.analytical.tle.generation.TleGenerationUtil;
 import org.orekit.propagation.conversion.osc2mean.OsculatingToMeanConverter;
 import org.orekit.propagation.conversion.osc2mean.TLETheory;
@@ -731,23 +730,6 @@ public class FieldTLE<T extends CalculusFieldElement<T>> implements FieldTimeSta
         } catch (OrekitException oe) {
             throw new OrekitInternalError(oe);
         }
-    }
-
-    /**
-     * Convert Spacecraft State into TLE.
-     *
-     * @param state Spacecraft State to convert into TLE
-     * @param templateTLE only used to get identifiers like satellite number, launch year, etc. In other words, the keplerian elements contained in the generated TLE are based on the provided state and not the template TLE.
-     * @param generationAlgorithm TLE generation algorithm
-     * @param <T> type of the element
-     * @return a generated TLE
-     * @since 12.0
-     * @deprecated As of release 13.0, use {@link #stateToTLE(FieldSpacecraftState, FieldTLE, OsculatingToMeanConverter)} instead.
-     */
-    @Deprecated
-    public static <T extends CalculusFieldElement<T>> FieldTLE<T> stateToTLE(final FieldSpacecraftState<T> state, final FieldTLE<T> templateTLE,
-                                                                             final TleGenerationAlgorithm generationAlgorithm) {
-        return generationAlgorithm.generate(state, templateTLE);
     }
 
     /**

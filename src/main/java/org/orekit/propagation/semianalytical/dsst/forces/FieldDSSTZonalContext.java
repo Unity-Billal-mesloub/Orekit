@@ -59,24 +59,6 @@ public class FieldDSSTZonalContext<T extends CalculusFieldElement<T>> extends Fi
     /** B * B. */
     private final T BB;
 
-    /** Constructor with central body frame equals orbit frame.
-     *
-     * @param auxiliaryElements auxiliary elements related to the current orbit
-     * @param provider          provider for spherical harmonics
-     * @param parameters        values of the force model parameters (only 1 values
-     * for each parameters corresponding to state date) obtained by calling the extract
-     * parameter method {@link #extractParameters(double[], AbsoluteDate)}
-     * to selected the right value for state date or by getting the parameters for a specific date
-     * @deprecated since 12.2 and issue 1104, should be removed in 13.0
-     */
-    @Deprecated
-    FieldDSSTZonalContext(final FieldAuxiliaryElements<T> auxiliaryElements,
-                          final UnnormalizedSphericalHarmonicsProvider provider,
-                          final T[] parameters) {
-
-        this(auxiliaryElements, auxiliaryElements.getFrame(), provider, parameters);
-    }
-
     /** Constructor with central body frame potentially different from orbit frame.
      *
      * @param auxiliaryElements auxiliary elements related to the current orbit

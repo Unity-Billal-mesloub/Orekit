@@ -34,7 +34,6 @@ import org.orekit.errors.OrekitMessages;
 import org.orekit.orbits.KeplerianOrbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.analytical.tle.generation.TleGenerationAlgorithm;
 import org.orekit.propagation.analytical.tle.generation.TleGenerationUtil;
 import org.orekit.propagation.conversion.osc2mean.OsculatingToMeanConverter;
 import org.orekit.propagation.conversion.osc2mean.TLETheory;
@@ -714,45 +713,6 @@ public class TLE implements TimeStamped, ParameterDriversProvider {
      */
     public String toString() {
         return getLine1() + System.getProperty("line.separator") + getLine2();
-    }
-
-    /**
-     * Convert Spacecraft State into TLE.
-     *
-     * @param state Spacecraft State to convert into TLE
-     * @param templateTLE only used to get identifiers like satellite number, launch year, etc. In other words, the keplerian elements contained in the generated TLE are based on the provided state and not the template TLE.
-     * @param generationAlgorithm TLE generation algorithm
-     * @return a generated TLE
-     * @since 12.0
-     * @deprecated As of release 13.0, use {@link #stateToTLE(SpacecraftState, TLE, OsculatingToMeanConverter)} instead.
-     */
-    @Deprecated
-    public static TLE stateToTLE(final SpacecraftState state, final TLE templateTLE,
-                                 final TleGenerationAlgorithm generationAlgorithm) {
-        return generationAlgorithm.generate(state, templateTLE);
-    }
-
-    /**
-     * Convert Spacecraft State into TLE.
-     * <p>
-     * Uses the {@link DataContext#getDefault() default data context}.
-     * </p>
-     * <p>
-     * The B* is not calculated. Its value is simply copied from the model to the generated TLE.
-     * </p>
-     * @param state       Spacecraft State to convert into TLE
-     * @param templateTLE only used to get identifiers like satellite number, launch year, etc.
-     *                    In other words, the keplerian elements contained in the generated TLE
-     *                    are based on the provided state and not the template TLE.
-     * @param converter   osculating to mean orbit converter
-     * @return a generated TLE
-     * @since 13.0
-     */
-    @DefaultDataContext
-    public static TLE stateToTLE(final SpacecraftState state,
-                                 final TLE templateTLE,
-                                 final OsculatingToMeanConverter converter) {
-        return stateToTLE(state, templateTLE, converter, DataContext.getDefault());
     }
 
     /**

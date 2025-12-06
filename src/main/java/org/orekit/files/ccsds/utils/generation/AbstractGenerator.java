@@ -31,7 +31,6 @@ import org.orekit.errors.OrekitMessages;
 import org.orekit.files.ccsds.definitions.TimeConverter;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.DateTimeComponents;
-import org.orekit.utils.AccurateFormatter;
 import org.orekit.utils.Formatter;
 import org.orekit.utils.units.Parser;
 import org.orekit.utils.units.PowerTerm;
@@ -87,21 +86,6 @@ public abstract class AbstractGenerator implements Generator {
         this.sections          = new ArrayDeque<>();
         this.siToCcsds         = new HashMap<>();
         this.formatter = formatter;
-    }
-
-    /** Simple constructor.
-     * @param output destination of generated output
-     * @param outputName output name for error messages
-     * @param maxRelativeOffset maximum offset in seconds to use relative dates
-     * (if a date is too far from reference, it will be displayed as calendar elements)
-     * @param writeUnits if true, units must be written
-     * @deprecated since 13.0, since does not allow user to specify formatter. This defaults to {@link AccurateFormatter}
-     * Use {@link AbstractGenerator#AbstractGenerator(Appendable, String, double, boolean, Formatter)} instead.
-     */
-    @Deprecated
-    protected AbstractGenerator(final Appendable output, final String outputName,
-                                final double maxRelativeOffset, final boolean writeUnits) {
-        this(output, outputName, maxRelativeOffset, writeUnits, new AccurateFormatter());
     }
 
     /** {@inheritDoc} */

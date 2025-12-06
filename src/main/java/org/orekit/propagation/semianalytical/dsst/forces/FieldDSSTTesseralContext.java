@@ -124,15 +124,6 @@ public class FieldDSSTTesseralContext<T extends CalculusFieldElement<T>> extends
         return theta;
     }
 
-    /** Get μ / a .
-     * @return moa
-     * @deprecated since 12.2 Use getMuoa() instead
-     */
-    @Deprecated
-    public T getMoa() {
-        return getMuoa();
-    }
-
     /** Get the Keplerian period.
      * <p>The Keplerian period is computed directly from semi major axis
      * and central acceleration constant.</p>
