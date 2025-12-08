@@ -73,8 +73,8 @@ public abstract class AbstractTimeInterpolator<T extends TimeStamped> implements
             final int sampleSize) {
 
         // Retrieve all sub-interpolators (or a singleton list with given interpolator if there are no sub-interpolators)
-        final List<TimeInterpolator<? extends TimeStamped>> subInterpolators = interpolator.getSubInterpolators();
-        for (final TimeInterpolator<? extends TimeStamped> subInterpolator : subInterpolators) {
+        for (final TimeInterpolator<?> subInterpolator :
+                interpolator.getSubInterpolators()) {
             if (sampleSize < subInterpolator.getNbInterpolationPoints()) {
                 throw new OrekitIllegalArgumentException(OrekitMessages.NOT_ENOUGH_DATA, sampleSize);
             }
@@ -146,7 +146,7 @@ public abstract class AbstractTimeInterpolator<T extends TimeStamped> implements
     }
 
     /** {@inheritDoc} */
-    public List<TimeInterpolator<? extends TimeStamped>> getSubInterpolators() {
+    public List<TimeInterpolator<?>> getSubInterpolators() {
         return Collections.singletonList(this);
     }
 
