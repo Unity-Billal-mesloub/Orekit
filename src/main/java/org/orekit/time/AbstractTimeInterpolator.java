@@ -83,13 +83,15 @@ public abstract class AbstractTimeInterpolator<T extends TimeStamped> implements
 
     /** {@inheritDoc} */
     @Override
-    public T interpolate(final AbsoluteDate interpolationDate, final Stream<T> sample) {
+    public T interpolate(final AbsoluteDate interpolationDate,
+                         final Stream<? extends T> sample) {
         return interpolate(interpolationDate, sample.collect(Collectors.toList()));
     }
 
     /** {@inheritDoc}. */
     @Override
-    public T interpolate(final AbsoluteDate interpolationDate, final Collection<T> sample) {
+    public T interpolate(final AbsoluteDate interpolationDate,
+                         final Collection<? extends T> sample) {
         final InterpolationData interpolationData = new InterpolationData(interpolationDate, sample);
         return interpolate(interpolationData);
     }
@@ -231,7 +233,8 @@ public abstract class AbstractTimeInterpolator<T extends TimeStamped> implements
          * @param interpolationDate interpolation date
          * @param sample time stamped sample
          */
-        protected InterpolationData(final AbsoluteDate interpolationDate, final Collection<T> sample) {
+        protected InterpolationData(final AbsoluteDate interpolationDate,
+                                    final Collection<? extends T> sample) {
             // Handle specific case that is not handled by the immutable time stamped cache constructor
             if (sample.isEmpty()) {
                 throw new OrekitIllegalArgumentException(OrekitMessages.NOT_ENOUGH_DATA, 0);
