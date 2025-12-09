@@ -201,12 +201,12 @@ public class AbsolutePVCoordinatesHermiteInterpolator extends AbstractTimeInterp
                                                                              new Vector3D(pva[1]),
                                                                              new Vector3D(pva[2]));
 
-        // Return interpolated as is
+        // return interpolated as is
         if (inputFrame == outputFrame) {
             return interpolated;
         }
 
-        // Convert to output frame
+        // convert to output frame
         return new AbsolutePVCoordinates(outputFrame, interpolated.getPVCoordinates(outputFrame));
     }
 }
