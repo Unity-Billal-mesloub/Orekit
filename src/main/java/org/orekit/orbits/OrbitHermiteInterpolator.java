@@ -20,7 +20,6 @@ import org.hipparchus.analysis.interpolation.HermiteInterpolator;
 import org.hipparchus.util.MathUtils;
 import org.orekit.errors.OrekitInternalError;
 import org.orekit.frames.Frame;
-import org.orekit.frames.Transform;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeInterpolator;
 import org.orekit.utils.CartesianDerivativesFilter;
@@ -168,7 +167,7 @@ public class OrbitHermiteInterpolator extends AbstractOrbitInterpolator {
         final Frame        outputFrame       = getOutputInertialFrame();
 
         if (orbitType == OrbitType.CARTESIAN) {
-            return interpolateCartesian(interpolationDate, inputFrame, outputFrame, sample);
+            return interpolateCartesian(interpolationDate, inputFrame, sample);
         } else {
             // Interpolate in input frame
             final Orbit interpolated = interpolateCommon(interpolationDate, inputFrame, sample, orbitType);
@@ -185,18 +184,16 @@ public class OrbitHermiteInterpolator extends AbstractOrbitInterpolator {
     }
 
     /**
-     * Interpolate Cartesian orbit using specific method for Cartesian orbit. Assumes that the input frame is the same
+     * Interpolate Cartesian orbit using a specific method for Cartesian orbit. Assumes that the input frame is the same
      * throughout the sample.
      *
      * @param interpolationDate interpolation date
      * @param inputFrame        input frame
-     * @param outputFrame       output frame
      * @param sample            orbits sample
      * @return interpolated Cartesian orbit
      */
     private CartesianOrbit interpolateCartesian(final AbsoluteDate interpolationDate,
                                                 final Frame inputFrame,
-                                                final Frame outputFrame,
                                                 final List<Orbit> sample) {
 
         // Create time stamped position-velocity-acceleration Hermite interpolator
@@ -208,9 +205,6 @@ public class OrbitHermiteInterpolator extends AbstractOrbitInterpolator {
         // Convert sample to stream
         final Stream<Orbit> sampleStream = sample.stream();
 
-        // Create transform from input to output frame
-        final Transform transform = inputFrame.getTransformTo(outputFrame, interpolationDate);
-
         // Map time stamped position-velocity-acceleration coordinates
         final Stream<TimeStampedPVCoordinates> sampleTimeStampedPV = sampleStream.map(Orbit::getPVCoordinates);
 
@@ -220,8 +214,8 @@ public class OrbitHermiteInterpolator extends AbstractOrbitInterpolator {
         // Use first entry gravitational parameter (initially checked that it is consistent throughout the sample)
         final double mu = sample.get(0).getMu();
 
-        return new CartesianOrbit(transform.transformPVCoordinates(interpolated),
-                                  outputFrame,
+        return new CartesianOrbit(interpolated,
+                                  inputFrame,
                                   interpolationDate,
                                   mu);
     }
