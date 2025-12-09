@@ -51,7 +51,11 @@ import org.orekit.utils.PVCoordinates;
 import java.util.Arrays;
 import java.util.Collection;
 
-/** Utility class for tests to reduce code duplication. */
+/**
+ * Utility class for testing purposes, providing methods for generating
+ * fake data, validation of mathematical entities, and utility functions
+ * for debugging and testing scenarios.
+ */
 public class TestUtils {
 
     private TestUtils() {
@@ -137,11 +141,23 @@ public class TestUtils {
                                         new FieldVector3D<>(new Binary64(5400), new Binary64(0), new Binary64(5400)));
     }
 
-    public static FieldOrbit<Binary64> getFieldOrbit() {
+    public static FieldOrbit<Binary64> getTestFieldOrbit() {
         return new FieldCartesianOrbit<>(getFieldPVCoordinates(),
                                          FramesFactory.getGCRF(),
                                          getFakeFieldAbsoluteDate(),
                                          new Binary64(Constants.IERS2010_EARTH_MU));
+    }
+
+    public static Orbit getTestOrbit() {
+        return new CartesianOrbit(getPVCoordinates(),
+                                  FramesFactory.getGCRF(),
+                                  new AbsoluteDate(),
+                                  Constants.IERS2010_EARTH_MU);
+    }
+
+    private static PVCoordinates getPVCoordinates() {
+        return new PVCoordinates(new Vector3D(6878e3, 0, 0),
+                                 new Vector3D(5400, 0, 5400));
     }
 
     public static FieldAbsoluteDate<Binary64> getFakeFieldAbsoluteDate() {

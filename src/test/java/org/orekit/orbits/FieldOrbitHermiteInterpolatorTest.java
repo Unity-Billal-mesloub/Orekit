@@ -649,7 +649,7 @@ class FieldOrbitHermiteInterpolatorTest {
     void testOutputFrameCommon() {
         // GIVEN
         // Define samples
-        final FieldOrbit<Binary64> orbit1 = new FieldCircularOrbit<>(TestUtils.getFieldOrbit());
+        final FieldOrbit<Binary64> orbit1 = new FieldCircularOrbit<>(TestUtils.getTestFieldOrbit());
         final FieldOrbit<Binary64> orbit2 = new FieldCircularOrbit<>(orbit1.shiftedBy(1));
 
         final List<FieldOrbit<Binary64>> samples = new ArrayList<>();
