@@ -16,6 +16,8 @@
  */
 package org.orekit.estimation.measurements.generation;
 
+import java.util.SortedSet;
+
 import org.hipparchus.linear.MatrixUtils;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.random.CorrelatedRandomVectorGenerator;
@@ -31,6 +33,7 @@ import org.orekit.estimation.EstimationTestUtils;
 import org.orekit.estimation.Force;
 import org.orekit.estimation.measurements.EstimatedMeasurementBase;
 import org.orekit.estimation.measurements.ObservableSatellite;
+import org.orekit.estimation.measurements.ObserverSatellite;
 import org.orekit.estimation.measurements.gnss.OneWayGNSSRangeRate;
 import org.orekit.estimation.measurements.modifiers.Bias;
 import org.orekit.orbits.KeplerianOrbit;
@@ -47,16 +50,14 @@ import org.orekit.time.FixedStepSelector;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.PVCoordinates;
 
-import java.util.SortedSet;
-
 public class OneWayGNSSRangeRateBuilderTest {
 
     private static final double SIGMA =  0.5;
     private static final double BIAS  = -0.01;
 
     private MeasurementBuilder<OneWayGNSSRangeRate> getBuilder(final RandomGenerator random,
-                                                           final ObservableSatellite receiver,
-                                                           final ObservableSatellite remote) {
+                                                               final ObservableSatellite receiver,
+                                                               final ObserverSatellite remote) {
         final RealMatrix covariance = MatrixUtils.createRealDiagonalMatrix(new double[] { SIGMA * SIGMA });
         MeasurementBuilder<OneWayGNSSRangeRate> b =
                         new OneWayGNSSRangeRateBuilder(random == null ? null : new CorrelatedRandomVectorGenerator(covariance,
@@ -93,11 +94,12 @@ public class OneWayGNSSRangeRateBuilderTest {
         ObservableSatellite receiver = generator.addPropagator(buildPropagator()); // useful third propagator
         generator.addPropagator(buildPropagator()); // dummy fourth propagator
         final Orbit o1 = context.initialOrbit;
+        
         // for the second satellite, we simply reverse velocity
         final Orbit o2 = new KeplerianOrbit(new PVCoordinates(o1.getPosition(),
                                                               o1.getVelocity().negate()),
                                             o1.getFrame(), o1.getDate(), o1.getMu());
-        ObservableSatellite remote = generator.addPropagator(new KeplerianPropagator(o2)); // useful sixth propagator
+        ObserverSatellite remote = new ObserverSatellite("GNSS-remote", new KeplerianPropagator(o2));
         final double step = 60.0;
 
         // beware that in order to avoid deadlocks, the secondary PV coordinates provider

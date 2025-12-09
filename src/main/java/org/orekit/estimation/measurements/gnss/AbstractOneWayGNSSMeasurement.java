@@ -21,9 +21,10 @@ import java.util.Collections;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.orekit.estimation.measurements.ObservableSatellite;
 import org.orekit.estimation.measurements.ObservedMeasurement;
-import org.orekit.time.clocks.QuadraticClockModel;
+import org.orekit.estimation.measurements.ObserverSatellite;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.clocks.QuadraticClockModel;
 import org.orekit.utils.FieldPVCoordinatesProvider;
 import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
@@ -56,22 +57,17 @@ public abstract class AbstractOneWayGNSSMeasurement<T extends ObservedMeasuremen
     extends AbstractOnBoardMeasurement<T> {
 
     /** Emitting satellite. */
-    private final PVCoordinatesProvider remotePV;
-
-    /** Clock offset of the emitting satellite. */
-    private final QuadraticClockModel remoteClock;
+    private final ObserverSatellite gnssSatellite;
 
     /** Simple constructor.
-     * @param remotePV provider for GNSS satellite which simply emits the signal
-     * @param remoteClock clock offset of the GNSS satellite
+     * @param gnssSatellite GNSS observer satellite
      * @param date date of the measurement
      * @param range observed value
      * @param sigma theoretical standard deviation
      * @param baseWeight base weight
      * @param local satellite which receives the signal and perform the measurement
      */
-    protected AbstractOneWayGNSSMeasurement(final PVCoordinatesProvider remotePV,
-                                            final QuadraticClockModel remoteClock,
+    protected AbstractOneWayGNSSMeasurement(final ObserverSatellite gnssSatellite,
                                             final AbsoluteDate date,
                                             final double range, final double sigma,
                                             final double baseWeight, final ObservableSatellite local) {
@@ -79,20 +75,19 @@ public abstract class AbstractOneWayGNSSMeasurement<T extends ObservedMeasuremen
         super(date, range, sigma, baseWeight, Collections.singletonList(local));
 
         // Initialise fields
-        this.remotePV    = remotePV;
-        this.remoteClock = remoteClock;
+        this.gnssSatellite = gnssSatellite;
     }
 
     /** {@inheritDoc} */
     @Override
     protected PVCoordinatesProvider getRemotePV(final SpacecraftState[] states) {
-        return remotePV;
+        return gnssSatellite.getPVCoordinatesProvider();
     }
 
     /** {@inheritDoc} */
     @Override
     protected QuadraticClockModel getRemoteClock() {
-        return remoteClock;
+        return gnssSatellite.getQuadraticClockModel();
     }
 
     /** {@inheritDoc} */
@@ -104,7 +99,7 @@ public abstract class AbstractOneWayGNSSMeasurement<T extends ObservedMeasuremen
 
             // apply the raw (no derivatives) remote provider
             final AbsoluteDate             dateBase = date.toAbsoluteDate();
-            final TimeStampedPVCoordinates pvBase   = remotePV.getPVCoordinates(dateBase, frame);
+            final TimeStampedPVCoordinates pvBase   = getRemotePV(states).getPVCoordinates(dateBase, frame);
             final TimeStampedFieldPVCoordinates<Gradient> pvWithoutDerivatives =
                 new TimeStampedFieldPVCoordinates<>(date.getField(), pvBase);
 

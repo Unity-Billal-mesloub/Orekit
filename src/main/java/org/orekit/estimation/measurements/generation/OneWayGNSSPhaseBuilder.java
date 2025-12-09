@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.hipparchus.random.CorrelatedRandomVectorGenerator;
 import org.orekit.estimation.measurements.ObservableSatellite;
+import org.orekit.estimation.measurements.ObserverSatellite;
 import org.orekit.estimation.measurements.gnss.AmbiguityCache;
 import org.orekit.estimation.measurements.gnss.OneWayGNSSPhase;
 import org.orekit.propagation.sampling.OrekitStepInterpolator;
@@ -40,7 +41,7 @@ public class OneWayGNSSPhaseBuilder extends AbstractMeasurementBuilder<OneWayGNS
     private final double wavelength;
 
     /** Satellite which simply emits the signal. */
-    private final ObservableSatellite remote;
+    private final ObserverSatellite satellite;
 
     /** Simple constructor.
      * @param noiseSource noise source, may be null for generating perfect measurements
@@ -53,12 +54,12 @@ public class OneWayGNSSPhaseBuilder extends AbstractMeasurementBuilder<OneWayGNS
      * @since 12.1
      */
     public OneWayGNSSPhaseBuilder(final CorrelatedRandomVectorGenerator noiseSource,
-                                  final ObservableSatellite local, final ObservableSatellite remote,
+                                  final ObservableSatellite local, final ObserverSatellite remote,
                                   final double wavelength, final double sigma, final double baseWeight,
                                   final AmbiguityCache cache) {
-        super(noiseSource, sigma, baseWeight, local, remote);
+        super(noiseSource, sigma, baseWeight, local);
+        this.satellite  = remote;
         this.wavelength = wavelength;
-        this.remote     = remote;
         this.cache      = cache;
     }
 
@@ -66,8 +67,7 @@ public class OneWayGNSSPhaseBuilder extends AbstractMeasurementBuilder<OneWayGNS
     @Override
     protected OneWayGNSSPhase buildObserved(final AbsoluteDate date,
                                             final Map<ObservableSatellite, OrekitStepInterpolator> interpolators) {
-        return new OneWayGNSSPhase(interpolators.get(remote),
-                                   remote.getName(), remote.getQuadraticClockModel(),
+        return new OneWayGNSSPhase(satellite,
                                    date, Double.NaN, wavelength,
                                    getTheoreticalStandardDeviation()[0],
                                    getBaseWeight()[0], getSatellites()[0],

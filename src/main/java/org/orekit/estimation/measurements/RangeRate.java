@@ -262,8 +262,8 @@ public class RangeRate extends GroundReceiverMeasurement<RangeRate> {
         if (!isTwoWay()) {
             // clock drifts, taken in account only in case of one way
             final ObservableSatellite satellite    = getSatellites().get(0);
-            final double              dtsDot       = satellite.getClockDriftDriver().getValue(transitState.getDate());
-            final double              dtgDot       = getStation().getClockDriftDriver().getValue(stationPV.getDate());
+            final double              dtsDot       = satellite.getQuadraticClockModel().getOffset(transitState.getDate()).getRate();
+            final double              dtgDot       = getStation().getQuadraticClockModel().getOffset(stationPV.getDate()).getRate();
 
             final double clockDriftBiais = (dtgDot - dtsDot) * Constants.SPEED_OF_LIGHT;
 

@@ -83,12 +83,7 @@ public abstract class GroundReceiverMeasurement<T extends GroundReceiverMeasurem
         addParameterDriver(station.getPolarDriftXDriver());
         addParameterDriver(station.getPolarOffsetYDriver());
         addParameterDriver(station.getPolarDriftYDriver());
-        if (!twoWay) {
-            // for one way measurements, the satellite clock offset affects the measurement
-            addParameterDriver(satellite.getClockOffsetDriver());
-            addParameterDriver(satellite.getClockDriftDriver());
-            addParameterDriver(satellite.getClockAccelerationDriver());
-        }
+
         this.station = station;
         this.twoway  = twoWay;
     }

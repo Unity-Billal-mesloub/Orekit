@@ -62,13 +62,6 @@ public abstract class AbstractOnBoardMeasurement<T extends ObservedMeasurement<T
         // Call to super constructor
         super(date, observed, sigma, baseWeight, satellites);
 
-        // Add parameter drivers
-        satellites.forEach(s -> {
-            addParameterDriver(s.getClockOffsetDriver());
-            addParameterDriver(s.getClockDriftDriver());
-            addParameterDriver(s.getClockAccelerationDriver());
-        });
-
     }
 
     /** Get emitting satellite clock provider.

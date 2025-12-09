@@ -24,13 +24,12 @@ import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.orekit.estimation.measurements.EstimatedMeasurement;
 import org.orekit.estimation.measurements.EstimatedMeasurementBase;
 import org.orekit.estimation.measurements.ObservableSatellite;
-import org.orekit.time.clocks.QuadraticClockModel;
+import org.orekit.estimation.measurements.ObserverSatellite;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.Constants;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.PVCoordinates;
-import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeSpanMap.Span;
 import org.orekit.utils.TimeStampedPVCoordinates;
@@ -60,25 +59,7 @@ public class OneWayGNSSRangeRate extends AbstractOneWayGNSSMeasurement<OneWayGNS
     public static final String MEASUREMENT_TYPE = "OneWayGNSSRangeRate";
 
     /** Simple constructor.
-     * @param remote provider for GNSS satellite which simply emits the signal
-     * @param dtRemote clock offset of the GNSS satellite, in seconds
-     * @param date date of the measurement
-     * @param rangeRate observed value
-     * @param sigma theoretical standard deviation
-     * @param baseWeight base weight
-     * @param local satellite which receives the signal and perform the measurement
-     */
-    public OneWayGNSSRangeRate(final PVCoordinatesProvider remote,
-                               final double dtRemote,
-                               final AbsoluteDate date,
-                               final double rangeRate, final double sigma,
-                               final double baseWeight, final ObservableSatellite local) {
-        this(remote, new QuadraticClockModel(date, dtRemote, 0.0, 0.0), date, rangeRate, sigma, baseWeight, local);
-    }
-
-    /** Simple constructor.
-     * @param remote provider for GNSS satellite which simply emits the signal
-     * @param remoteClock clock offset of the GNSS satellite
+     * @param gnssSatellite GNSS observer satellite
      * @param date date of the measurement
      * @param rangeRate observed value
      * @param sigma theoretical standard deviation
@@ -86,13 +67,12 @@ public class OneWayGNSSRangeRate extends AbstractOneWayGNSSMeasurement<OneWayGNS
      * @param local satellite which receives the signal and perform the measurement
      * @since 12.1
      */
-    public OneWayGNSSRangeRate(final PVCoordinatesProvider remote,
-                               final QuadraticClockModel remoteClock,
+    public OneWayGNSSRangeRate(final ObserverSatellite gnssSatellite,
                                final AbsoluteDate date,
                                final double rangeRate, final double sigma,
                                final double baseWeight, final ObservableSatellite local) {
         // Call super constructor
-        super(remote, remoteClock, date, rangeRate, sigma, baseWeight, local);
+        super(gnssSatellite, date, rangeRate, sigma, baseWeight, local);
     }
 
     /** {@inheritDoc} */

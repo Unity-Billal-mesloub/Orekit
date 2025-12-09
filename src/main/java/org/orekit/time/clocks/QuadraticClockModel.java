@@ -16,6 +16,8 @@
  */
 package org.orekit.time.clocks;
 
+import java.util.Map;
+
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.util.FastMath;
@@ -24,8 +26,6 @@ import org.orekit.errors.OrekitMessages;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.ParameterDriver;
-
-import java.util.Map;
 
 /** Quadratic clock model.
  *
@@ -111,6 +111,18 @@ public class QuadraticClockModel implements ClockModel {
                                (c2 * dt + c1) * dt + c0,
                                2 * c2 * dt + c1,
                                2 * c2);
+    }
+
+    public ParameterDriver getClockOffsetDriver() {
+        return a0;
+    }
+
+    public ParameterDriver getClockDriftDriver() {
+        return a1;
+    }
+
+    public ParameterDriver getClockAccelerationDriver() {
+        return a2;
     }
 
     /** {@inheritDoc} */

@@ -45,6 +45,8 @@ import org.orekit.models.earth.displacement.StationDisplacement;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.UT1Scale;
+import org.orekit.time.clocks.QuadraticClockModel;
+import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
 
 /** Class modeling a ground station that can perform some measurements.
@@ -85,26 +87,7 @@ import org.orekit.utils.ParameterDriver;
  * @author Luc Maisonobe
  * @since 8.0
  */
-public class GroundStation {
-
-    /** Suffix for ground station position and clock offset parameters names. */
-    public static final String OFFSET_SUFFIX = "-offset";
-
-    /** Suffix for ground clock drift parameters name. */
-    public static final String DRIFT_SUFFIX = "-drift-clock";
-
-    /** Suffix for ground clock drift parameters name.
-     * @since 12.1
-     */
-    public static final String ACCELERATION_SUFFIX = "-acceleration-clock";
-
-    /** Clock offset scaling factor.
-     * <p>
-     * We use a power of 2 to avoid numeric noise introduction
-     * in the multiplications/divisions sequences.
-     * </p>
-     */
-    private static final double CLOCK_OFFSET_SCALE = FastMath.scalb(1.0, -10);
+public class GroundStation extends MeasurementObject implements Observer {
 
     /** Position offsets scaling factor.
      * <p>
@@ -128,17 +111,6 @@ public class GroundStation {
 
     /** Displacement models. */
     private final StationDisplacement[] displacements;
-
-    /** Driver for clock offset. */
-    private final ParameterDriver clockOffsetDriver;
-
-    /** Driver for clock drift. */
-    private final ParameterDriver clockDriftDriver;
-
-    /** Driver for clock acceleration.
-     * @since 12.1
-     */
-    private final ParameterDriver clockAccelerationDriver;
 
     /** Driver for position offset along the East axis. */
     private final ParameterDriver eastOffsetDriver;
@@ -172,6 +144,29 @@ public class GroundStation {
     }
 
     /**
+     * Build a ground station ignoring {@link StationDisplacement station displacements}.
+     * <p>
+     * The initial values for the pole and prime meridian parametric linear models
+     * ({@link #getPrimeMeridianOffsetDriver()}, {@link #getPrimeMeridianDriftDriver()},
+     * {@link #getPolarOffsetXDriver()}, {@link #getPolarDriftXDriver()}, {@link #getPolarOffsetXDriver()},
+     * {@link #getPolarDriftXDriver()}) are set to 0. The initial values for the station offset model
+     * ({@link #getClockOffsetDriver()}, {@link #getEastOffsetDriver()}, {@link #getNorthOffsetDriver()},
+     * {@link #getZenithOffsetDriver()}) are set to 0. This implies that as long as these values are not changed, the
+     * offset frame is the same as the {@link #getBaseFrame() base frame}. As soon as some of these models are changed,
+     * the offset frame moves away from the {@link #getBaseFrame() base frame}.
+     * </p>
+     *
+     * @param baseFrame base frame associated with the station, without *any* parametric model
+     *                  (no station offset, no polar motion, no meridian shift)
+     * @param clock         new quadratic clock model with user-supplied displacements
+     * @see #GroundStation(TopocentricFrame, EOPHistory, StationDisplacement...)
+     * @since 13.0
+     */
+    public GroundStation(final TopocentricFrame baseFrame, final QuadraticClockModel clock) {
+        this(baseFrame, FramesFactory.findEOP(baseFrame), clock);
+    }
+
+    /**
      * Simple constructor.
      * <p>
      * The initial values for the pole and prime meridian parametric linear models
@@ -193,7 +188,33 @@ public class GroundStation {
      */
     public GroundStation(final TopocentricFrame baseFrame, final EOPHistory eopHistory,
                          final StationDisplacement... displacements) {
+        this(baseFrame, eopHistory, createEmptyQuadraticClock(baseFrame.getName()), displacements);
+    }
 
+     /**
+     * Simple constructor.
+     * <p>
+     * The initial values for the pole and prime meridian parametric linear models
+     * ({@link #getPrimeMeridianOffsetDriver()}, {@link #getPrimeMeridianDriftDriver()},
+     * {@link #getPolarOffsetXDriver()}, {@link #getPolarDriftXDriver()}, {@link #getPolarOffsetXDriver()},
+     * {@link #getPolarDriftXDriver()}) are set to 0. The initial values for the station offset model
+     * ({@link #getClockOffsetDriver()}, {@link #getEastOffsetDriver()}, {@link #getNorthOffsetDriver()},
+     * {@link #getZenithOffsetDriver()}, {@link #getClockOffsetDriver()}) are set to 0. This implies that as long as
+     * these values are not changed, the offset frame is the same as the {@link #getBaseFrame() base frame}. As soon as
+     * some of these models are changed, the offset frame moves away from the {@link #getBaseFrame() base frame}.
+     * </p>
+     *
+     * @param baseFrame     base frame associated with the station, without *any* parametric model (no station offset,
+     *                      no polar motion, no meridian shift)
+     * @param eopHistory    EOP history associated with Earth frames
+     * @param clock         new quadratic clock model with user-supplied displacements
+     * @param displacements ground station displacement model (tides, ocean loading, atmospheric loading, thermal
+     *                      effects...)
+     * @since 12.1
+     */
+    public GroundStation(final TopocentricFrame baseFrame, final EOPHistory eopHistory,
+                         final QuadraticClockModel clock, final StationDisplacement... displacements) {
+        super(baseFrame.getName(), clock);
         this.baseFrame = baseFrame;
 
         if (eopHistory == null) {
@@ -216,18 +237,6 @@ public class GroundStation {
 
         this.displacements = displacements.clone();
 
-        this.clockOffsetDriver = new ParameterDriver(baseFrame.getName() + OFFSET_SUFFIX + "-clock",
-                                                     0.0, CLOCK_OFFSET_SCALE,
-                                                     Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-
-        this.clockDriftDriver = new ParameterDriver(baseFrame.getName() + DRIFT_SUFFIX,
-                                                    0.0, CLOCK_OFFSET_SCALE,
-                                                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-
-        this.clockAccelerationDriver = new ParameterDriver(baseFrame.getName() + ACCELERATION_SUFFIX,
-                                                    0.0, CLOCK_OFFSET_SCALE,
-                                                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-
         this.eastOffsetDriver = new ParameterDriver(baseFrame.getName() + OFFSET_SUFFIX + "-East",
                                                     0.0, POSITION_OFFSET_SCALE,
                                                     Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
@@ -240,6 +249,23 @@ public class GroundStation {
                                                       0.0, POSITION_OFFSET_SCALE,
                                                       Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
+        // Add the ground station parameters to the master list.
+        addParameterDriver(this.eastOffsetDriver);
+        addParameterDriver(this.northOffsetDriver);
+        addParameterDriver(this.zenithOffsetDriver);
+        addParameterDriver(this.estimatedEarthFrameProvider.getPrimeMeridianOffsetDriver());
+        addParameterDriver(this.estimatedEarthFrameProvider.getPrimeMeridianDriftDriver());
+        addParameterDriver(this.estimatedEarthFrameProvider.getPolarOffsetXDriver());
+        addParameterDriver(this.estimatedEarthFrameProvider.getPolarDriftXDriver());
+        addParameterDriver(this.estimatedEarthFrameProvider.getPolarOffsetYDriver());
+        addParameterDriver(this.estimatedEarthFrameProvider.getPolarDriftYDriver());
+
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final ObserverType getObserverType() {
+        return ObserverType.GROUNDSTATION;
     }
 
     /** Get the displacement models.
@@ -248,30 +274,6 @@ public class GroundStation {
      */
     public StationDisplacement[] getDisplacements() {
         return displacements.clone();
-    }
-
-    /** Get a driver allowing to change station clock (which is related to measurement date).
-     * @return driver for station clock offset
-     * @since 9.3
-     */
-    public ParameterDriver getClockOffsetDriver() {
-        return clockOffsetDriver;
-    }
-
-    /** Get a driver allowing to change station clock drift (which is related to measurement date).
-     * @return driver for station clock drift
-     * @since 10.3
-     */
-    public ParameterDriver getClockDriftDriver() {
-        return clockDriftDriver;
-    }
-
-    /** Get a driver allowing to change station clock acceleration (which is related to measurement date).
-     * @return driver for station clock acceleration
-     * @since 12.1
-     */
-    public ParameterDriver getClockAccelerationDriver() {
-        return clockAccelerationDriver;
     }
 
     /** Get a driver allowing to change station position along East axis.
@@ -359,6 +361,12 @@ public class GroundStation {
      */
     public ParameterDriver getPolarDriftYDriver() {
         return estimatedEarthFrameProvider.getPolarDriftYDriver();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final PVCoordinatesProvider getPVCoordinatesProvider() {
+        return getBaseFrame();
     }
 
     /** Get the base frame associated with the station.
@@ -490,7 +498,7 @@ public class GroundStation {
         // take clock offset into account
         final AbsoluteDate offsetCompensatedDate = clockOffsetAlreadyApplied ?
                                                    date :
-                                                   new AbsoluteDate(date, -clockOffsetDriver.getValue());
+                                                   new AbsoluteDate(date, -getClockOffsetDriver().getValue());
 
         // take Earth offsets into account
         final Transform intermediateToBody = estimatedEarthFrameProvider.getTransform(offsetCompensatedDate).getInverse();
@@ -543,7 +551,7 @@ public class GroundStation {
                                                         final int freeParameters,
                                                         final Map<String, Integer> indices) {
         // take clock offset into account
-        final Gradient offset = clockOffsetDriver.getValue(freeParameters, indices, clockDate);
+        final Gradient offset = getClockOffsetDriver().getValue(freeParameters, indices, clockDate);
         final FieldAbsoluteDate<Gradient> offsetCompensatedDate =
                         new FieldAbsoluteDate<>(clockDate, offset.negate());
 

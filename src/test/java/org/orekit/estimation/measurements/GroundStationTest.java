@@ -16,6 +16,12 @@
  */
 package org.orekit.estimation.measurements;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.hipparchus.analysis.UnivariateVectorFunction;
 import org.hipparchus.analysis.differentiation.FiniteDifferencesDifferentiator;
 import org.hipparchus.analysis.differentiation.Gradient;
@@ -51,17 +57,13 @@ import org.orekit.orbits.PositionAngleType;
 import org.orekit.propagation.Propagator;
 import org.orekit.propagation.conversion.NumericalPropagatorBuilder;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.clocks.QuadraticClockModel;
 import org.orekit.utils.Constants;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.IERSConventions;
 import org.orekit.utils.PVCoordinates;
+import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 class GroundStationTest {
 
@@ -87,9 +89,11 @@ class GroundStationTest {
         final BodyShape parent       = base.getParentShape();
         final double deltaClock      = 0.00084532;
         final String changedSuffix   = "-changed";
+        final QuadraticClockModel blankClock = new QuadraticClockModel(context.initialOrbit.getDate(), 0.0, 0.0, 0.0);
         final GroundStation changed  = new GroundStation(new TopocentricFrame(parent, base.getPoint(),
                                                                               base.getName() + changedSuffix), context.ut1.getEOPHistory(),
-                                                         context.stations.get(0).getDisplacements());
+                                                         blankClock, context.stations.get(0).getDisplacements());
+        final PVCoordinatesProvider groundCoordProvider = changed.getPVCoordinatesProvider();
 
         // create orbit estimator
         final BatchLSEstimator estimator = new BatchLSEstimator(new LevenbergMarquardtOptimizer(),
@@ -127,6 +131,7 @@ class GroundStationTest {
 
         RealMatrix normalizedCovariances = estimator.getOptimum().getCovariances(1.0e-10);
         RealMatrix physicalCovariances   = estimator.getPhysicalCovariances(1.0e-10);
+        Assertions.assertEquals( Observer.ObserverType.GROUNDSTATION.equals( changed.getObserverType() ), true);
         Assertions.assertEquals(7,        normalizedCovariances.getRowDimension());
         Assertions.assertEquals(7,        normalizedCovariances.getColumnDimension());
         Assertions.assertEquals(7,        physicalCovariances.getRowDimension());
@@ -356,7 +361,7 @@ class GroundStationTest {
         doTestCartesianDerivatives(FastMath.toRadians(35), FastMath.toRadians(20), 1200.0, 100.0,
                                    relativeTolerancePositionValue, relativeTolerancePositionDerivative,
                                    relativeToleranceVelocityValue, relativeToleranceVelocityDerivative,
-                                   ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -368,7 +373,7 @@ class GroundStationTest {
         doTestAngularDerivatives(FastMath.toRadians(35), FastMath.toRadians(20), 1200.0, 100.0,
                                  toleranceRotationValue,     toleranceRotationDerivative,
                                  toleranceRotationRateValue, toleranceRotationRateDerivative,
-                                 ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -380,7 +385,7 @@ class GroundStationTest {
         doTestCartesianDerivatives(FastMath.toRadians(-35), FastMath.toRadians(20), 1200.0, 100.0,
                                    relativeTolerancePositionValue, relativeTolerancePositionDerivative,
                                    relativeToleranceVelocityValue, relativeToleranceVelocityDerivative,
-                                   ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -392,7 +397,7 @@ class GroundStationTest {
         doTestAngularDerivatives(FastMath.toRadians(-35), FastMath.toRadians(20), 1200.0, 100.0,
                                  toleranceRotationValue,     toleranceRotationDerivative,
                                  toleranceRotationRateValue, toleranceRotationRateDerivative,
-                                 ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -404,7 +409,7 @@ class GroundStationTest {
         doTestCartesianDerivatives(FastMath.toRadians(35), FastMath.toRadians(-20), 1200.0, 100.0,
                                    relativeTolerancePositionValue, relativeTolerancePositionDerivative,
                                    relativeToleranceVelocityValue, relativeToleranceVelocityDerivative,
-                                   ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -416,7 +421,7 @@ class GroundStationTest {
         doTestAngularDerivatives(FastMath.toRadians(35), FastMath.toRadians(-20), 1200.0, 100.0,
                                  toleranceRotationValue,     toleranceRotationDerivative,
                                  toleranceRotationRateValue, toleranceRotationRateDerivative,
-                                 ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -428,7 +433,7 @@ class GroundStationTest {
         doTestCartesianDerivatives(FastMath.toRadians(-35), FastMath.toRadians(-20), 1200.0, 100.0,
                                    relativeTolerancePositionValue, relativeTolerancePositionDerivative,
                                    relativeToleranceVelocityValue, relativeToleranceVelocityDerivative,
-                                   ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -440,7 +445,7 @@ class GroundStationTest {
         doTestAngularDerivatives(FastMath.toRadians(-35), FastMath.toRadians(-20), 1200.0, 100.0,
                                  toleranceRotationValue,     toleranceRotationDerivative,
                                  toleranceRotationRateValue, toleranceRotationRateDerivative,
-                                 ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -452,7 +457,7 @@ class GroundStationTest {
         doTestCartesianDerivatives(FastMath.toRadians(150), FastMath.toRadians(20), 1200.0, 100.0,
                                    relativeTolerancePositionValue, relativeTolerancePositionDerivative,
                                    relativeToleranceVelocityValue, relativeToleranceVelocityDerivative,
-                                   ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -464,7 +469,7 @@ class GroundStationTest {
         doTestAngularDerivatives(FastMath.toRadians(150), FastMath.toRadians(20), 1200.0, 100.0,
                                  toleranceRotationValue,     toleranceRotationDerivative,
                                  toleranceRotationRateValue, toleranceRotationRateDerivative,
-                                 ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -476,7 +481,7 @@ class GroundStationTest {
         doTestCartesianDerivatives(FastMath.toRadians(150), FastMath.toRadians(20), 1200.0, 100.0,
                                    relativeTolerancePositionValue, relativeTolerancePositionDerivative,
                                    relativeToleranceVelocityValue, relativeToleranceVelocityDerivative,
-                                   ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -488,7 +493,7 @@ class GroundStationTest {
         doTestAngularDerivatives(FastMath.toRadians(150), FastMath.toRadians(20), 1200.0, 100.0,
                                  toleranceRotationValue,     toleranceRotationDerivative,
                                  toleranceRotationRateValue, toleranceRotationRateDerivative,
-                                 ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -500,7 +505,7 @@ class GroundStationTest {
         doTestCartesianDerivatives(FastMath.toRadians(-150), FastMath.toRadians(-20), 1200.0, 100.0,
                                    relativeTolerancePositionValue, relativeTolerancePositionDerivative,
                                    relativeToleranceVelocityValue, relativeToleranceVelocityDerivative,
-                                   ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -512,7 +517,7 @@ class GroundStationTest {
         doTestAngularDerivatives(FastMath.toRadians(-150), FastMath.toRadians(-20), 1200.0, 100.0,
                                  toleranceRotationValue,     toleranceRotationDerivative,
                                  toleranceRotationRateValue, toleranceRotationRateDerivative,
-                                 ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -524,7 +529,7 @@ class GroundStationTest {
         doTestCartesianDerivatives(FastMath.toRadians(-150), FastMath.toRadians(-20), 1200.0, 100.0,
                                    relativeTolerancePositionValue, relativeTolerancePositionDerivative,
                                    relativeToleranceVelocityValue, relativeToleranceVelocityDerivative,
-                                   ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -536,7 +541,7 @@ class GroundStationTest {
         doTestAngularDerivatives(FastMath.toRadians(-150), FastMath.toRadians(-20), 1200.0, 100.0,
                                  toleranceRotationValue,     toleranceRotationDerivative,
                                  toleranceRotationRateValue, toleranceRotationRateDerivative,
-                                 ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -548,7 +553,7 @@ class GroundStationTest {
         doTestCartesianDerivatives(FastMath.toRadians(89.99995), FastMath.toRadians(90), 1200.0, 100.0,
                                    relativeTolerancePositionValue, relativeTolerancePositionDerivative,
                                    relativeToleranceVelocityValue, relativeToleranceVelocityDerivative,
-                                   ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
@@ -560,7 +565,7 @@ class GroundStationTest {
         doTestAngularDerivatives(FastMath.toRadians(89.99995), FastMath.toRadians(90), 1200.0, 100.0,
                                  toleranceRotationValue,     toleranceRotationDerivative,
                                  toleranceRotationRateValue, toleranceRotationRateDerivative,
-                                 ".*-clock");
+                                   ".*-clock-.*");
     }
 
     @Test
