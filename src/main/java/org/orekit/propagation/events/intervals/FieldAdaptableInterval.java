@@ -25,6 +25,7 @@ import org.orekit.propagation.events.FieldEventDetector;
 /** This interface represents an event checking interval that depends on state.
 *
 * @see FieldEventDetector
+* @see AdaptableInterval
 * @author Luc Maisonobe
 * @since 12.0
 * @param <T> the type of the field elements
