@@ -128,7 +128,7 @@ public class FieldDateDetectorTest {
         // GIVEN
         final FieldDateDetector<Binary64> detector = new FieldDateDetector<>(FieldAbsoluteDate.getArbitraryEpoch(Binary64Field.getInstance()));
         // WHEN
-        final boolean value = detector.dependsOnTimeOnly();
+        final boolean value = detector.getEventFunction().dependsOnTimeOnly();
         // THEN
         Assertions.assertTrue(value);
     }

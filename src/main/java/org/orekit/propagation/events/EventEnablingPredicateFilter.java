@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import org.hipparchus.ode.events.Action;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.time.AbsoluteDate;
 
@@ -153,15 +154,19 @@ public class EventEnablingPredicateFilter implements DetectorModifier {
         return predicate;
     }
 
-    /**  {@inheritDoc} */
     @Override
-    public boolean dependsOnTimeOnly() {
-        return false;  // cannot know what predicate needs
-    }
+    public EventFunction getEventFunction() {
+        return new EventFunction() {
+            @Override
+            public double value(final SpacecraftState state) {
+                return g(state);
+            }
 
-    @Override
-    public boolean dependsOnMainVariablesOnly() {
-        return false;  // cannot know what predicate needs
+            @Override
+            public boolean dependsOnMainVariablesOnly() {
+                return false;
+            }
+        };
     }
 
     /**  {@inheritDoc} */

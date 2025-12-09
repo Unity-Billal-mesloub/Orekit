@@ -55,6 +55,7 @@ public class FieldOrDetectorTest {
         b = new MockDetector();
         s = Mockito.mock(FieldSpacecraftState.class);
         Mockito.when(s.getDate()).thenReturn(FieldAbsoluteDate.getArbitraryEpoch(Binary64Field.getInstance()));
+        Mockito.when(s.getMass()).thenReturn(new Binary64(100));
         or = FieldBooleanDetector.orCombine(a, b);
     }
 
@@ -171,7 +172,7 @@ public class FieldOrDetectorTest {
 
         @Override
         public Binary64 g(FieldSpacecraftState<Binary64> s) {
-            return this.g;
+            return g;
         }
 
         @Override

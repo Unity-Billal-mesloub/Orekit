@@ -16,10 +16,9 @@
  */
 package org.orekit.propagation.events;
 
-import org.hipparchus.analysis.differentiation.UnivariateDerivative2;
 import org.orekit.bodies.BodyShape;
-import org.orekit.bodies.FieldGeodeticPoint;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.LatitudeExtremumEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnIncreasing;
 
@@ -29,7 +28,10 @@ import org.orekit.propagation.events.handlers.StopOnIncreasing;
  * @author Luc Maisonobe
  * @since 7.1
  */
-public class LatitudeExtremumDetector extends AbstractGeodeticExtremumDetector<LatitudeExtremumDetector> {
+public class LatitudeExtremumDetector extends AbstractGeographicalDetector<LatitudeExtremumDetector> {
+
+    /** Event function. */
+    private final LatitudeExtremumEventFunction eventFunction;
 
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
@@ -64,6 +66,12 @@ public class LatitudeExtremumDetector extends AbstractGeodeticExtremumDetector<L
     protected LatitudeExtremumDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                        final BodyShape body) {
         super(detectionSettings, handler, body);
+        this.eventFunction = new LatitudeExtremumEventFunction(body);
+    }
+
+    @Override
+    public LatitudeExtremumEventFunction getEventFunction() {
+        return eventFunction;
     }
 
     /** {@inheritDoc} */
@@ -81,12 +89,7 @@ public class LatitudeExtremumDetector extends AbstractGeodeticExtremumDetector<L
      * @return spacecraft latitude time derivative
      */
     public double g(final SpacecraftState s) {
-        // convert state to geodetic coordinates
-        final FieldGeodeticPoint<UnivariateDerivative2> gp = transformToFieldGeodeticPoint(s);
-
-        // latitude time derivative
-        return gp.getLatitude().getFirstDerivative();
-
+        return getEventFunction().value(s);
     }
 
 }

@@ -17,6 +17,7 @@
 package org.orekit.propagation.events;
 
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.SingleDateEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnEvent;
 import org.orekit.time.AbsoluteDate;
@@ -34,6 +35,9 @@ public class SingleDateDetector extends AbstractDetector<SingleDateDetector> imp
     /** Date to detect. */
     private final AbsoluteDate date;
 
+    /** Event function. */
+    private final SingleDateEventFunction dateEvent;
+
     /** Full constructor.
      * @param detectionSettings event detection settings
      * @param eventHandler event handler
@@ -43,6 +47,7 @@ public class SingleDateDetector extends AbstractDetector<SingleDateDetector> imp
                               final AbsoluteDate date) {
         super(detectionSettings, eventHandler);
         this.date = date;
+        this.dateEvent = new SingleDateEventFunction(date);
     }
 
     /** Build a new instance with default detection settings.
@@ -69,14 +74,14 @@ public class SingleDateDetector extends AbstractDetector<SingleDateDetector> imp
 
     /** {@inheritDoc} */
     @Override
-    public boolean dependsOnTimeOnly() {
-        return true;
+    public SingleDateEventFunction getEventFunction() {
+        return dateEvent;
     }
 
     /** {@inheritDoc} */
     @Override
     public double g(final SpacecraftState s) {
-        return s.durationFrom(date);
+        return dateEvent.value(s);
     }
 
     /** {@inheritDoc} */

@@ -44,6 +44,7 @@ import org.orekit.propagation.events.DateDetector;
 import org.orekit.propagation.events.DetectorModifier;
 import org.orekit.propagation.events.EventDetectionSettings;
 import org.orekit.propagation.events.EventDetector;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.FieldDateDetector;
 import org.orekit.propagation.events.FieldDetectorModifier;
 import org.orekit.propagation.events.FieldEventDetectionSettings;
@@ -371,6 +372,28 @@ class SwitchEventHandlerTest {
         }
 
         @Override
+        public EventFunction getEventFunction() {
+            return new EventFunction() {
+                @Override
+                public double value(SpacecraftState s) {
+                    final PVCoordinates relativePV = new PVCoordinates(s.getPosition().subtract(pvCoordinates.getPosition()),
+                            s.getPVCoordinates().getVelocity().subtract(pvCoordinates.getVelocity()));
+                    final Vector3D relativePosition = relativePV.getPosition();
+                    final Vector3D relativeVelocity = relativePV.getVelocity();
+                    return s.durationFrom(pvCoordinates.getDate())
+                            + relativePosition.getX() + (relativePosition.getY() + relativePosition.getZ())
+                            + relativeVelocity.getX() + (relativeVelocity.getY()) + (relativeVelocity.getZ());
+                }
+
+                @Override
+                @SuppressWarnings("unchecked")
+                public <S extends CalculusFieldElement<S>> S value(FieldSpacecraftState<S> fieldState) {
+                    return (S) g((FieldSpacecraftState<T>) fieldState);
+                }
+            };
+        }
+
+        @Override
         public T g(FieldSpacecraftState<T> s) {
             final FieldPVCoordinates<T> relativePV = new FieldPVCoordinates<>(s.getPosition().subtract(pvCoordinates.getPosition()),
                     s.getPVCoordinates().getVelocity().subtract(pvCoordinates.getVelocity()));
@@ -403,13 +426,13 @@ class SwitchEventHandlerTest {
             public Stream<EventDetector> getEventDetectors() {
                 return Stream.of(new DetectorModifier() {
                     @Override
-                    public boolean dependsOnTimeOnly() {
-                        return false;
+                    public EventDetector getDetector() {
+                        return new DateDetector(date);
                     }
 
                     @Override
-                    public EventDetector getDetector() {
-                        return new DateDetector(date);
+                    public EventFunction getEventFunction() {
+                        return state -> getDetector().getEventFunction().value(state);
                     }
                 });
             }
@@ -418,8 +441,8 @@ class SwitchEventHandlerTest {
             public <T extends CalculusFieldElement<T>> Stream<FieldEventDetector<T>> getFieldEventDetectors(Field<T> field) {
                 return Stream.of(new FieldDetectorModifier<T>() {
                     @Override
-                    public boolean dependsOnTimeOnly() {
-                        return false;
+                    public EventFunction getEventFunction() {
+                        return state -> getDetector().getEventFunction().value(state);
                     }
 
                     @Override

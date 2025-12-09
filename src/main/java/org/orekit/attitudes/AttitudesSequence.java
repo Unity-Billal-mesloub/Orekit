@@ -227,11 +227,6 @@ public class AttitudesSequence extends AbstractSwitchingAttitudeProvider {
 
         }
 
-        @Override
-        public boolean dependsOnMainVariablesOnly() {
-            return false;
-        }
-
         /** {@inheritDoc} */
         @Override
         public double g(final SpacecraftState s) {

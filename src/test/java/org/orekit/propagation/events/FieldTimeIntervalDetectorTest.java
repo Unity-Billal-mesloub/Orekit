@@ -28,6 +28,7 @@ import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.TimeInterval;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,7 +55,7 @@ class FieldTimeIntervalDetectorTest {
         final FieldTimeIntervalDetector<Binary64> detector = new FieldTimeIntervalDetector<>(Binary64Field.getInstance(),
                 interval);
         // WHEN
-        final boolean value = detector.dependsOnTimeOnly();
+        final boolean value = detector.getEventFunction().dependsOnTimeOnly();
         // THEN
         Assertions.assertTrue(value);
     }
@@ -110,6 +111,7 @@ class FieldTimeIntervalDetectorTest {
     private static FieldSpacecraftState<Binary64> mockState(final AbsoluteDate date) {
         final FieldSpacecraftState<Binary64> state = mock();
         when(state.getDate()).thenReturn(new FieldAbsoluteDate<>(Binary64Field.getInstance(), date));
+        when(state.durationFrom(any(AbsoluteDate.class))).thenCallRealMethod();
         return state;
     }
 }

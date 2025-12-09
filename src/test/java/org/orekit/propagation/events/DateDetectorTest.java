@@ -250,7 +250,7 @@ public class DateDetectorTest {
         // GIVEN
         final DateDetector detector = new DateDetector();
         // WHEN
-        final boolean value = detector.dependsOnTimeOnly();
+        final boolean value = detector.getEventFunction().dependsOnTimeOnly();
         // THEN
         Assertions.assertTrue(value);
     }

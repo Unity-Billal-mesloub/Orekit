@@ -17,6 +17,7 @@
 package org.orekit.propagation.events;
 
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.time.AbsoluteDate;
 
@@ -54,13 +55,8 @@ public interface DetectorModifier extends EventDetector {
 
     /** {@inheritDoc} */
     @Override
-    default boolean dependsOnTimeOnly() {
-        return getDetector().dependsOnTimeOnly();
-    }
-
-    @Override
-    default boolean dependsOnMainVariablesOnly() {
-        return getDetector().dependsOnMainVariablesOnly();
+    default EventFunction getEventFunction() {
+        return getDetector().getEventFunction();
     }
 
     /** {@inheritDoc} */

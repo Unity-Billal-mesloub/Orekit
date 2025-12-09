@@ -26,8 +26,10 @@ import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.DetectorModifier;
 import org.orekit.propagation.events.EventDetector;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.FieldEventDetector;
 import org.orekit.propagation.events.FieldEventDetectionSettings;
+import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.time.AbsoluteDate;
@@ -161,10 +163,14 @@ abstract class AbstractSwitchingAttitudeProvider implements AttitudeProvider {
                 attitudeSwitch.finish(state.toSpacecraftState());
             }
 
-            /** {@inheritDoc} */
+            @Override
+            public EventFunction getEventFunction() {
+                return attitudeSwitch.getEventFunction();
+            }
+
             @Override
             public T g(final FieldSpacecraftState<T> s) {
-                return field.getZero().newInstance(attitudeSwitch.g(s.toSpacecraftState()));
+                return getEventFunction().value(s);
             }
 
             @Override
@@ -229,6 +235,9 @@ abstract class AbstractSwitchingAttitudeProvider implements AttitudeProvider {
         /** Wrapped event detector. */
         private final EventDetector event;
 
+        /** Event function. */
+        private final SwitchEventFunction eventFunction;
+
         /**
          * Simple constructor.
          *
@@ -249,12 +258,18 @@ abstract class AbstractSwitchingAttitudeProvider implements AttitudeProvider {
             this.past = past;
             this.future = future;
             this.switchHandler = switchHandler;
+            this.eventFunction = new SwitchEventFunction(event.getEventFunction());
         }
 
         /** {@inheritDoc} */
         @Override
         public EventDetector getDetector() {
             return event;
+        }
+
+        @Override
+        public EventFunction getEventFunction() {
+            return eventFunction;
         }
 
         /**
@@ -314,6 +329,25 @@ abstract class AbstractSwitchingAttitudeProvider implements AttitudeProvider {
             return getDetector().getHandler().resetState(getDetector(), oldState);
         }
 
+        private static class SwitchEventFunction implements EventFunctionModifier {
+
+            /** Wrapped event function. */
+            private final EventFunction function;
+
+            SwitchEventFunction(final EventFunction function) {
+                this.function = function;
+            }
+
+            @Override
+            public EventFunction getBaseFunction() {
+                return function;
+            }
+
+            @Override
+            public boolean dependsOnMainVariablesOnly() {
+                return false;
+            }
+        }
     }
 
 }

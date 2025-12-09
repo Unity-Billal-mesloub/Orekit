@@ -20,6 +20,7 @@ package org.orekit.propagation.events;
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.TimeIntervalEventFunction;
 import org.orekit.propagation.events.handlers.FieldContinueOnEvent;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.intervals.DateDetectionAdaptableIntervalFactory;
@@ -42,6 +43,9 @@ public class FieldTimeIntervalDetector<T extends CalculusFieldElement<T>>
     /** Time interval for detection. */
     private final TimeInterval timeInterval;
 
+    /** Time interval event function. */
+    private final TimeIntervalEventFunction eventFunction;
+
     /**
      * Constructor with default detection settings and handler.
      * @param field field
@@ -62,6 +66,7 @@ public class FieldTimeIntervalDetector<T extends CalculusFieldElement<T>>
                                      final TimeInterval timeInterval) {
         super(detectionSettings, handler);
         this.timeInterval = timeInterval;
+        this.eventFunction = new TimeIntervalEventFunction(timeInterval);
     }
 
     /**
@@ -95,15 +100,13 @@ public class FieldTimeIntervalDetector<T extends CalculusFieldElement<T>>
         return new FieldTimeIntervalDetector<>(detectionSettings, newHandler, timeInterval);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean dependsOnTimeOnly() {
-        return true;
+    public TimeIntervalEventFunction getEventFunction() {
+        return eventFunction;
     }
 
     @Override
     public T g(final FieldSpacecraftState<T> s) {
-        final FieldAbsoluteDate<T> date = s.getDate();
-        return (date.durationFrom(timeInterval.getStartDate())).multiply(date.durationFrom(timeInterval.getEndDate())).negate();
+        return eventFunction.value(s);
     }
 }

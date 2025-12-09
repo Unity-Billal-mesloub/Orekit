@@ -16,10 +16,9 @@
  */
 package org.orekit.propagation.events;
 
-import org.hipparchus.analysis.differentiation.UnivariateDerivative2;
 import org.orekit.bodies.BodyShape;
-import org.orekit.bodies.FieldGeodeticPoint;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.LongitudeExtremumEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnIncreasing;
 
@@ -29,7 +28,10 @@ import org.orekit.propagation.events.handlers.StopOnIncreasing;
  * @author Luc Maisonobe
  * @since 7.1
  */
-public class LongitudeExtremumDetector extends AbstractGeodeticExtremumDetector<LongitudeExtremumDetector> {
+public class LongitudeExtremumDetector extends AbstractGeographicalDetector<LongitudeExtremumDetector> {
+
+    /** Event function. */
+    private final LongitudeExtremumEventFunction eventFunction;
 
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
@@ -66,6 +68,12 @@ public class LongitudeExtremumDetector extends AbstractGeodeticExtremumDetector<
     protected LongitudeExtremumDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                         final BodyShape body) {
         super(detectionSettings, handler, body);
+        this.eventFunction = new LongitudeExtremumEventFunction(body);
+    }
+
+    @Override
+    public LongitudeExtremumEventFunction getEventFunction() {
+        return eventFunction;
     }
 
     /** {@inheritDoc} */
@@ -83,12 +91,7 @@ public class LongitudeExtremumDetector extends AbstractGeodeticExtremumDetector<
      * @return spacecraft longitude time derivative
      */
     public double g(final SpacecraftState s) {
-        // convert state to geodetic coordinates
-        final FieldGeodeticPoint<UnivariateDerivative2> gp = transformToFieldGeodeticPoint(s);
-
-        // longitude time derivative
-        return gp.getLongitude().getFirstDerivative();
-
+        return getEventFunction().value(s);
     }
 
 }

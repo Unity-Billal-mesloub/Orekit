@@ -21,13 +21,15 @@ import java.util.stream.Collectors;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
-import org.hipparchus.util.FastMath;
 import org.orekit.errors.OrekitException;
 import org.orekit.errors.OrekitMessages;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.TimeIntervalEventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnEvent;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.TimeInterval;
 import org.orekit.utils.DateDriver;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.ParameterObserver;
@@ -211,10 +213,9 @@ public class FieldParameterDrivenDateIntervalDetector<T extends CalculusFieldEle
         return duration;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean dependsOnTimeOnly() {
-        return true;
+    public EventFunction getEventFunction() {
+        return new ParameterDrivenDateIntervalEventFunction(start.getDate(), stop.getDate());
     }
 
     /** Compute the value of the switching function.
@@ -229,9 +230,9 @@ public class FieldParameterDrivenDateIntervalDetector<T extends CalculusFieldEle
      * @param s the current state information: date, kinematics, attitude
      * @return value of the switching function
      */
+    @Override
     public T g(final FieldSpacecraftState<T> s) {
-        return FastMath.min(s.getDate().durationFrom(start.getDate()),
-                            s.getDate().durationFrom(stop.getDate()).negate());
+        return getEventFunction().value(s);
     }
 
     /** Base observer. */
@@ -314,4 +315,26 @@ public class FieldParameterDrivenDateIntervalDetector<T extends CalculusFieldEle
         }
     }
 
+    private static class ParameterDrivenDateIntervalEventFunction extends TimeIntervalEventFunction {
+
+        /**
+         * Constructor.
+         * @param startDate start date
+         * @param endDate end date
+         */
+        ParameterDrivenDateIntervalEventFunction(final AbsoluteDate startDate, final AbsoluteDate endDate) {
+            super(new TimeInterval() {
+                // unsafe implementation without sorting check
+                @Override
+                public AbsoluteDate getStartDate() {
+                    return startDate;
+                }
+
+                @Override
+                public AbsoluteDate getEndDate() {
+                    return endDate;
+                }
+            });
+        }
+    }
 }

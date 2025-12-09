@@ -48,7 +48,7 @@ class SingleDateDetectorTest {
         // WHEN
         final SingleDateDetector detector = new SingleDateDetector(date);
         // THEN
-        assertTrue(detector.dependsOnTimeOnly());
+        assertTrue(detector.getEventFunction().dependsOnTimeOnly());
     }
 
     @Test

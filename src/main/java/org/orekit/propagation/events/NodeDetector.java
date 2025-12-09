@@ -25,6 +25,7 @@ import org.orekit.orbits.Orbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.NodeEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnIncreasing;
 import org.orekit.propagation.events.intervals.AdaptableInterval;
@@ -55,6 +56,9 @@ public class NodeDetector extends AbstractDetector<NodeDetector> {
 
     /** Frame in which the equator is defined. */
     private final Frame frame;
+
+    /** Event function. */
+    private final NodeEventFunction eventFunction;
 
     /** Build a new instance.
      * <p>The default {@link #getMaxCheckInterval() max check interval}
@@ -117,6 +121,7 @@ public class NodeDetector extends AbstractDetector<NodeDetector> {
                            final Frame frame) {
         super(detectionSettings, handler);
         this.frame = frame;
+        this.eventFunction = new NodeEventFunction(frame);
     }
 
     /** {@inheritDoc} */
@@ -172,13 +177,18 @@ public class NodeDetector extends AbstractDetector<NodeDetector> {
         return frame;
     }
 
+    @Override
+    public NodeEventFunction getEventFunction() {
+        return eventFunction;
+    }
+
     /** Compute the value of the switching function.
      * This function computes the Z position in the defined frame.
      * @param s the current state information: date, kinematics, attitude
      * @return value of the switching function
      */
     public double g(final SpacecraftState s) {
-        return s.getPosition(frame).getZ();
+        return getEventFunction().value(s);
     }
 
 }

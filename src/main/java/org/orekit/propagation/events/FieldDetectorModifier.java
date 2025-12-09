@@ -18,6 +18,7 @@ package org.orekit.propagation.events;
 
 import org.hipparchus.CalculusFieldElement;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.time.FieldAbsoluteDate;
 
@@ -56,13 +57,8 @@ public interface FieldDetectorModifier<T extends CalculusFieldElement<T>> extend
 
     /** {@inheritDoc} */
     @Override
-    default boolean dependsOnTimeOnly() {
-        return getDetector().dependsOnTimeOnly();
-    }
-
-    @Override
-    default boolean dependsOnMainVariablesOnly() {
-        return getDetector().dependsOnMainVariablesOnly();
+    default EventFunction getEventFunction() {
+        return getDetector().getEventFunction();
     }
 
     /** {@inheritDoc} */

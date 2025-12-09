@@ -18,14 +18,11 @@ package org.orekit.propagation.events;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
-import org.hipparchus.analysis.differentiation.FieldUnivariateDerivative2;
 import org.orekit.bodies.BodyShape;
-import org.orekit.bodies.FieldGeodeticPoint;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.LongitudeExtremumEventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnIncreasing;
-import org.orekit.time.FieldAbsoluteDate;
-import org.orekit.utils.FieldPVCoordinates;
 
 /** Detector for longitude extrema.
  * @author Romain Serra
@@ -35,6 +32,9 @@ import org.orekit.utils.FieldPVCoordinates;
  */
 public class FieldLongitudeExtremumDetector<T extends CalculusFieldElement<T>>
         extends FieldAbstractGeographicalDetector<FieldLongitudeExtremumDetector<T>, T> {
+
+    /** Event function. */
+    private final LongitudeExtremumEventFunction eventFunction;
 
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
@@ -62,6 +62,13 @@ public class FieldLongitudeExtremumDetector<T extends CalculusFieldElement<T>>
     public FieldLongitudeExtremumDetector(final FieldEventDetectionSettings<T> detectionSettings,
                                           final FieldEventHandler<T> handler, final BodyShape body) {
         super(detectionSettings, handler, body);
+        this.eventFunction = new LongitudeExtremumEventFunction(body);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public LongitudeExtremumEventFunction getEventFunction() {
+        return eventFunction;
     }
 
     /** {@inheritDoc} */
@@ -71,16 +78,10 @@ public class FieldLongitudeExtremumDetector<T extends CalculusFieldElement<T>>
         return new FieldLongitudeExtremumDetector<>(detectionSettings, newHandler, getBodyShape());
     }
 
+    /** {@inheritDoc} */
     @Override
     public T g(final FieldSpacecraftState<T> s) {
-        // convert state to geodetic coordinates
-        final FieldAbsoluteDate<FieldUnivariateDerivative2<T>> fud2Date = s.getDate().toFUD2Field();
-        final FieldPVCoordinates<FieldUnivariateDerivative2<T>> pv = s.getPVCoordinates().toUnivariateDerivative2PV();
-        final FieldGeodeticPoint<FieldUnivariateDerivative2<T>> gp = getBodyShape().transform(pv.getPosition(), s.getFrame(), fud2Date);
-
-        // longitude rate
-        return gp.getLongitude().getFirstDerivative();
-
+        return getEventFunction().value(s);
     }
 
 }

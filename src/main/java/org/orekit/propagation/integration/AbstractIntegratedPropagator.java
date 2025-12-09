@@ -1009,7 +1009,7 @@ public abstract class AbstractIntegratedPropagator extends AbstractPropagator {
          * @return Orekit state
          */
         private SpacecraftState convertToOrekitForEventFunction(final ODEStateAndDerivative s) {
-            if (!this.detector.dependsOnMainVariablesOnly()) {
+            if (!this.detector.getEventFunction().dependsOnMainVariablesOnly()) {
                 return convertToOrekitWithAdditional(s);
             } else {
                 // event function does not require secondary states or attitude rates

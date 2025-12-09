@@ -28,6 +28,7 @@ import org.orekit.orbits.Orbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngleType;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.NodeEventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnEvent;
 import org.orekit.propagation.events.handlers.FieldStopOnIncreasing;
@@ -51,6 +52,9 @@ import org.orekit.propagation.events.intervals.FieldAdaptableInterval;
  * @param <T> type of the field elements
  */
 public class FieldNodeDetector<T extends CalculusFieldElement<T>> extends FieldAbstractDetector<FieldNodeDetector<T>, T> {
+
+    /** Event function. */
+    private final NodeEventFunction eventFunction;
 
     /** Frame in which the equator is defined. */
     private final Frame frame;
@@ -110,6 +114,7 @@ public class FieldNodeDetector<T extends CalculusFieldElement<T>> extends FieldA
                                 final FieldEventHandler<T> handler, final Frame frame) {
         super(detectionSettings, handler);
         this.frame = frame;
+        this.eventFunction = new NodeEventFunction(frame);
     }
 
     /** {@inheritDoc} */
@@ -166,17 +171,19 @@ public class FieldNodeDetector<T extends CalculusFieldElement<T>> extends FieldA
         return frame;
     }
 
+    @Override
+    public NodeEventFunction getEventFunction() {
+        return eventFunction;
+    }
+
     /** Compute the value of the switching function.
      * This function computes the Z position in the defined frame.
      * @param s the current state information: date, kinematics, attitude
      * @return value of the switching function
      */
+    @Override
     public T g(final FieldSpacecraftState<T> s) {
-        return s.getPosition(frame).getZ();
+        return getEventFunction().value(s);
     }
-
-//    public NodeDetector toNoField() {
-//        return new NodeDetector(getThreshold().getReal(), orbit.toOrbit(), frame);
-//    }
 
 }

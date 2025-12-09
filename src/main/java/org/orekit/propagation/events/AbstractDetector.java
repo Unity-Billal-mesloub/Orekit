@@ -19,6 +19,7 @@ package org.orekit.propagation.events;
 import org.orekit.errors.OrekitException;
 import org.orekit.errors.OrekitMessages;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.intervals.AdaptableInterval;
 import org.orekit.time.AbsoluteDate;
@@ -42,8 +43,11 @@ public abstract class AbstractDetector<T extends AbstractDetector<T>> implements
     /** Detection settings. */
     private final EventDetectionSettings eventDetectionSettings;
 
-    /** Default handler for event overrides. */
+    /** Handler for event overrides. */
     private final EventHandler handler;
+
+    /** Default event function. */
+    private final EventFunction defaultEventFunction;
 
     /** Propagation direction. */
     private boolean forward;
@@ -69,6 +73,7 @@ public abstract class AbstractDetector<T extends AbstractDetector<T>> implements
         this.eventDetectionSettings = detectionSettings;
         this.handler   = handler;
         this.forward   = true;
+        this.defaultEventFunction = this::g;
     }
 
     /**
@@ -105,6 +110,11 @@ public abstract class AbstractDetector<T extends AbstractDetector<T>> implements
                      final AbsoluteDate t) {
         EventDetector.super.init(s0, t);
         forward = checkIfForward(s0, t);
+    }
+
+    @Override
+    public EventFunction getEventFunction() {
+        return defaultEventFunction;
     }
 
     /** {@inheritDoc} */

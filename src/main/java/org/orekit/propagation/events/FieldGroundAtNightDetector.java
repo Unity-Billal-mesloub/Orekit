@@ -17,14 +17,13 @@
 package org.orekit.propagation.events;
 
 import org.hipparchus.CalculusFieldElement;
-import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
-import org.orekit.frames.Frame;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.models.AtmosphericRefractionModel;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.GroundAtNightEventFunction;
 import org.orekit.propagation.events.handlers.FieldContinueOnEvent;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
-import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.ExtendedPositionProvider;
 
 
@@ -54,6 +53,9 @@ public class FieldGroundAtNightDetector<T extends CalculusFieldElement<T>>
 
     /** Atmospheric Model used for calculations, if defined. */
     private final AtmosphericRefractionModel refractionModel;
+
+    /** Event function. */
+    private final EventFunction eventFunction;
 
     /** Simple constructor.
      * @param topocentricFrame ground location to check
@@ -85,6 +87,7 @@ public class FieldGroundAtNightDetector<T extends CalculusFieldElement<T>>
         this.sun               = sun;
         this.dawnDuskElevation = dawnDuskElevation;
         this.refractionModel   = refractionModel;
+        this.eventFunction = new LocalEventFunction(getTopocentricFrame());
     }
 
     /** {@inheritDoc} */
@@ -96,8 +99,8 @@ public class FieldGroundAtNightDetector<T extends CalculusFieldElement<T>>
     }
 
     @Override
-    public boolean dependsOnTimeOnly() {
-        return true;
+    public EventFunction getEventFunction() {
+        return eventFunction;
     }
 
     /** {@inheritDoc}
@@ -111,21 +114,24 @@ public class FieldGroundAtNightDetector<T extends CalculusFieldElement<T>>
      */
     @Override
     public T g(final FieldSpacecraftState<T> state) {
-
-        final FieldAbsoluteDate<T> date     = state.getDate();
-        final Frame         frame    = state.getFrame();
-        final FieldVector3D<T> position = sun.getPosition(date, frame);
-        final T trueElevation   = getTopocentricFrame().getElevation(position, frame, date);
-
-        final T calculatedElevation;
-        if (refractionModel != null) {
-            calculatedElevation = trueElevation.add(refractionModel.getRefraction(trueElevation.getReal()));
-        } else {
-            calculatedElevation = trueElevation;
-        }
-
-        return dawnDuskElevation.subtract(calculatedElevation);
-
+        return eventFunction.value(state);
     }
 
+    private class LocalEventFunction extends GroundAtNightEventFunction {
+
+        protected LocalEventFunction(final TopocentricFrame topocentricFrame) {
+            super(topocentricFrame, sun, dawnDuskElevation.getReal(), refractionModel);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <S extends CalculusFieldElement<S>> S value(final FieldSpacecraftState<S> state) {
+            final S g = super.value(state);
+            if (g.getField().equals(getThreshold().getField())) {
+                return (S) ((T) g).add(dawnDuskElevation.getAddendum());
+            } else {
+                return g;
+            }
+        }
+    }
 }
