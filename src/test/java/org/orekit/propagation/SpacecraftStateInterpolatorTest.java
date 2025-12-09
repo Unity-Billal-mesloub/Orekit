@@ -660,7 +660,7 @@ class SpacecraftStateInterpolatorTest {
         }
 
         @Override
-        public List<TimeInterpolator<? extends TimeStamped>> getSubInterpolators() {
+        public List<TimeInterpolator<?>> getSubInterpolators() {
             return Collections.emptyList();
         }
     }
