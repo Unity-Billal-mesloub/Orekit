@@ -43,6 +43,7 @@ import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.AbsolutePVCoordinates;
+import org.orekit.utils.Constants;
 import org.orekit.utils.FieldAbsolutePVCoordinates;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.PVCoordinates;
@@ -129,6 +130,18 @@ public class TestUtils {
                                          FramesFactory.getGCRF(),
                                          getFakeFieldAbsoluteDate(),
                                          new Binary64(1));
+    }
+
+    public static FieldPVCoordinates<Binary64> getFieldPVCoordinates() {
+        return new FieldPVCoordinates<>(new FieldVector3D<>(new Binary64(6878e3), new Binary64(0), new Binary64(0)),
+                                        new FieldVector3D<>(new Binary64(5400), new Binary64(0), new Binary64(5400)));
+    }
+
+    public static FieldOrbit<Binary64> getFieldOrbit() {
+        return new FieldCartesianOrbit<>(getFieldPVCoordinates(),
+                                         FramesFactory.getGCRF(),
+                                         getFakeFieldAbsoluteDate(),
+                                         new Binary64(Constants.IERS2010_EARTH_MU));
     }
 
     public static FieldAbsoluteDate<Binary64> getFakeFieldAbsoluteDate() {
