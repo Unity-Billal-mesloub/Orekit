@@ -161,26 +161,27 @@ public class OrbitHermiteInterpolator extends AbstractOrbitInterpolator {
 
         // Get information for interpolation
         final AbsoluteDate interpolationDate = interpolationData.getInterpolationDate();
-        final OrbitType    orbitType         = sample.get(0).getType();
-        final Frame        inputFrame        = sample.get(0).getFrame();
-        final double       mu                = sample.get(0).getMu();
+        final Orbit        firstEntry        = sample.get(0);
+        final OrbitType    orbitType         = firstEntry.getType();
+        final Frame        inputFrame        = firstEntry.getFrame();
+        final double       mu                = firstEntry.getMu();
         final Frame        outputFrame       = getOutputInertialFrame();
 
+        final Orbit interpolated;
         if (orbitType == OrbitType.CARTESIAN) {
-            return interpolateCartesian(interpolationDate, inputFrame, sample);
-        } else {
-            // Interpolate in input frame
-            final Orbit interpolated = interpolateCommon(interpolationDate, inputFrame, sample, orbitType);
-
-            // Return interpolated if input and output frame are the same
-            if (inputFrame.equals(outputFrame)) {
-                return interpolated;
-            }
-
-            // Otherwise, express in output frame
-            return new CartesianOrbit(interpolated.getPVCoordinates(outputFrame), outputFrame, mu);
+            interpolated = interpolateCartesian(interpolationDate, inputFrame, sample);
+        }
+        else {
+            interpolated = interpolateCommon(interpolationDate, inputFrame, sample, orbitType);
         }
 
+        // Return interpolated if input and output frame are the same
+        if (inputFrame.equals(outputFrame)) {
+            return interpolated;
+        }
+
+        // Otherwise, express in the output frame
+        return new CartesianOrbit(interpolated.getPVCoordinates(outputFrame), outputFrame, mu);
     }
 
     /**
