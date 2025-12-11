@@ -164,7 +164,6 @@ public class OrbitHermiteInterpolator extends AbstractOrbitInterpolator {
         final Orbit        firstEntry        = sample.get(0);
         final OrbitType    orbitType         = firstEntry.getType();
         final Frame        inputFrame        = firstEntry.getFrame();
-        final double       mu                = firstEntry.getMu();
         final Frame        outputFrame       = getOutputInertialFrame();
 
         final Orbit interpolated;
@@ -181,7 +180,7 @@ public class OrbitHermiteInterpolator extends AbstractOrbitInterpolator {
         }
 
         // Otherwise, express in the output frame
-        return new CartesianOrbit(interpolated.getPVCoordinates(outputFrame), outputFrame, mu);
+        return interpolated.inFrame(outputFrame);
     }
 
     /**

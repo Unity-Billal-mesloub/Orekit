@@ -176,7 +176,6 @@ public class FieldOrbitHermiteInterpolator<KK extends CalculusFieldElement<KK>> 
         final FieldOrbit<KK>        firstEntry        = sample.get(0);
         final OrbitType             orbitType         = firstEntry.getType();
         final Frame                 inputFrame        = firstEntry.getFrame();
-        final KK                    mu                = firstEntry.getMu();
         final Frame                 outputFrame       = getOutputInertialFrame();
 
         // Extract field
@@ -199,7 +198,7 @@ public class FieldOrbitHermiteInterpolator<KK extends CalculusFieldElement<KK>> 
         }
 
         // Otherwise, express in the output frame
-        return new FieldCartesianOrbit<>(interpolated.getPVCoordinates(outputFrame), outputFrame, mu);
+        return interpolated.inFrame(outputFrame);
     }
 
     /**
