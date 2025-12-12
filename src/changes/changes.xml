@@ -26,6 +26,9 @@
       <action dev="evan" type="fix" issue="1854">
           Fixed regression on performance with OCM.
       </action>
+      <action dev="vcucchie" type="fix" issue="1844">
+          Fixed frame conversion issue with Ephemeris class (for both AbsolutePVCoordinates and any type of Orbit)
+      </action>
     </release>
     <release version="13.1.2" date="2025-09-25" description="Orekit 13.1.2 is a patch release. It fixes various bugs including a couple of urgent ones">
         <action dev="luc" type="fix" issue="1831">
