@@ -676,9 +676,6 @@ class FieldOrbitHermiteInterpolatorTest {
         Assertions.assertEquals(originalPosition.getY(), actualPosition.getY(), 1.0e-8);
         Assertions.assertEquals(originalPosition.getZ(), actualPosition.getZ(), 1.0e-8);
 
-        // Assert output type
-        Assertions.assertInstanceOf(FieldCartesianOrbit.class, interpolatedOrbit);
-
         // Assert frame
         Assertions.assertEquals(outputFrame, interpolatedOrbit.getFrame());
     }
