@@ -28,6 +28,9 @@ import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinates;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Position provider assuming pure Keplerian motion.
  * Propagation is computed with the same orbital parameters used to define the reference.
@@ -44,6 +47,9 @@ public class KeplerianExtendedPositionProvider implements ExtendedPositionProvid
     /** Reference orbit. */
     private final Orbit referenceOrbit;
 
+    /** Cache for already encountered Field. */
+    private final Map<Field<? extends CalculusFieldElement<?>>, FieldOrbit<?>> fieldCache;
+
     /**
      * Constructor.
      * @param referenceOrbit reference orbit (non-Keplerian terms will be ignored if any)
@@ -54,6 +60,7 @@ public class KeplerianExtendedPositionProvider implements ExtendedPositionProvid
         final CartesianOrbit cartesianOrbit = new CartesianOrbit(keplerianPV, referenceOrbit.getFrame(),
                 referenceOrbit.getDate(), referenceOrbit.getMu());
         this.referenceOrbit = referenceOrbit.getType().convertType(cartesianOrbit);
+        this.fieldCache = new HashMap<>();
     }
 
     /** {@inheritDoc} */
@@ -100,7 +107,9 @@ public class KeplerianExtendedPositionProvider implements ExtendedPositionProvid
      * @return FieldOrbit
      * @param <T> field
      */
+    @SuppressWarnings("unchecked")
     private <T extends CalculusFieldElement<T>> FieldOrbit<T> buildFieldOrbit(final Field<T> field) {
-        return referenceOrbit.getType().convertToFieldOrbit(field, referenceOrbit);
+        final OrbitType orbitType = referenceOrbit.getType();
+        return (FieldOrbit<T>) fieldCache.computeIfAbsent(field, ignored -> orbitType.convertToFieldOrbit(field, referenceOrbit));
     }
 }

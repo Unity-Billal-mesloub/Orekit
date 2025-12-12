@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
+        <action dev="serrof" type="add" issue="issue-1877">
+            Add Taylor ExtendedPositionProvider.
+        </action>
         <action dev="serrof" type="add" issue="issue-1871">
           Add GNSS ExtendedPositionProvider.
         </action>

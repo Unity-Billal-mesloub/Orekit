@@ -18,23 +18,14 @@
 package org.orekit.propagation.events;
 
 import org.hipparchus.ode.ODEIntegrator;
-import org.hipparchus.ode.nonstiff.DormandPrince853Integrator;
+import org.hipparchus.ode.nonstiff.ClassicalRungeKuttaIntegrator;
 import org.orekit.orbits.OrbitType;
-import org.orekit.propagation.ToleranceProvider;
-import org.orekit.propagation.numerical.NumericalPropagator;
 
-/**
- * Test event handling with a {@link NumericalPropagator} and a {@link
- * DormandPrince853Integrator}.
- *
- * @author Evan Ward
- */
-public class CloseEventsNumericalDP853Test extends AbstractCloseEventsNumericalTest {
+public class CloseEventsNumericalRK4Test extends AbstractCloseEventsNumericalTest {
 
     @Override
-    ODEIntegrator getIntegrator(double stepSize, final OrbitType orbitType) {
-        double[][] tol = ToleranceProvider.getDefaultToleranceProvider(1e-1).getTolerances(initialOrbit, orbitType);
-        return new DormandPrince853Integrator(stepSize, stepSize, tol[0], tol[1]);
+    ODEIntegrator getIntegrator(final double stepSize, final OrbitType orbitType) {
+        return new ClassicalRungeKuttaIntegrator(stepSize);
     }
 
 }

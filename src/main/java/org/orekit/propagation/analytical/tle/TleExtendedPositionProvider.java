@@ -30,6 +30,9 @@ import org.orekit.utils.ExtendedPositionProvider;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinates;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Position provider from a TLE.
  *
@@ -49,6 +52,9 @@ public class TleExtendedPositionProvider implements ExtendedPositionProvider {
     /** Cached propagator. */
     private TLEPropagator propagator;
 
+    /** Cache for already encountered Field. */
+    private final Map<Field<? extends CalculusFieldElement<?>>, FieldTLE<?>> fieldCache;
+
     /**
      * Constructor.
      * @param tle reference TLE
@@ -57,6 +63,7 @@ public class TleExtendedPositionProvider implements ExtendedPositionProvider {
     public TleExtendedPositionProvider(final TLE tle, final Frames frames) {
         this.tle = tle;
         this.teme = frames.getTEME();
+        this.fieldCache = new HashMap<>();
     }
 
     /**
@@ -130,8 +137,9 @@ public class TleExtendedPositionProvider implements ExtendedPositionProvider {
      * @return Field TLE propagator
      * @param <T> field
      */
+    @SuppressWarnings("unchecked")
     private <T extends CalculusFieldElement<T>> FieldTLEPropagator<T> buildFieldPropagator(final Field<T> field) {
-
-        return FieldTLEPropagator.selectExtrapolator(new FieldTLE<>(field, tle), teme, tle.getParameters(field));
+        final FieldTLE<?> fieldTLE = fieldCache.computeIfAbsent(field, ignored -> new FieldTLE<>(field, tle));
+        return FieldTLEPropagator.selectExtrapolator((FieldTLE<T>) fieldTLE, teme, tle.getParameters(field));
     }
 }
