@@ -29,6 +29,9 @@ import org.orekit.utils.ExtendedPositionProvider;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinates;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Class for GNSS extended position provider.
  * @see ExtendedPositionProvider
@@ -39,6 +42,9 @@ public class GNSSExtendedPositionProvider implements ExtendedPositionProvider {
 
     /** Internal propagator. */
     private final GNSSPropagator gnssPropagator;
+
+    /** Cache for already encountered Field. */
+    private final Map<Field<? extends CalculusFieldElement<?>>, FieldGnssPropagator<?>> fieldCache;
 
     /**
      * Build a new instance.
@@ -51,6 +57,7 @@ public class GNSSExtendedPositionProvider implements ExtendedPositionProvider {
     public GNSSExtendedPositionProvider(final GNSSOrbitalElements<?> orbitalElements, final Frame eci,
                                         final Frame ecef, final AttitudeProvider provider, final double mass) {
         this.gnssPropagator = new GNSSPropagator(orbitalElements, eci, ecef, provider, mass);
+        this.fieldCache = new HashMap<>();
     }
 
     @Override
@@ -92,9 +99,10 @@ public class GNSSExtendedPositionProvider implements ExtendedPositionProvider {
      * @return field propagator
      * @param <T> field type
      */
+    @SuppressWarnings("unchecked")
     private <T extends CalculusFieldElement<T>> FieldGnssPropagator<T> getFieldPropagator(final Field<T> field) {
-        return new FieldGnssPropagator<>(gnssPropagator.getOrbitalElements().toField(field),
+        return (FieldGnssPropagator<T>) fieldCache.computeIfAbsent(field, ignored -> new FieldGnssPropagator<>(gnssPropagator.getOrbitalElements().toField(field),
                 gnssPropagator.getECI(), gnssPropagator.getECEF(), gnssPropagator.getAttitudeProvider(),
-                field.getZero().newInstance(gnssPropagator.getInitialState().getMass()));
+                field.getZero().newInstance(gnssPropagator.getInitialState().getMass())));
     }
 }
