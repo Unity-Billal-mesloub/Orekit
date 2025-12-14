@@ -24,11 +24,20 @@
           Fixed number of interpolation points used when using interpolators with sub-interpolators requiring more
           interpolation points (normal + fielded version).
       </action>
-      <action dev="serrof" type="fix" issue="1854">
+      <action dev="serrof" type="fix" issue="1874">
+          Call init and finish in FieldImpulseProvider built from ImpulseProvider.
+      </action>
+      <action dev="afossa" type="fix" issue="1866">
+          Added check on date and mu in faster computation of field acceleration in HolmesFeatherstoneAttractionModel.
+      </action>
+      <action dev="serrof" type="fix" issue="1864">
           Take into account rejected measurements in dimension for chi distribution in least-squares.
       </action>
       <action dev="evan" type="fix" issue="1854">
           Fixed regression on performance with OCM.
+      </action>
+      <action dev="vcucchie" type="fix" issue="1844">
+          Fixed frame conversion issue with Ephemeris class (for both AbsolutePVCoordinates and any type of Orbit)
       </action>
     </release>
     <release version="13.1.2" date="2025-09-25" description="Orekit 13.1.2 is a patch release. It fixes various bugs including a couple of urgent ones">
