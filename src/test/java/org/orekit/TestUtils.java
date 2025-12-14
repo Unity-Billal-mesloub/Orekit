@@ -23,6 +23,7 @@ import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.geometry.euclidean.twod.FieldVector2D;
 import org.hipparchus.geometry.euclidean.twod.Vector2D;
+import org.hipparchus.linear.BlockRealMatrix;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.RealMatrix;
 import org.hipparchus.util.Binary64;
@@ -32,6 +33,7 @@ import org.hipparchus.util.MathArrays;
 import org.junit.jupiter.api.Assertions;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
+import org.orekit.frames.LOFType;
 import org.orekit.orbits.CartesianOrbit;
 import org.orekit.orbits.FieldCartesianOrbit;
 import org.orekit.orbits.FieldOrbit;
@@ -40,6 +42,7 @@ import org.orekit.propagation.AdditionalDataProvider;
 import org.orekit.propagation.FieldAdditionalDataProvider;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.StateCovariance;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.AbsolutePVCoordinates;
@@ -375,4 +378,17 @@ public class TestUtils {
         return false;
     }
 
+    public static StateCovariance getFakeStateCovarianceInLOF(AbsoluteDate absoluteDate,
+                                                              LOFType lofType) {
+        final RealMatrix covariance = new BlockRealMatrix(new double[][] {
+                { 1e4, 0, 0, 0, 0, 0 },
+                { 0, 1e4, 0, 0, 0, 0 },
+                { 0, 0, 1e4, 0, 0, 0 },
+                { 0, 0, 0, 1e-2, 0, 0 },
+                { 0, 0, 0, 0, 1e-2, 0 },
+                { 0, 0, 0, 0, 0, 1e-2 },
+                });
+
+        return new StateCovariance(covariance, absoluteDate, lofType);
+    }
 }
