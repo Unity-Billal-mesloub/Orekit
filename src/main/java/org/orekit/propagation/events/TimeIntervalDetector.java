@@ -18,9 +18,9 @@
 package org.orekit.propagation.events;
 
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.TimeIntervalEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.intervals.DateDetectionAdaptableIntervalFactory;
-import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeInterval;
 
 
@@ -35,6 +35,9 @@ public class TimeIntervalDetector extends AbstractDetector<TimeIntervalDetector>
 
     /** Time interval for detection. */
     private final TimeInterval timeInterval;
+
+    /** Time interval event function. */
+    private final TimeIntervalEventFunction eventFunction;
 
     /**
      * Constructor with default detection settings.
@@ -56,6 +59,7 @@ public class TimeIntervalDetector extends AbstractDetector<TimeIntervalDetector>
                                 final TimeInterval timeInterval) {
         super(detectionSettings, handler);
         this.timeInterval = timeInterval;
+        this.eventFunction = new TimeIntervalEventFunction(timeInterval);
     }
 
     /**
@@ -71,15 +75,13 @@ public class TimeIntervalDetector extends AbstractDetector<TimeIntervalDetector>
         return new TimeIntervalDetector(detectionSettings, newHandler, timeInterval);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean dependsOnTimeOnly() {
-        return true;
+    public TimeIntervalEventFunction getEventFunction() {
+        return eventFunction;
     }
 
     @Override
     public double g(final SpacecraftState s) {
-        final AbsoluteDate date = s.getDate();
-        return (date.durationFrom(timeInterval.getStartDate())) * (timeInterval.getEndDate().durationFrom(date));
+        return eventFunction.value(s);
     }
 }

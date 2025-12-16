@@ -46,7 +46,7 @@ class FieldParameterDrivenDateIntervalDetectorTest {
         final FieldParameterDrivenDateIntervalDetector<Binary64> detector = new FieldParameterDrivenDateIntervalDetector<>(fieldDate.getField(),
                 "e", fieldDate.toAbsoluteDate(), fieldDate.toAbsoluteDate());
         // WHEN
-        final boolean value = detector.dependsOnTimeOnly();
+        final boolean value = detector.getEventFunction().dependsOnTimeOnly();
         // THEN
         Assertions.assertTrue(value);
     }
@@ -211,7 +211,7 @@ class FieldParameterDrivenDateIntervalDetectorTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         Utils.setDataRoot("regular-data");
     }
 

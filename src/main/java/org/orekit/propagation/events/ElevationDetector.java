@@ -20,11 +20,13 @@ import org.hipparchus.ode.events.Action;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.models.AtmosphericRefractionModel;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.AbstractElevationEventFunction;
+import org.orekit.propagation.events.functions.MaskedElevationEventFunction;
+import org.orekit.propagation.events.functions.MinimumElevationEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnDecreasing;
 import org.orekit.propagation.events.intervals.AdaptableInterval;
 import org.orekit.utils.ElevationMask;
-import org.orekit.utils.TrackingCoordinates;
 
 
 /**
@@ -49,6 +51,9 @@ public class ElevationDetector extends AbstractTopocentricDetector<ElevationDete
 
     /** Atmospheric Model used for calculations, if defined. */
     private final AtmosphericRefractionModel refractionModel;
+
+    /** Event function. */
+    private final AbstractElevationEventFunction eventFunction;
 
     /**
      * Creates an instance of Elevation detector based on passed in topocentric frame
@@ -120,6 +125,8 @@ public class ElevationDetector extends AbstractTopocentricDetector<ElevationDete
         this.minElevation    = minElevation;
         this.elevationMask   = mask;
         this.refractionModel = refractionModel;
+        this.eventFunction = mask == null ? new MinimumElevationEventFunction(refractionModel, topo, minElevation) :
+                new MaskedElevationEventFunction(refractionModel, topo, mask);
     }
 
     /** {@inheritDoc} */
@@ -158,6 +165,11 @@ public class ElevationDetector extends AbstractTopocentricDetector<ElevationDete
         return this.refractionModel;
     }
 
+    @Override
+    public AbstractElevationEventFunction getEventFunction() {
+        return eventFunction;
+    }
+
     /** Compute the value of the switching function.
      * This function measures the difference between the current elevation
      * (and azimuth if necessary) and the reference mask or minimum value.
@@ -166,22 +178,7 @@ public class ElevationDetector extends AbstractTopocentricDetector<ElevationDete
      */
     @Override
     public double g(final SpacecraftState s) {
-
-        final TrackingCoordinates tc = getTopocentricFrame().getTrackingCoordinates(s.getPosition(), s.getFrame(), s.getDate());
-
-        final double calculatedElevation;
-        if (refractionModel != null) {
-            calculatedElevation = tc.getElevation() + refractionModel.getRefraction(tc.getElevation());
-        } else {
-            calculatedElevation = tc.getElevation();
-        }
-
-        if (elevationMask != null) {
-            return calculatedElevation - elevationMask.getElevation(tc.getAzimuth());
-        } else {
-            return calculatedElevation - minElevation;
-        }
-
+        return getEventFunction().value(s);
     }
 
     /**

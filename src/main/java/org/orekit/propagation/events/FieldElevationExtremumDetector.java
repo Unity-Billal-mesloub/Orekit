@@ -18,12 +18,10 @@ package org.orekit.propagation.events;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
-import org.hipparchus.analysis.differentiation.FieldUnivariateDerivative1;
-import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.ode.events.FieldEventSlopeFilter;
-import org.orekit.frames.FieldStaticTransform;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.ElevationExtremumEventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnIncreasing;
 
@@ -46,6 +44,9 @@ import org.orekit.propagation.events.handlers.FieldStopOnIncreasing;
  */
 public class FieldElevationExtremumDetector<T extends CalculusFieldElement<T>>
     extends FieldAbstractTopocentricDetector<FieldElevationExtremumDetector<T>, T> {
+
+    /** Event function. */
+    private final ElevationExtremumEventFunction eventFunction;
 
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
@@ -85,6 +86,7 @@ public class FieldElevationExtremumDetector<T extends CalculusFieldElement<T>>
                                              final FieldEventHandler<T> handler,
                                              final TopocentricFrame topo) {
         super(detectionSettings, handler, topo);
+        this.eventFunction = new ElevationExtremumEventFunction(topo);
     }
 
     /** {@inheritDoc} */
@@ -102,6 +104,11 @@ public class FieldElevationExtremumDetector<T extends CalculusFieldElement<T>>
         return getTopocentricFrame().getElevation(s.getPosition(), s.getFrame(), s.getDate());
     }
 
+    @Override
+    public ElevationExtremumEventFunction getEventFunction() {
+        return eventFunction;
+    }
+
     /** Compute the value of the detection function.
      * <p>
      * The value is the spacecraft elevation first time derivative.
@@ -109,20 +116,9 @@ public class FieldElevationExtremumDetector<T extends CalculusFieldElement<T>>
      * @param s the current state information: date, kinematics, attitude
      * @return spacecraft elevation first time derivative
      */
+    @Override
     public T g(final FieldSpacecraftState<T> s) {
-
-        // get position, velocity acceleration of spacecraft in topocentric frame
-        final FieldStaticTransform<FieldUnivariateDerivative1<T>> inertToTopo = s.getFrame().getStaticTransformTo(getTopocentricFrame(),
-                s.getDate().toFUD1Field());
-        final FieldVector3D<FieldUnivariateDerivative1<T>> positionInert = s.getPVCoordinates().toUnivariateDerivative1Vector();
-        final FieldVector3D<FieldUnivariateDerivative1<T>> posTopo = inertToTopo.transformPosition(positionInert);
-
-        // compute elevation and its first time derivative
-        final FieldUnivariateDerivative1<T> elevation = posTopo.getDelta();
-
-        // return elevation first time derivative
-        return elevation.getFirstDerivative();
-
+        return getEventFunction().value(s);
     }
 
 }

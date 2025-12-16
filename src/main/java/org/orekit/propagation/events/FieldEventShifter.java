@@ -18,11 +18,16 @@ package org.orekit.propagation.events;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.ode.events.Action;
-import org.hipparchus.util.FastMath;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.BooleanEventFunction;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.ShiftedEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** Wrapper shifting events occurrences times.
  * <p>This class wraps an {@link FieldEventDetector event detector} to slightly
@@ -60,6 +65,9 @@ public class FieldEventShifter<T extends CalculusFieldElement<T>> implements Fie
 
     /** Event detection settings. */
     private final FieldEventDetectionSettings<T> detectionSettings;
+
+    /** Event function. */
+    private final EventFunction eventFunction;
 
     /** Build a new instance.
      * <p>The {@link #getMaxCheckInterval() max check interval}, the
@@ -102,6 +110,15 @@ public class FieldEventShifter<T extends CalculusFieldElement<T>> implements Fie
         this.useShiftedStates = useShiftedStates;
         this.increasingOffset = increasingTimeShift.negate();
         this.decreasingOffset = decreasingTimeShift.negate();
+        final ShiftedEventFunction increasingShifted = new ShiftedEventFunction(detector.getEventFunction(),
+                increasingOffset.getReal());
+        final ShiftedEventFunction decreasingShifted = new ShiftedEventFunction(detector.getEventFunction(),
+                decreasingOffset.getReal());
+        final List<EventFunction> eventFunctionList = new ArrayList<>();
+        eventFunctionList.add(increasingShifted);
+        eventFunctionList.add(decreasingShifted);
+        this.eventFunction = (increasingOffset.getReal() >= decreasingOffset.getReal()) ? BooleanEventFunction.orCombine(eventFunctionList) :
+                BooleanEventFunction.andCombine(eventFunctionList);
     }
 
     @Override
@@ -136,6 +153,11 @@ public class FieldEventShifter<T extends CalculusFieldElement<T>> implements Fie
         return decreasingOffset.negate();
     }
 
+    @Override
+    public EventFunction getEventFunction() {
+        return eventFunction;
+    }
+
     /**
      * Builds a new instance from the input detection settings.
      * @param settings event detection settings to be used
@@ -148,10 +170,7 @@ public class FieldEventShifter<T extends CalculusFieldElement<T>> implements Fie
     /** {@inheritDoc} */
     @Override
     public T g(final FieldSpacecraftState<T> s) {
-        final T incShiftedG = detector.g(s.shiftedBy(increasingOffset));
-        final T decShiftedG = detector.g(s.shiftedBy(decreasingOffset));
-        return (increasingOffset.getReal() >= decreasingOffset.getReal()) ?
-               FastMath.max(incShiftedG, decShiftedG) : FastMath.min(incShiftedG, decShiftedG);
+        return getEventFunction().value(s);
     }
 
     /** Local class for handling events. */

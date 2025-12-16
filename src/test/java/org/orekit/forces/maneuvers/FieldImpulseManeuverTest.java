@@ -328,26 +328,9 @@ class FieldImpulseManeuverTest {
     }
 
     private <T extends CalculusFieldElement<T>> FieldImpulseManeuver<T> convertManeuver(
-            final Field<T> field, final ImpulseManeuver impulseManeuver, final FieldEventHandler<T> fieldHandler) {
+            final Field<T> field, final ImpulseManeuver impulseManeuver) {
         final T fieldIsp = field.getZero().add(impulseManeuver.getIsp());
-        final EventDetector detector = impulseManeuver.getTrigger();
-        FieldAbstractDetector<?, T> fieldDetector;
-        if (detector instanceof DateDetector) {
-            fieldDetector = new FieldDateDetector<>(field, new FieldAbsoluteDate<>(field, ((DateDetector) detector).getDate()));
-        } else if (detector instanceof LatitudeCrossingDetector) {
-            fieldDetector = new FieldLatitudeCrossingDetector<>(field,
-                                                                ((LatitudeCrossingDetector) detector).getBodyShape(),
-                                                                ((LatitudeCrossingDetector) detector).getLatitude());
-        } else if (detector instanceof EclipseDetector) {
-            fieldDetector = new FieldEclipseDetector<>(field,
-                                                       ((EclipseDetector) detector).getOccultationEngine());
-        } else {
-            throw new OrekitInternalError(null);
-        }
-
-        return new FieldImpulseManeuver<>(fieldDetector.withDetectionSettings(new FieldEventDetectionSettings<>(field, detector.getDetectionSettings()))
-                .withHandler(fieldHandler),
-                impulseManeuver.getAttitudeOverride(), FieldImpulseProvider.of(impulseManeuver.getImpulseProvider()), fieldIsp, impulseManeuver.getControl3DVectorCostType());
+        return new FieldImpulseManeuver<>(fieldIsp.getField(), impulseManeuver);
     }
 
     private <T extends CalculusFieldElement<T>> void templateDetector(final Field<T> field,
@@ -364,7 +347,7 @@ class FieldImpulseManeuverTest {
                 buildEventDetector(detectorType, propagator).withHandler(new StopOnEvent()),
                 attitudeOverride, ImpulseProvider.of(deltaV), isp, control3DVectorCostType);
         propagator.addEventDetector(impulseManeuver);
-        fieldPropagator.addEventDetector(convertManeuver(field, impulseManeuver, new FieldStopOnEvent<>()));
+        fieldPropagator.addEventDetector(convertManeuver(field, impulseManeuver));
         // When
         final SpacecraftState
             terminalState = propagator.propagate(endOfPropagationDate);
@@ -509,7 +492,7 @@ class FieldImpulseManeuverTest {
         final ImpulseManeuver impulseManeuver = new ImpulseManeuver(dateDetector, Vector3D.PLUS_I, isp);
         final FieldNumericalPropagator<T> fieldPropagator = createUnperturbedFieldPropagator(field,
                 initialOrbit, propagator.getInitialState().getMass());
-        fieldPropagator.addEventDetector(convertManeuver(field, impulseManeuver, new FieldStopOnEvent<>()));
+        fieldPropagator.addEventDetector(convertManeuver(field, impulseManeuver));
         return fieldPropagator;
     }
 
@@ -525,7 +508,7 @@ class FieldImpulseManeuverTest {
                 initialOrbit, initialMass);
         fieldPropagator.setAttitudeProvider(propagator.getAttitudeProvider());
         fieldPropagator.setResetAtEnd(true);
-        fieldPropagator.addEventDetector(convertManeuver(univariateDerivative1Field, impulseManeuver, new FieldContinueOnEvent<>()));
+        fieldPropagator.addEventDetector(convertManeuver(univariateDerivative1Field, impulseManeuver));
         // When
         final UnivariateDerivative1 backwardDuration = zero.add(-10000.);
         final FieldAbsoluteDate<UnivariateDerivative1> fieldEpoch = fieldPropagator.getInitialState().getDate();

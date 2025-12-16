@@ -30,19 +30,10 @@ import org.orekit.propagation.events.handlers.FieldResetDerivativesOnEvent;
 class FieldControlSwitchDetectorTest {
 
     @Test
-    void testDependsOnMainVariablesOnly() {
-        // GIVEN
-        final TestDetector detector = new TestDetector(null);
-        // WHEN
-        final boolean actual = detector.dependsOnMainVariablesOnly();
-        // THEN
-        Assertions.assertFalse(actual);
-    }
-
-    @Test
     void testGetHandler() {
         // GIVEN
-        final TestDetector detector = new TestDetector(null);
+        final TestDetector detector = new TestDetector(new FieldEventDetectionSettings<>(Binary64Field.getInstance(),
+                EventDetectionSettings.getDefaultEventDetectionSettings()));
         // WHEN
         final FieldEventHandler<Binary64> eventHandler = detector.getHandler();
         // THEN

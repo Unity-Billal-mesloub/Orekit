@@ -18,6 +18,7 @@ package org.orekit.propagation.events;
 
 import org.hipparchus.CalculusFieldElement;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.intervals.FieldAdaptableInterval;
 import org.orekit.time.FieldAbsoluteDate;
@@ -63,8 +64,45 @@ import org.orekit.time.FieldAbsoluteDate;
  * @param <T> type of the field element
  * @author Luc Maisonobe
  * @author V&eacute;ronique Pommier-Maurussane
+ * @see EventDetector
  */
 public interface FieldEventDetector <T extends CalculusFieldElement<T>> {
+
+    /**
+     * Builds instance from event function, handler and detection settings.
+     * @param eventFunction event function
+     * @param eventHandler handler
+     * @param eventDetectionSettings detection settings
+     * @param <S> field type
+     * @return event detector
+     * @since 14.0
+     */
+    static <S extends CalculusFieldElement<S>> FieldEventDetector<S> of(final EventFunction eventFunction,
+                                                                        final FieldEventHandler<S> eventHandler,
+                                                                        final FieldEventDetectionSettings<S> eventDetectionSettings) {
+        return new FieldEventDetector<S>() {
+
+            @Override
+            public EventFunction getEventFunction() {
+                return eventFunction;
+            }
+
+            @Override
+            public S g(final FieldSpacecraftState<S> s) {
+                return getEventFunction().value(s);
+            }
+
+            @Override
+            public FieldEventHandler<S> getHandler() {
+                return eventHandler;
+            }
+
+            @Override
+            public FieldEventDetectionSettings<S> getDetectionSettings() {
+                return eventDetectionSettings;
+            }
+        };
+    }
 
     /** Initialize event detector at the start of a propagation.
      * <p>
@@ -95,29 +133,6 @@ public interface FieldEventDetector <T extends CalculusFieldElement<T>> {
         // nothing by default
     }
 
-    /**
-     * Method returning true if and only if the detection function g does not depend on dependent variables,
-     * just the independent one i.e. time. This information is used for performance in propagation
-     * and derivatives correction with switches in the dynamics.
-     * @return flag
-     * @since 13.1
-     */
-    default boolean dependsOnTimeOnly() {
-        return false;
-    }
-
-    /**
-     * Method returning true if and only if the detection function g does not depend on dependent variables,
-     * other than the Cartesian coordinates (or equivalent), mass and attitude (excepts for its rates).
-     * It should thus return false if the STM is needed to evaluate the event.
-     * This information is used for performance in propagation.
-     * @return flag
-     * @since 14.0
-     */
-    default boolean dependsOnMainVariablesOnly() {
-        return true;
-    }
-
     /** Compute the value of the switching function.
      * This function must be continuous (at least in its roots neighborhood),
      * as the integrator will need to find its roots to locate the events.
@@ -125,6 +140,15 @@ public interface FieldEventDetector <T extends CalculusFieldElement<T>> {
      * @return value of the switching function
      */
     T g(FieldSpacecraftState<T> s);
+
+    /**
+     * Get the event function. It defines g both for double and Field.
+     * @return event function
+     * @since 14.0
+     */
+    default EventFunction getEventFunction() {
+        return EventFunction.of(getThreshold().getField(), this::g);
+    }
 
     /** Get the convergence threshold in the event time search.
      * @return convergence threshold (s)
@@ -168,4 +192,5 @@ public interface FieldEventDetector <T extends CalculusFieldElement<T>> {
      * @since 12.2
      */
     FieldEventDetectionSettings<T> getDetectionSettings();
+
 }

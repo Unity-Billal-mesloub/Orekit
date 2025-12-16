@@ -82,7 +82,7 @@ class EventEnablingPredicateFilterTest {
         final EnablingPredicate enablingPredicate = Mockito.mock();
         final EventEnablingPredicateFilter predicateFilter = new EventEnablingPredicateFilter(detector, enablingPredicate);
         // WHEN
-        final boolean value = predicateFilter.dependsOnTimeOnly();
+        final boolean value = predicateFilter.getEventFunction().dependsOnTimeOnly();
         // THEN
         Assertions.assertFalse(value);
     }
@@ -94,7 +94,7 @@ class EventEnablingPredicateFilterTest {
         final EnablingPredicate enablingPredicate = Mockito.mock();
         final EventEnablingPredicateFilter predicateFilter = new EventEnablingPredicateFilter(detector, enablingPredicate);
         // WHEN
-        final boolean value = predicateFilter.dependsOnMainVariablesOnly();
+        final boolean value = predicateFilter.getEventFunction().dependsOnMainVariablesOnly();
         // THEN
         Assertions.assertFalse(value);
     }

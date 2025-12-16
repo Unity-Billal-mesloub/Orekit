@@ -16,16 +16,24 @@
  */
 package org.orekit.propagation.events;
 
+import org.hipparchus.CalculusFieldElement;
+import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.util.FastMath;
+import org.orekit.errors.OrekitException;
+import org.orekit.errors.OrekitMessages;
 import org.orekit.frames.Frame;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.models.AtmosphericRefractionModel;
 import org.orekit.models.earth.ITURP834AtmosphericRefraction;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.GroundAtNightEventFunction;
 import org.orekit.propagation.events.handlers.ContinueOnEvent;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.utils.ExtendedPositionProvider;
 import org.orekit.utils.PVCoordinatesProvider;
 
 
@@ -61,6 +69,9 @@ public class GroundAtNightDetector extends AbstractTopocentricDetector<GroundAtN
 
     /** Atmospheric Model used for calculations, if defined. */
     private final AtmosphericRefractionModel refractionModel;
+
+    /** Event function. */
+    private final EventFunction eventFunction;
 
     /** Simple constructor.
      * <p>
@@ -103,6 +114,7 @@ public class GroundAtNightDetector extends AbstractTopocentricDetector<GroundAtN
         this.sun               = sun;
         this.dawnDuskElevation = dawnDuskElevation;
         this.refractionModel   = refractionModel;
+        this.eventFunction = new LocalEventFunction(getTopocentricFrame());
     }
 
     /** {@inheritDoc} */
@@ -114,8 +126,8 @@ public class GroundAtNightDetector extends AbstractTopocentricDetector<GroundAtN
     }
 
     @Override
-    public boolean dependsOnTimeOnly() {
-        return true;
+    public EventFunction getEventFunction() {
+        return eventFunction;
     }
 
     /** {@inheritDoc}
@@ -129,21 +141,37 @@ public class GroundAtNightDetector extends AbstractTopocentricDetector<GroundAtN
      */
     @Override
     public double g(final SpacecraftState state) {
-
-        final AbsoluteDate  date     = state.getDate();
-        final Frame         frame    = state.getFrame();
-        final Vector3D      position = sun.getPosition(date, frame);
-        final double trueElevation   = getTopocentricFrame().getElevation(position, frame, date);
-
-        final double calculatedElevation;
-        if (refractionModel != null) {
-            calculatedElevation = trueElevation + refractionModel.getRefraction(trueElevation);
-        } else {
-            calculatedElevation = trueElevation;
-        }
-
-        return dawnDuskElevation - calculatedElevation;
-
+        return eventFunction.value(state);
     }
 
+    private class LocalEventFunction extends GroundAtNightEventFunction {
+
+        protected LocalEventFunction(final TopocentricFrame topocentricFrame) {
+            super(topocentricFrame, new LocalExtendedPositionProvider(sun), dawnDuskElevation, refractionModel);
+        }
+    }
+
+    private static class LocalExtendedPositionProvider implements ExtendedPositionProvider {
+        /** Wrapper provider. */
+        private final PVCoordinatesProvider provider;
+
+        LocalExtendedPositionProvider(final PVCoordinatesProvider provider) {
+            this.provider = provider;
+        }
+
+        @Override
+        public Vector3D getPosition(final AbsoluteDate date, final Frame frame) {
+            return provider.getPosition(date, frame);
+        }
+
+        @Override
+        public <T extends CalculusFieldElement<T>> FieldVector3D<T> getPosition(final FieldAbsoluteDate<T> date,
+                                                                                final Frame frame) {
+            if (provider instanceof ExtendedPositionProvider) {
+                return ((ExtendedPositionProvider) provider).getPosition(date, frame);
+            } else {
+                throw new OrekitException(OrekitMessages.FUNCTION_NOT_IMPLEMENTED);
+            }
+        }
+    }
 }

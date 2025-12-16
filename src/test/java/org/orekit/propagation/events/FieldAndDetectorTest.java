@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.intervals.FieldAdaptableInterval;
 import org.orekit.time.FieldAbsoluteDate;
@@ -36,7 +37,7 @@ import org.orekit.time.FieldAbsoluteDate;
  *
  * @author Evan Ward
  */
-public class FieldAndDetectorTest {
+class FieldAndDetectorTest {
 
     /** first operand. */
     private MockDetector a;
@@ -50,7 +51,7 @@ public class FieldAndDetectorTest {
     /** create subject under test and dependencies. */
     @SuppressWarnings("unchecked")
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         a = new MockDetector();
         b = new MockDetector();
         s = Mockito.mock(FieldSpacecraftState.class);
@@ -62,7 +63,7 @@ public class FieldAndDetectorTest {
      * check {@link BooleanDetector#g(SpacecraftState)}.
      */
     @Test
-    public void testG() {
+    void testG() {
         // test both zero
         a.g = b.g = new Binary64(0.0);
         Assertions.assertEquals(0.0, and.g(s).getReal(), 0);
@@ -103,7 +104,7 @@ public class FieldAndDetectorTest {
      * check {@link BooleanDetector} for cancellation.
      */
     @Test
-    public void testCancellation() {
+    void testCancellation() {
         a.g = new Binary64(-1e-10);
         b.g = new Binary64(1e10);
         Assertions.assertTrue(and.g(s).getReal() < 0, "negative");
@@ -123,7 +124,7 @@ public class FieldAndDetectorTest {
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void testInit() {
+    void testInit() {
         // setup
         FieldEventDetector<Binary64> a = Mockito.mock(FieldEventDetector.class);
         Mockito.when(a.getMaxCheckInterval()).thenReturn(FieldAdaptableInterval.of(AbstractDetector.DEFAULT_MAX_CHECK));
@@ -149,7 +150,7 @@ public class FieldAndDetectorTest {
 
     /** check when no operands are passed to the constructor. */
     @Test
-    public void testZeroDetectors() {
+    void testZeroDetectors() {
         // action
         try {
             BooleanDetector.andCombine(Collections.emptyList());
@@ -162,17 +163,16 @@ public class FieldAndDetectorTest {
     /** Mock detector to set the g function to arbitrary values. */
     private static class MockDetector implements FieldEventDetector<Binary64> {
 
-        /** value to return from {@link #g(SpacecraftState)}. */
         public Binary64 g = new Binary64(0);
 
         @Override
-        public void init(FieldSpacecraftState<Binary64> s0, FieldAbsoluteDate<Binary64> t) {
-
+        public EventFunction getEventFunction() {
+            return state -> g.getReal();
         }
 
         @Override
         public Binary64 g(FieldSpacecraftState<Binary64> s) {
-            return this.g;
+            return g;
         }
 
         @Override

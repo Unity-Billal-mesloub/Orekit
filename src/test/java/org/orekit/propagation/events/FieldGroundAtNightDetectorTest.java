@@ -46,7 +46,7 @@ class FieldGroundAtNightDetectorTest {
         final FieldGroundAtNightDetector<Binary64> fieldDetector = new FieldGroundAtNightDetector<>(mock(TopocentricFrame.class),
                 null, Binary64.ZERO, null);
         // WHEN
-        final boolean value = fieldDetector.dependsOnTimeOnly();
+        final boolean value = fieldDetector.getEventFunction().dependsOnTimeOnly();
         // THEN
         Assertions.assertTrue(value);
     }

@@ -50,7 +50,7 @@ class FieldSingleDateDetectorTest {
         // WHEN
         final FieldSingleDateDetector<Binary64> detector = new FieldSingleDateDetector<>(Binary64Field.getInstance(), date);
         // THEN
-        assertTrue(detector.dependsOnTimeOnly());
+        assertTrue(detector.getEventFunction().dependsOnTimeOnly());
     }
 
     @Test

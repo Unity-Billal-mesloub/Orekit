@@ -643,7 +643,7 @@ class AttitudesSequenceTest {
         // THEN
         Assertions.assertEquals(1, switches1.size());
         Assertions.assertNotSame(switches1, switches2);
-        Assertions.assertFalse(switches1.get(0).dependsOnMainVariablesOnly());
+        Assertions.assertFalse(switches1.get(0).getEventFunction().dependsOnMainVariablesOnly());
     }
 
     private static class Handler implements AttitudeSwitchHandler {

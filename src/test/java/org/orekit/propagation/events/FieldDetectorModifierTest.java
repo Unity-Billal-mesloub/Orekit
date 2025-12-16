@@ -21,10 +21,9 @@ import org.hipparchus.util.Binary64;
 import org.hipparchus.util.Binary64Field;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnEvent;
 import org.orekit.time.FieldAbsoluteDate;
@@ -45,30 +44,17 @@ class FieldDetectorModifierTest {
         Assertions.assertEquals(detectionSettings, actualSettings);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void testDependsOnlyOnTime(final boolean value) {
+    @Test
+    void testGetEventFunction() {
         // GIVEN
         final FieldEventDetector<?> detector = Mockito.mock(FieldEventDetector.class);
-        Mockito.when(detector.dependsOnTimeOnly()).thenReturn(value);
+        final EventFunction eventFunction = state -> 0.;
+        Mockito.when(detector.getEventFunction()).thenReturn(eventFunction);
         final TestFieldDetector<?> modifierDetector = new TestFieldDetector<>(detector);
         // WHEN
-        final boolean actual = modifierDetector.dependsOnTimeOnly();
+        final EventFunction actual = modifierDetector.getEventFunction();
         // THEN
-        Assertions.assertEquals(value, actual);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void testDependsOnMainVariablesOnly(final boolean value) {
-        // GIVEN
-        final FieldEventDetector<?> detector = Mockito.mock(FieldEventDetector.class);
-        Mockito.when(detector.dependsOnMainVariablesOnly()).thenReturn(value);
-        final TestFieldDetector<?> modifierDetector = new TestFieldDetector<>(detector);
-        // WHEN
-        final boolean actual = modifierDetector.dependsOnMainVariablesOnly();
-        // THEN
-        Assertions.assertEquals(value, actual);
+        Assertions.assertEquals(eventFunction, actual);
     }
 
     @Test

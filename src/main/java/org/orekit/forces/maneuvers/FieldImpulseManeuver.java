@@ -17,6 +17,7 @@
 package org.orekit.forces.maneuvers;
 
 import org.hipparchus.CalculusFieldElement;
+import org.hipparchus.Field;
 import org.hipparchus.geometry.euclidean.threed.FieldRotation;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.ode.events.Action;
@@ -29,6 +30,7 @@ import org.orekit.propagation.events.FieldDetectorModifier;
 import org.orekit.propagation.events.FieldEventDetectionSettings;
 import org.orekit.propagation.events.FieldEventDetector;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
+import org.orekit.propagation.events.handlers.FieldStopOnEvent;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.Constants;
 import org.orekit.utils.FieldAbsolutePVCoordinates;
@@ -149,6 +151,19 @@ public class FieldImpulseManeuver<T extends CalculusFieldElement<T>> extends Abs
         this.isp = isp;
         this.vExhaust = this.isp.multiply(Constants.G0_STANDARD_GRAVITY);
         this.handler = new Handler();
+    }
+
+    /**
+     * Constructor from non-Field impulse maneuver.
+     * @param field field
+     * @param maneuver non-Field impulse maneuver
+     * @since 14.0
+     */
+    public FieldImpulseManeuver(final Field<T> field, final ImpulseManeuver maneuver) {
+        this(FieldEventDetector.of(maneuver.getDetector().getEventFunction(), new FieldStopOnEvent<>(),
+                new FieldEventDetectionSettings<>(field, maneuver.getDetectionSettings())),
+                maneuver.getAttitudeOverride(), FieldImpulseProvider.of(maneuver.getImpulseProvider()),
+                field.getZero().newInstance(maneuver.getIsp()), maneuver.getControl3DVectorCostType());
     }
 
     /**

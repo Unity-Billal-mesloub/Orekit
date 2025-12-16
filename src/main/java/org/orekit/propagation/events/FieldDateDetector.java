@@ -26,6 +26,8 @@ import org.hipparchus.ode.events.Action;
 import org.orekit.errors.OrekitIllegalArgumentException;
 import org.orekit.errors.OrekitMessages;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnEvent;
 import org.orekit.propagation.events.intervals.DateDetectionAdaptableIntervalFactory;
@@ -77,6 +79,9 @@ public class FieldDateDetector<T extends CalculusFieldElement<T>> extends FieldA
     /** List of event dates. */
     private final ArrayList<FieldEventDate<T>> eventDateList;
 
+    /** Event function. */
+    private final EventFunction eventFunction;
+
     /** Current event date. */
     private int currentIndex;
 
@@ -126,6 +131,18 @@ public class FieldDateDetector<T extends CalculusFieldElement<T>> extends FieldA
             addEventDate(ts.getDate());
         }
         this.minGap        = minGap;
+        final EventFunction baseFunction = super.getEventFunction();
+        this.eventFunction = new EventFunctionModifier() {
+            @Override
+            public EventFunction getBaseFunction() {
+                return baseFunction;
+            }
+
+            @Override
+            public boolean dependsOnTimeOnly() {
+                return true;
+            }
+        };
     }
 
     /**
@@ -149,10 +166,9 @@ public class FieldDateDetector<T extends CalculusFieldElement<T>> extends FieldA
         return new FieldDateDetector<>(detectionSettings, newHandler, minGap, dates);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean dependsOnTimeOnly() {
-        return true;
+    public EventFunction getEventFunction() {
+        return eventFunction;
     }
 
     /** Get all event field dates currently managed, in chronological order.
@@ -168,6 +184,7 @@ public class FieldDateDetector<T extends CalculusFieldElement<T>> extends FieldA
      * @param s the current state information: date, kinematics, attitude
      * @return value of the switching function
      */
+    @Override
     public T g(final FieldSpacecraftState<T> s) {
         gDate = s.getDate();
         if (currentIndex < 0) {
@@ -286,5 +303,4 @@ public class FieldDateDetector<T extends CalculusFieldElement<T>> extends FieldA
         }
 
     }
-
 }

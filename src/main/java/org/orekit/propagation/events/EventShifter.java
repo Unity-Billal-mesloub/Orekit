@@ -17,9 +17,14 @@
 package org.orekit.propagation.events;
 
 import org.hipparchus.ode.events.Action;
-import org.hipparchus.util.FastMath;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.BooleanEventFunction;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.ShiftedEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** Wrapper shifting events occurrences times.
  * <p>This class wraps an {@link EventDetector event detector} to slightly
@@ -54,6 +59,9 @@ public class EventShifter implements DetectorModifier {
 
     /** Specialized event handler. */
     private final LocalHandler handler;
+
+    /** Event function. */
+    private final EventFunction eventFunction;
 
     /** Build a new instance.
      * <p>The {@link #getMaxCheckInterval() max check interval}, the
@@ -101,12 +109,25 @@ public class EventShifter implements DetectorModifier {
         this.useShiftedStates = useShiftedStates;
         this.increasingOffset = -increasingTimeShift;
         this.decreasingOffset = -decreasingTimeShift;
+        final ShiftedEventFunction increasingShifted = new ShiftedEventFunction(detector.getEventFunction(), increasingOffset);
+        final ShiftedEventFunction decreasingShifted = new ShiftedEventFunction(detector.getEventFunction(), decreasingOffset);
+        final List<EventFunction> eventFunctionList = new ArrayList<>();
+        eventFunctionList.add(increasingShifted);
+        eventFunctionList.add(decreasingShifted);
+        this.eventFunction = (increasingOffset >= decreasingOffset) ? BooleanEventFunction.orCombine(eventFunctionList) :
+                BooleanEventFunction.andCombine(eventFunctionList);
     }
 
     /** {@inheritDoc} */
     @Override
     public EventHandler getHandler() {
         return handler;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public EventFunction getEventFunction() {
+        return eventFunction;
     }
 
     /** {@inheritDoc} */
@@ -141,10 +162,7 @@ public class EventShifter implements DetectorModifier {
     /** {@inheritDoc} */
     @Override
     public double g(final SpacecraftState s) {
-        final double incShiftedG = detector.g(s.shiftedBy(increasingOffset));
-        final double decShiftedG = detector.g(s.shiftedBy(decreasingOffset));
-        return (increasingOffset >= decreasingOffset) ?
-               FastMath.max(incShiftedG, decShiftedG) : FastMath.min(incShiftedG, decShiftedG);
+        return getEventFunction().value(s);
     }
 
     /**

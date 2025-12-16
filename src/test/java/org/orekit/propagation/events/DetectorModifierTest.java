@@ -24,8 +24,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.orekit.Utils;
 import org.orekit.errors.OrekitException;
@@ -33,6 +31,7 @@ import org.orekit.frames.FramesFactory;
 import org.orekit.orbits.EquinoctialOrbit;
 import org.orekit.orbits.Orbit;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnEvent;
 import org.orekit.propagation.numerical.NumericalPropagator;
@@ -64,30 +63,17 @@ class DetectorModifierTest {
         Assertions.assertEquals(detectionSettings, actualSettings);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void testDependsOnTimeOnly(final boolean value) {
+    @Test
+    void testGetEventFunction() {
         // GIVEN
         final EventDetector detector = Mockito.mock(EventDetector.class);
-        Mockito.when(detector.dependsOnTimeOnly()).thenReturn(value);
+        final EventFunction eventFunction = Mockito.mock(EventFunction.class);
+        Mockito.when(detector.getEventFunction()).thenReturn(eventFunction);
         final DetectorModifier detectorModifier = new TestDetectorModifier(detector);
         // WHEN
-        final boolean actual = detectorModifier.dependsOnTimeOnly();
+        final EventFunction actualFunction = detectorModifier.getEventFunction();
         // THEN
-        Assertions.assertEquals(value, actual);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void testDependsOnMainVariablesOnly(final boolean value) {
-        // GIVEN
-        final EventDetector detector = Mockito.mock(EventDetector.class);
-        Mockito.when(detector.dependsOnMainVariablesOnly()).thenReturn(value);
-        final DetectorModifier detectorModifier = new TestDetectorModifier(detector);
-        // WHEN
-        final boolean actual = detectorModifier.dependsOnMainVariablesOnly();
-        // THEN
-        Assertions.assertEquals(value, actual);
+        Assertions.assertEquals(eventFunction, actualFunction);
     }
 
     @Test
@@ -203,7 +189,7 @@ class DetectorModifierTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         try {
             Utils.setDataRoot("regular-data");
             final double mu = 3.9860047e14;

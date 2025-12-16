@@ -22,6 +22,8 @@ import java.util.Arrays;
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.ode.events.Action;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.time.FieldAbsoluteDate;
 
@@ -81,6 +83,9 @@ public class FieldEventEnablingPredicateFilter<T extends CalculusFieldElement<T>
     /** Specialized event handler. */
     private final LocalHandler<T> handler;
 
+    /** Event function. */
+    private final EventFunction eventFunction;
+
     /** Indicator for forward integration. */
     private boolean forward;
 
@@ -115,6 +120,7 @@ public class FieldEventEnablingPredicateFilter<T extends CalculusFieldElement<T>
         this.predicate = enabler;
         this.transformers = new Transformer[HISTORY_SIZE];
         this.updates      = (FieldAbsoluteDate<T>[]) Array.newInstance(FieldAbsoluteDate.class, HISTORY_SIZE);
+        this.eventFunction = new LocalEventFunction(EventFunction.of(detectionSettings.getThreshold().getField(), this::g));
     }
 
     /**
@@ -136,6 +142,12 @@ public class FieldEventEnablingPredicateFilter<T extends CalculusFieldElement<T>
 
     /**  {@inheritDoc} */
     @Override
+    public EventFunction getEventFunction() {
+        return eventFunction;
+    }
+
+    /**  {@inheritDoc} */
+    @Override
     public FieldEventHandler<T> getHandler() {
         return handler;
     }
@@ -153,17 +165,6 @@ public class FieldEventEnablingPredicateFilter<T extends CalculusFieldElement<T>
      */
     public FieldEnablingPredicate<T> getPredicate() {
         return predicate;
-    }
-
-    /**  {@inheritDoc} */
-    @Override
-    public boolean dependsOnTimeOnly() {
-        return false;  // cannot know what predicate needs
-    }
-
-    @Override
-    public boolean dependsOnMainVariablesOnly() {
-        return false;  // cannot know what predicate needs
     }
 
     /**  {@inheritDoc} */
@@ -330,6 +331,26 @@ public class FieldEventEnablingPredicateFilter<T extends CalculusFieldElement<T>
      */
     public boolean isForward() {
         return forward;
+    }
+
+    private static class LocalEventFunction implements EventFunctionModifier {
+
+        /** Wrapped event function. */
+        private final EventFunction baseFunction;
+
+        LocalEventFunction(final EventFunction baseFunction) {
+            this.baseFunction = baseFunction;
+        }
+
+        @Override
+        public EventFunction getBaseFunction() {
+            return baseFunction;
+        }
+
+        @Override
+        public boolean dependsOnMainVariablesOnly() {
+            return false;
+        }
     }
 
     /** Local handler.

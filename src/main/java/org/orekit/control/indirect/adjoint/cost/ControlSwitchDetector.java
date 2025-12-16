@@ -16,8 +16,10 @@
  */
 package org.orekit.control.indirect.adjoint.cost;
 
+import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.EventDetectionSettings;
 import org.orekit.propagation.events.EventDetector;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.ResetDerivativesOnEvent;
 
@@ -44,8 +46,18 @@ public abstract class ControlSwitchDetector implements EventDetector {
     }
 
     @Override
-    public boolean dependsOnMainVariablesOnly() {
-        return false;
+    public EventFunction getEventFunction() {
+        return new EventFunction() {
+            @Override
+            public double value(final SpacecraftState state) {
+                return g(state);
+            }
+
+            @Override
+            public boolean dependsOnMainVariablesOnly() {
+                return false;
+            }
+        };
     }
 
     @Override

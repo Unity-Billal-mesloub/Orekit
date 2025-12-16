@@ -133,7 +133,7 @@ class GroundAtNightDetectorTest {
         final GroundAtNightDetector detector = new GroundAtNightDetector(Mockito.mock(TopocentricFrame.class),
                 Mockito.mock(PVCoordinatesProvider.class), 1, null);
         // WHEN
-        final boolean value = detector.dependsOnTimeOnly();
+        final boolean value = detector.getEventFunction().dependsOnTimeOnly();
         // THEN
         Assertions.assertTrue(value);
     }

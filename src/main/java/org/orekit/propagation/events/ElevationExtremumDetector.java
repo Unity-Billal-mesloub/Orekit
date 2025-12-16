@@ -16,14 +16,11 @@
  */
 package org.orekit.propagation.events;
 
-import org.hipparchus.analysis.differentiation.UnivariateDerivative1;
-import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
-import org.orekit.frames.KinematicTransform;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.ElevationExtremumEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnIncreasing;
-import org.orekit.utils.TimeStampedPVCoordinates;
 
 /** Detector for elevation extremum with respect to a ground point.
  * <p>This detector identifies when a spacecraft reaches its
@@ -42,6 +39,9 @@ import org.orekit.utils.TimeStampedPVCoordinates;
  * @since 7.1
  */
 public class ElevationExtremumDetector extends AbstractTopocentricDetector<ElevationExtremumDetector> {
+
+    /** Event function. */
+    private final ElevationExtremumEventFunction eventFunction;
 
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
@@ -77,6 +77,7 @@ public class ElevationExtremumDetector extends AbstractTopocentricDetector<Eleva
     protected ElevationExtremumDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                         final TopocentricFrame topo) {
         super(detectionSettings, handler, topo);
+        this.eventFunction = new ElevationExtremumEventFunction(topo);
     }
 
     /** {@inheritDoc} */
@@ -94,6 +95,11 @@ public class ElevationExtremumDetector extends AbstractTopocentricDetector<Eleva
         return getTopocentricFrame().getElevation(s.getPosition(), s.getFrame(), s.getDate());
     }
 
+    @Override
+    public ElevationExtremumEventFunction getEventFunction() {
+        return eventFunction;
+    }
+
     /** Compute the value of the detection function.
      * <p>
      * The value is the spacecraft elevation first time derivative.
@@ -102,23 +108,6 @@ public class ElevationExtremumDetector extends AbstractTopocentricDetector<Eleva
      * @return spacecraft elevation first time derivative
      */
     public double g(final SpacecraftState s) {
-
-        // get position, velocity of spacecraft in topocentric frame
-        final KinematicTransform inertToTopo = s.getFrame().getKinematicTransformTo(getTopocentricFrame(), s.getDate());
-        final TimeStampedPVCoordinates pvTopo = inertToTopo.transformOnlyPV(s.getPVCoordinates());
-
-        // convert the coordinates to UnivariateDerivative1 based vector
-        // instead of having vector position, then vector velocity then vector acceleration
-        // we get one vector and each coordinate is a Taylor expansion containing
-        // value, first time derivative (we don't need second time derivative here)
-        final FieldVector3D<UnivariateDerivative1> positionUD1 = pvTopo.toUnivariateDerivative1Vector();
-
-        // compute elevation and its first time derivative
-        final UnivariateDerivative1 elevation = positionUD1.getDelta();
-
-        // return elevation first time derivative
-        return elevation.getFirstDerivative();
-
+        return getEventFunction().value(s);
     }
-
 }

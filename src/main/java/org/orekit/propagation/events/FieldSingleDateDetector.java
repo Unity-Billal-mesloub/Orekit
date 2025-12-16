@@ -19,6 +19,7 @@ package org.orekit.propagation.events;
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.SingleDateEventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnEvent;
 import org.orekit.time.AbsoluteDate;
@@ -39,6 +40,9 @@ public class FieldSingleDateDetector<T extends CalculusFieldElement<T>>
     /** Date to detect. */
     private final AbsoluteDate date;
 
+    /** Event function. */
+    private final SingleDateEventFunction dateEvent;
+
     /** Full constructor.
      * @param detectionSettings event detection settings
      * @param eventHandler event handler
@@ -48,6 +52,7 @@ public class FieldSingleDateDetector<T extends CalculusFieldElement<T>>
                                    final AbsoluteDate date) {
         super(detectionSettings, eventHandler);
         this.date = date;
+        this.dateEvent = new SingleDateEventFunction(date);
     }
 
     /** Build a new instance with default detection settings and handler (stop on event).
@@ -69,14 +74,14 @@ public class FieldSingleDateDetector<T extends CalculusFieldElement<T>>
 
     /** {@inheritDoc} */
     @Override
-    public boolean dependsOnTimeOnly() {
-        return true;
+    public SingleDateEventFunction getEventFunction() {
+        return dateEvent;
     }
 
     /** {@inheritDoc} */
     @Override
     public T g(final FieldSpacecraftState<T> s) {
-        return s.durationFrom(date);
+        return dateEvent.value(s);
     }
 
     /** {@inheritDoc} */

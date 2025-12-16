@@ -20,6 +20,8 @@ import org.hipparchus.CalculusFieldElement;
 import org.orekit.errors.OrekitException;
 import org.orekit.errors.OrekitMessages;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.intervals.FieldAdaptableInterval;
 import org.orekit.time.FieldAbsoluteDate;
@@ -51,6 +53,9 @@ public abstract class FieldAbstractDetector<D extends FieldAbstractDetector<D, T
     /** Propagation direction. */
     private boolean forward;
 
+    /** Event function. */
+    private final EventFunction defaultEventFunction;
+
     /** Build a new instance.
      * @param detectionSettings event detection settings
      * @param handler event handler to call at event occurrences
@@ -62,6 +67,7 @@ public abstract class FieldAbstractDetector<D extends FieldAbstractDetector<D, T
         this.eventDetectionSettings = detectionSettings;
         this.handler   = handler;
         this.forward   = true;
+        this.defaultEventFunction = EventFunction.of(detectionSettings.getThreshold().getField(), this::g);
     }
 
     /**
@@ -86,6 +92,11 @@ public abstract class FieldAbstractDetector<D extends FieldAbstractDetector<D, T
         if (value <= 0.0) {
             throw new OrekitException(OrekitMessages.NOT_STRICTLY_POSITIVE, value);
         }
+    }
+
+    @Override
+    public EventFunction getEventFunction() {
+        return defaultEventFunction;
     }
 
     /** {@inheritDoc} */
@@ -200,4 +211,13 @@ public abstract class FieldAbstractDetector<D extends FieldAbstractDetector<D, T
         return forward;
     }
 
+    /**
+     * Build non-Field instance.
+     * @param eventHandler event handler
+     * @return event detector
+     * @since 14.0
+     */
+    public EventDetector toEventDetector(final EventHandler eventHandler) {
+        return EventDetector.of(getEventFunction(), eventHandler, getDetectionSettings().toEventDetectionSettings());
+    }
 }

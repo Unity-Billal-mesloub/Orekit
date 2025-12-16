@@ -28,7 +28,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.orekit.Utils;
 import org.orekit.bodies.GeodeticPoint;
 import org.orekit.bodies.OneAxisEllipsoid;
@@ -79,7 +78,7 @@ class FieldEventEnablingPredicateFilterTest {
         final FieldEventEnablingPredicateFilter<Binary64> filter = new FieldEventEnablingPredicateFilter<>(detector,
                 expectedPredicate);
         // WHEN
-        final boolean value = filter.dependsOnTimeOnly();
+        final boolean value = filter.getEventFunction().dependsOnTimeOnly();
         // THEN
         Assertions.assertFalse(value);
     }
@@ -88,11 +87,13 @@ class FieldEventEnablingPredicateFilterTest {
     @SuppressWarnings("unchecked")
     void testWithDetectionSettings() {
         // GIVEN
-        final FieldDateDetector<Binary64> detector = new FieldDateDetector<>(FieldAbsoluteDate.getArbitraryEpoch(Binary64Field.getInstance()));
+        final Binary64Field field = Binary64Field.getInstance();
+        final FieldDateDetector<Binary64> detector = new FieldDateDetector<>(FieldAbsoluteDate.getArbitraryEpoch(field));
         final FieldEnablingPredicate<Binary64> predicate = (s, e, t) -> true;
         final FieldEventEnablingPredicateFilter<Binary64> template = new FieldEventEnablingPredicateFilter<>(detector,
                 predicate);
-        final FieldEventDetectionSettings<Binary64> detectionSettings = Mockito.mock();
+        final FieldEventDetectionSettings<Binary64> detectionSettings = new FieldEventDetectionSettings<>(field,
+                EventDetectionSettings.getDefaultEventDetectionSettings());
         // WHEN
         final FieldEventEnablingPredicateFilter<Binary64> filter = template.withDetectionSettings(detectionSettings);
         // THEN
@@ -216,6 +217,7 @@ class FieldEventEnablingPredicateFilterTest {
         FieldDateDetector<Binary64> raw = new FieldDateDetector<>(Binary64Field.getInstance(), orbit.getDate().shiftedBy(3600.0)).
                         withMaxCheck(1000.0).
                         withHandler(new FieldEventHandler<Binary64>() {
+                            @Override
                             public FieldSpacecraftState<Binary64> resetState(FieldEventDetector<Binary64> detector,
                                                                              FieldSpacecraftState<Binary64> oldState) {
                                 reset.add(oldState.getDate());

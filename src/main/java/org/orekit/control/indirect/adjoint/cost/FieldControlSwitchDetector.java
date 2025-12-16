@@ -17,8 +17,10 @@
 package org.orekit.control.indirect.adjoint.cost;
 
 import org.hipparchus.CalculusFieldElement;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.FieldEventDetectionSettings;
 import org.orekit.propagation.events.FieldEventDetector;
+import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldResetDerivativesOnEvent;
 
@@ -36,17 +38,21 @@ public abstract class FieldControlSwitchDetector<T extends CalculusFieldElement<
     /** Event detection settings. */
     private final FieldEventDetectionSettings<T> detectionSettings;
 
+    /** Event function. */
+    private final EventFunction eventFunction;
+
     /**
      * Constructor.
      * @param detectionSettings detection settings
      */
     protected FieldControlSwitchDetector(final FieldEventDetectionSettings<T> detectionSettings) {
         this.detectionSettings = detectionSettings;
+        this.eventFunction = new LocalEventFunction(EventFunction.of(detectionSettings.getThreshold().getField(), this::g));
     }
 
     @Override
-    public boolean dependsOnMainVariablesOnly() {
-        return false;
+    public EventFunction getEventFunction() {
+        return eventFunction;
     }
 
     @Override
@@ -57,5 +63,24 @@ public abstract class FieldControlSwitchDetector<T extends CalculusFieldElement<
     @Override
     public FieldEventHandler<T> getHandler() {
         return handler;
+    }
+
+    private static class LocalEventFunction implements EventFunctionModifier {
+        /** Wrapped event function. */
+        private final EventFunction baseFunction;
+
+        LocalEventFunction(final EventFunction baseFunction) {
+            this.baseFunction = baseFunction;
+        }
+
+        @Override
+        public EventFunction getBaseFunction() {
+            return baseFunction;
+        }
+
+        @Override
+        public boolean dependsOnMainVariablesOnly() {
+            return false;
+        }
     }
 }

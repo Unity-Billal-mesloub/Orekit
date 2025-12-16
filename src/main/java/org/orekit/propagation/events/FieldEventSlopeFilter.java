@@ -23,6 +23,7 @@ import java.util.Arrays;
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.ode.events.Action;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.time.FieldAbsoluteDate;
 
@@ -186,6 +187,11 @@ public class FieldEventSlopeFilter<D extends FieldEventDetector<T>, T extends Ca
     public void finish(final FieldSpacecraftState<T> state) {
         FieldEventDetector.super.finish(state);
         rawDetector.finish(state);
+    }
+
+    @Override
+    public EventFunction getEventFunction() {
+        return rawDetector.getEventFunction();
     }
 
     /**  {@inheritDoc} */
