@@ -1167,6 +1167,51 @@ class BatchLSEstimatorTest {
         doTestEstimateOnlySomeOrbitalParameters(new boolean[]{ false,  true, false, true, false, false });
     }
 
+    /**
+     * Test added for coverage. Check that an error is returned when no observed measurements are available for
+     * estimator.
+     * @since 13.1.3
+     */
+    @Test
+    void testErrorThrownWhenNoEnabledMeasurements() {
+        // GIVEN
+        // Create propagator builder for estimator
+        Context context = EstimationTestUtils.eccentricContext("regular-data:potential:tides");
+        final NumericalPropagatorBuilder propagatorBuilder =
+                context.createBuilder(OrbitType.KEPLERIAN, PositionAngleType.TRUE, true,
+                                      1.0e-6, 60.0, 1.0e-3);
+
+        // Estimate orbital parameters
+        final List<DelegatingDriver> drivers = propagatorBuilder.getOrbitalParametersDrivers().getDrivers();
+        drivers.forEach(driver -> driver.setSelected(true));
+        drivers.forEach(driver -> driver.setValue(1.0001 * driver.getValue()));
+
+        // create the estimator
+        final BatchLSEstimator estimator = new BatchLSEstimator(new LevenbergMarquardtOptimizer(),
+                                                                propagatorBuilder);
+        estimator.setParametersConvergenceThreshold(1.0e-2);
+        estimator.setMaxIterations(10);
+        estimator.setMaxEvaluations(20);
+
+
+        // Create measurements
+        final Propagator propagator = EstimationTestUtils.createPropagator(context.initialOrbit,
+                                                                           propagatorBuilder);
+        final List<ObservedMeasurement<?>> measurements =
+                EstimationTestUtils.createMeasurements(propagator,
+                                                       new PVMeasurementCreator(),
+                                                       0.0, 1.0, 300.0);
+
+        // Disable measurements for test purpose
+        measurements.forEach(measurement -> measurement.setEnabled(false));
+
+        // Add measurements to estimator
+        measurements.forEach(estimator::addMeasurement);
+
+        // WHEN & THEN
+        Assertions.assertThrows(IndexOutOfBoundsException.class, estimator::estimate);
+    }
+
     private void doTestEstimateOnlySomeOrbitalParameters(boolean[] orbitalParametersEstimated) {
 
         Context context = EstimationTestUtils.eccentricContext("regular-data:potential:tides");

@@ -23,6 +23,10 @@
       <action dev="vcucchie" type="fix" issue="1878">
           Fixed getSubInterpolators method in attitude interpolators (including fielded version).
       </action>
+      <action dev="vcucchie" type="fix" issue="1875">
+          Fixed number of interpolation points used when using interpolators with sub-interpolators requiring more
+          interpolation points (normal + fielded version).
+      </action>
       <action dev="serrof" type="fix" issue="1874">
           Call init and finish in FieldImpulseProvider built from ImpulseProvider.
       </action>
