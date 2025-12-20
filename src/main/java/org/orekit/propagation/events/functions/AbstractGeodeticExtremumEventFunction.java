@@ -17,15 +17,15 @@
 package org.orekit.propagation.events.functions;
 
 import org.hipparchus.CalculusFieldElement;
-import org.hipparchus.analysis.differentiation.FieldUnivariateDerivative2;
-import org.hipparchus.analysis.differentiation.UnivariateDerivative2;
-import org.hipparchus.analysis.differentiation.UnivariateDerivative2Field;
+import org.hipparchus.analysis.differentiation.FieldUnivariateDerivative1;
+import org.hipparchus.analysis.differentiation.UnivariateDerivative1;
+import org.hipparchus.analysis.differentiation.UnivariateDerivative1Field;
+import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.FieldGeodeticPoint;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.FieldAbsoluteDate;
-import org.orekit.utils.FieldPVCoordinates;
 
 /** Abstract class for geodetic coordinates extremum event function.
  * @author Romain Serra
@@ -55,12 +55,12 @@ public abstract class AbstractGeodeticExtremumEventFunction implements EventFunc
      * @param s the current state information: date, kinematics, attitude
      * @return geodetic point in Taylor Differential Algebra
      */
-    protected FieldGeodeticPoint<UnivariateDerivative2> transformToFieldGeodeticPoint(final SpacecraftState s) {
-        final FieldPVCoordinates<UnivariateDerivative2> pv = s.getPVCoordinates().toUnivariateDerivative2PV();
-        final UnivariateDerivative2Field field = UnivariateDerivative2Field.getInstance();
-        final UnivariateDerivative2 dt = new UnivariateDerivative2(0, 1, 0);
-        final FieldAbsoluteDate<UnivariateDerivative2> fieldDate = new FieldAbsoluteDate<>(field, s.getDate()).shiftedBy(dt);
-        return getBodyShape().transform(pv.getPosition(), s.getFrame(), fieldDate);
+    protected FieldGeodeticPoint<UnivariateDerivative1> transformToFieldGeodeticPoint(final SpacecraftState s) {
+        final FieldVector3D<UnivariateDerivative1> position = s.getPVCoordinates().toUnivariateDerivative1Vector();
+        final UnivariateDerivative1Field field = UnivariateDerivative1Field.getInstance();
+        final UnivariateDerivative1 dt = new UnivariateDerivative1(0, 1);
+        final FieldAbsoluteDate<UnivariateDerivative1> fieldDate = new FieldAbsoluteDate<>(field, s.getDate()).shiftedBy(dt);
+        return getBodyShape().transform(position, s.getFrame(), fieldDate);
     }
 
     /** Compute the geodetic coordinates with automatic differentiation.
@@ -68,9 +68,9 @@ public abstract class AbstractGeodeticExtremumEventFunction implements EventFunc
      * @param <T> field type
      * @return geodetic point in Taylor Differential Algebra
      */
-    protected <T extends CalculusFieldElement<T>> FieldGeodeticPoint<FieldUnivariateDerivative2<T>> transformToFieldGeodeticPoint(final FieldSpacecraftState<T> s) {        // convert state to geodetic coordinates
-        final FieldAbsoluteDate<FieldUnivariateDerivative2<T>> fud2Date = s.getDate().toFUD2Field();
-        final FieldPVCoordinates<FieldUnivariateDerivative2<T>> pv = s.getPVCoordinates().toUnivariateDerivative2PV();
-        return getBodyShape().transform(pv.getPosition(), s.getFrame(), fud2Date);
+    protected <T extends CalculusFieldElement<T>> FieldGeodeticPoint<FieldUnivariateDerivative1<T>> transformToFieldGeodeticPoint(final FieldSpacecraftState<T> s) {        // convert state to geodetic coordinates
+        final FieldAbsoluteDate<FieldUnivariateDerivative1<T>> fud1Date = s.getDate().toFUD1Field();
+        final FieldVector3D<FieldUnivariateDerivative1<T>> fieldPosition = s.getPVCoordinates().toUnivariateDerivative1Vector();
+        return getBodyShape().transform(fieldPosition, s.getFrame(), fud1Date);
     }
 }
