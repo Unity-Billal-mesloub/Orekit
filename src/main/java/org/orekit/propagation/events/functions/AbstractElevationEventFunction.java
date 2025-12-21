@@ -67,7 +67,7 @@ public abstract class AbstractElevationEventFunction implements EventFunction {
      */
     protected double applyRefraction(final double elevation) {
         if (refractionModel != null) {
-            return  elevation + refractionModel.getRefraction(elevation);
+            return elevation + refractionModel.getRefraction(elevation);
         } else {
             return elevation;
         }

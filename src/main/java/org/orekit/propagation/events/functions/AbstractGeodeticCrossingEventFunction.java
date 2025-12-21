@@ -27,7 +27,7 @@ import org.orekit.propagation.SpacecraftState;
  * @author Romain Serra
  * @since 14.0
  */
-public abstract class AbstractGeodeticEventFunction implements EventFunction {
+public abstract class AbstractGeodeticCrossingEventFunction implements EventFunction {
 
     /** Body shape. */
     private final BodyShape bodyShape;
@@ -35,7 +35,7 @@ public abstract class AbstractGeodeticEventFunction implements EventFunction {
     /** Constructor.
      * @param body body
      */
-    protected AbstractGeodeticEventFunction(final BodyShape body) {
+    protected AbstractGeodeticCrossingEventFunction(final BodyShape body) {
         this.bodyShape = body;
     }
 

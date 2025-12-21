@@ -40,6 +40,12 @@ public class BooleanEventFunction implements EventFunction {
     /** The composition function. Should be associative for predictable behavior. */
     private final Operator operator;
 
+    /** Flag for time dependence. */
+    private final boolean flagTime;
+
+    /** Flag for main variables dependence. */
+    private final boolean flagMainVariables;
+
     /**
      * Protected constructor with all the parameters.
      *
@@ -50,6 +56,8 @@ public class BooleanEventFunction implements EventFunction {
     private BooleanEventFunction(final List<EventFunction> eventFunctions, final Operator operator) {
         this.eventFunctions = eventFunctions;
         this.operator = operator;
+        this.flagTime = eventFunctions.stream().allMatch(EventFunction::dependsOnTimeOnly);
+        this.flagMainVariables = eventFunctions.stream().allMatch(EventFunction::dependsOnMainVariablesOnly);
     }
 
     /**
@@ -108,12 +116,12 @@ public class BooleanEventFunction implements EventFunction {
 
     @Override
     public boolean dependsOnTimeOnly() {
-        return eventFunctions.stream().allMatch(EventFunction::dependsOnTimeOnly);
+        return flagTime;
     }
 
     @Override
     public boolean dependsOnMainVariablesOnly() {
-        return eventFunctions.stream().allMatch(EventFunction::dependsOnMainVariablesOnly);
+        return flagMainVariables;
     }
 
     /** Local class for operator. */

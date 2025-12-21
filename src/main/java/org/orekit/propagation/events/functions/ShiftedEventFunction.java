@@ -42,6 +42,10 @@ public class ShiftedEventFunction implements EventFunctionModifier {
         this.timeShift = timeShift;
     }
 
+    /**
+     * Getter for time shift.
+     * @return shit
+     */
     public double getTimeShift() {
         return timeShift;
     }

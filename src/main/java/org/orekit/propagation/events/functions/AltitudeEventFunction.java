@@ -26,7 +26,7 @@ import org.orekit.propagation.SpacecraftState;
  * @author Romain Serra
  * @since 14.0
  */
-public class AltitudeEventFunction extends AbstractGeodeticEventFunction {
+public class AltitudeEventFunction extends AbstractGeodeticCrossingEventFunction {
 
     /** Critical altitude for crossing event. */
     private final double criticalAltitude;

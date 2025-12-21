@@ -26,7 +26,7 @@ import org.orekit.propagation.SpacecraftState;
  * @author Romain Serra
  * @since 14.0
  */
-public class LatitudeValueCrossingEventFunction extends AbstractGeodeticEventFunction {
+public class LatitudeValueCrossingEventFunction extends AbstractGeodeticCrossingEventFunction {
 
     /** Critical latitude for crossing event. */
     private final double criticalLatitude;

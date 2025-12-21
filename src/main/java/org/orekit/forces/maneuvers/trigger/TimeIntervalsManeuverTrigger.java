@@ -32,10 +32,8 @@ import org.orekit.propagation.events.intervals.AdaptableInterval;
 import org.orekit.propagation.events.intervals.DateDetectionAdaptableIntervalFactory;
 import org.orekit.time.TimeInterval;
 import org.orekit.time.TimeStamped;
-import org.orekit.utils.ParameterDriver;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -109,8 +107,4 @@ public class TimeIntervalsManeuverTrigger extends IntervalEventTrigger<BooleanDe
                 .collect(Collectors.toList()));
     }
 
-    @Override
-    public List<ParameterDriver> getParametersDrivers() {
-        return Collections.emptyList();
-    }
 }

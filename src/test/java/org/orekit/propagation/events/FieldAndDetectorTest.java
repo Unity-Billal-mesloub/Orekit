@@ -16,9 +16,6 @@
  */
 package org.orekit.propagation.events;
 
-import java.util.Collections;
-import java.util.NoSuchElementException;
-
 import org.hipparchus.util.Binary64;
 import org.hipparchus.util.Binary64Field;
 import org.junit.jupiter.api.Assertions;
@@ -31,6 +28,12 @@ import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.intervals.FieldAdaptableInterval;
 import org.orekit.time.FieldAbsoluteDate;
+
+import java.util.Collections;
+import java.util.NoSuchElementException;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link BooleanDetector}.
@@ -55,7 +58,7 @@ class FieldAndDetectorTest {
         a = new MockDetector();
         b = new MockDetector();
         s = Mockito.mock(FieldSpacecraftState.class);
-        Mockito.when(s.getDate()).thenReturn(FieldAbsoluteDate.getArbitraryEpoch(Binary64Field.getInstance()));
+        when(s.getDate()).thenReturn(FieldAbsoluteDate.getArbitraryEpoch(Binary64Field.getInstance()));
         and = FieldBooleanDetector.andCombine(a, b);
     }
 
@@ -127,16 +130,18 @@ class FieldAndDetectorTest {
     void testInit() {
         // setup
         FieldEventDetector<Binary64> a = Mockito.mock(FieldEventDetector.class);
-        Mockito.when(a.getMaxCheckInterval()).thenReturn(FieldAdaptableInterval.of(AbstractDetector.DEFAULT_MAX_CHECK));
-        Mockito.when(a.getThreshold()).thenReturn(new Binary64(AbstractDetector.DEFAULT_THRESHOLD));
+        when(a.getEventFunction()).thenReturn(mock(EventFunction.class));
+        when(a.getMaxCheckInterval()).thenReturn(FieldAdaptableInterval.of(AbstractDetector.DEFAULT_MAX_CHECK));
+        when(a.getThreshold()).thenReturn(new Binary64(AbstractDetector.DEFAULT_THRESHOLD));
         FieldEventDetector<Binary64> b = Mockito.mock(FieldEventDetector.class);
-        Mockito.when(b.getMaxCheckInterval()).thenReturn(FieldAdaptableInterval.of(AbstractDetector.DEFAULT_MAX_CHECK));
-        Mockito.when(b.getThreshold()).thenReturn(new Binary64(AbstractDetector.DEFAULT_THRESHOLD));
+        when(b.getEventFunction()).thenReturn(mock(EventFunction.class));
+        when(b.getMaxCheckInterval()).thenReturn(FieldAdaptableInterval.of(AbstractDetector.DEFAULT_MAX_CHECK));
+        when(b.getThreshold()).thenReturn(new Binary64(AbstractDetector.DEFAULT_THRESHOLD));
         FieldEventHandler<Binary64> c = Mockito.mock(FieldEventHandler.class);
         FieldBooleanDetector<Binary64> and = FieldBooleanDetector.andCombine(a, b).withHandler(c);
         FieldAbsoluteDate<Binary64> t = FieldAbsoluteDate.getCCSDSEpoch(Binary64Field.getInstance());
         s = Mockito.mock(FieldSpacecraftState.class);
-        Mockito.when(s.getDate()).thenReturn(t.shiftedBy(60.0));
+        when(s.getDate()).thenReturn(t.shiftedBy(60.0));
 
         // action
         and.init(s, t);

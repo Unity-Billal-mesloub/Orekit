@@ -22,7 +22,7 @@ import org.hipparchus.util.FastMath;
 import org.orekit.bodies.BodyShape;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.events.functions.AbstractGeodeticEventFunction;
+import org.orekit.propagation.events.functions.AbstractGeodeticCrossingEventFunction;
 import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
@@ -51,7 +51,7 @@ public class FieldLatitudeRangeCrossingDetector <T extends CalculusFieldElement<
     private final double toLatitude;
 
     /** Event function. */
-    private final AbstractGeodeticEventFunction eventFunction;
+    private final AbstractGeodeticCrossingEventFunction eventFunction;
 
     /**
      * Build a new detector.
@@ -175,7 +175,7 @@ public class FieldLatitudeRangeCrossingDetector <T extends CalculusFieldElement<
      * Local event function.
      * @since 14.0
      */
-    private static class LocalEventFunction extends AbstractGeodeticEventFunction {
+    private static class LocalEventFunction extends AbstractGeodeticCrossingEventFunction {
 
         /** Lower bound latitude. */
         private final double minLatitude;

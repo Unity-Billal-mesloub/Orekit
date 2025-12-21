@@ -21,6 +21,10 @@ import org.hipparchus.Field;
 import org.hipparchus.ode.events.Action;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.propagation.FieldSpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.EventFunctionModifier;
+import org.orekit.propagation.events.functions.PenumbraEventFunction;
+import org.orekit.propagation.events.functions.UmbraEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnIncreasing;
@@ -50,6 +54,9 @@ public class FieldEclipseDetector<T extends CalculusFieldElement<T>> extends Fie
 
     /** Margin to apply to eclipse angle. */
     private final T margin;
+
+    /** Event function. */
+    private final EventFunction eventFunction;
 
     /** Build a new eclipse detector.
      * <p>The new instance is a total eclipse (umbra) detector with default
@@ -99,6 +106,8 @@ public class FieldEclipseDetector<T extends CalculusFieldElement<T>> extends Fie
         this.occultationEngine = occultationEngine;
         this.margin            = margin;
         this.totalEclipse      = totalEclipse;
+        this.eventFunction = EventFunctionModifier.addFieldValue(totalEclipse ? new UmbraEventFunction(occultationEngine) :
+                new PenumbraEventFunction(occultationEngine), margin);
     }
 
     /** {@inheritDoc} */
@@ -175,6 +184,11 @@ public class FieldEclipseDetector<T extends CalculusFieldElement<T>> extends Fie
         return totalEclipse;
     }
 
+    @Override
+    public EventFunction getEventFunction() {
+        return eventFunction;
+    }
+
     /** Compute the value of the switching function.
      * This function becomes negative when entering the region of shadow
      * and positive when exiting.
@@ -182,10 +196,7 @@ public class FieldEclipseDetector<T extends CalculusFieldElement<T>> extends Fie
      * @return value of the switching function
      */
     public T g(final FieldSpacecraftState<T> s) {
-        final OccultationEngine.FieldOccultationAngles<T> angles = occultationEngine.angles(s);
-        return totalEclipse ?
-               angles.getSeparation().subtract(angles.getLimbRadius()).add(angles.getOccultedApparentRadius().add(margin)) :
-               angles.getSeparation().subtract(angles.getLimbRadius()).subtract(angles.getOccultedApparentRadius()).add(margin);
+        return getEventFunction().value(s);
     }
 
     @Override
