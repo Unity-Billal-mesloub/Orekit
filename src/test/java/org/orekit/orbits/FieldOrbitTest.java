@@ -17,6 +17,7 @@
 package org.orekit.orbits;
 
 import org.hipparchus.CalculusFieldElement;
+import org.hipparchus.Field;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.analysis.differentiation.GradientField;
 import org.hipparchus.complex.Complex;
@@ -24,23 +25,34 @@ import org.hipparchus.complex.ComplexField;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.util.Binary64;
+import org.hipparchus.util.Binary64Field;
 import org.hipparchus.util.MathUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.orekit.TestUtils;
+import org.orekit.Utils;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.frames.Predefined;
+import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.time.TimeScale;
+import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 
-
 class FieldOrbitTest {
+
+    @BeforeAll
+    static void setUp() {
+        // Load orekit data
+        Utils.setDataRoot("regular-data");
+    }
 
     @Test
     void testGetPosition() {
@@ -73,7 +85,7 @@ class FieldOrbitTest {
     void testHasNonKeplerianAccelerationDerivative() {
         // GIVEN
         final GradientField field = GradientField.getField(0);
-        final Gradient mu = field.getZero().newInstance(Constants.EGM96_EARTH_MU);
+        final Gradient                     mu                 = field.getZero().newInstance(Constants.EGM96_EARTH_MU);
         final FieldPVCoordinates<Gradient> fieldPVCoordinates = createFieldTPVWithKeplerianAcceleration(mu);
         // WHEN
         final boolean actualResult = FieldOrbit.hasNonKeplerianAcceleration(fieldPVCoordinates, mu);
@@ -143,6 +155,37 @@ class FieldOrbitTest {
 
         // THEN
         Assertions.assertEquals(fakeOrbit.getVelocity(), velocity);
+    }
+
+    /**
+     * Test related to issue 1883.
+     *
+     * @see <a href="https://gitlab.orekit.org/orekit/orekit/-/issues/1883">Issue 1883</a>
+     */
+    @Test
+    public void testCorrectDate() {
+        // GIVEN
+        // Define dates
+        final TimeScale       utc   = TimeScalesFactory.getUTC();
+        final Frame           gcrf  = FramesFactory.getGCRF();
+        final Field<Binary64> field = Binary64Field.getInstance();
+
+        AbsoluteDate date1 = new AbsoluteDate("2025-12-15T11:11:00.000000000000000000Z", utc);
+        AbsoluteDate date2 = new AbsoluteDate("2025-12-15T14:56:00.000000000000000000Z", utc);
+
+        FieldAbsoluteDate<Binary64> fieldDate1        = new FieldAbsoluteDate<>(field, date1);
+        FieldAbsoluteDate<Binary64> fieldDate2        = new FieldAbsoluteDate<>(field, date2);
+        FieldAbsoluteDate<Binary64> fieldDate2Shifted = fieldDate2.shiftedBy(0.123456789);
+
+        // Define orbit
+        final FieldOrbit<Binary64> orbitAtShiftedDate = TestUtils.getDefaultFieldOrbit(fieldDate2Shifted);
+
+        // WHEN
+        final TimeStampedFieldPVCoordinates<Binary64> pv         = orbitAtShiftedDate.getPVCoordinates(fieldDate1, gcrf);
+        final FieldAbsoluteDate<Binary64>             actualDate = pv.getDate();
+
+        // THEN
+        Assertions.assertEquals(0, actualDate.durationFrom(date1));
     }
 
     private static class TestFieldOrbit extends FieldOrbit<Complex> {

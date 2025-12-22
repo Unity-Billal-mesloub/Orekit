@@ -19,17 +19,27 @@ package org.orekit.orbits;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.util.MathUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.orekit.TestUtils;
+import org.orekit.Utils;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeOffset;
+import org.orekit.time.TimeScale;
+import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinates;
 
 
 class OrbitTest {
+
+    @BeforeAll
+    static void setUp() {
+        // Load orekit data
+        Utils.setDataRoot("regular-data");
+    }
 
     @Test
     void testGetPosition() {
@@ -78,6 +88,33 @@ class OrbitTest {
 
         // THEN
         Assertions.assertEquals(fakeOrbit.getVelocity(), velocity);
+    }
+
+    /**
+     * Test related to issue 1883.
+     *
+     * @see <a href="https://gitlab.orekit.org/orekit/orekit/-/issues/1883">Issue 1883</a>
+     */
+    @Test
+    public void testCorrectDate() {
+        // GIVEN
+        // Define dates
+        final TimeScale utc  = TimeScalesFactory.getUTC();
+        final Frame     gcrf = FramesFactory.getGCRF();
+
+        AbsoluteDate date1 = new AbsoluteDate("2025-12-15T11:11:00.000000000000000000Z", utc);
+        AbsoluteDate date2 = new AbsoluteDate("2025-12-15T14:56:00.000000000000000000Z", utc);
+        AbsoluteDate date2Shifted = date2.shiftedBy(0.123456789);
+
+        // Define orbit
+        final Orbit orbitAtShiftedDate = TestUtils.getDefaultOrbit(date2Shifted);
+
+        // WHEN
+        final TimeStampedPVCoordinates pv         = orbitAtShiftedDate.getPVCoordinates(date1, gcrf);
+        final AbsoluteDate             actualDate = pv.getDate();
+
+        // THEN
+        Assertions.assertEquals(0, actualDate.durationFrom(date1));
     }
 
     private void templateTestIsElliptical(final double aIn) {

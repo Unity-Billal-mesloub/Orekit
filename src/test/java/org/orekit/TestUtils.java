@@ -85,6 +85,30 @@ public class TestUtils {
     }
 
     /**
+     * Create and return a default equatorial circular orbit at 400km altitude.
+     *
+     * @param date date of the orbit
+     *
+     * @return default orbit
+     */
+    public static <T extends CalculusFieldElement<T>> FieldOrbit<T> getDefaultFieldOrbit(FieldAbsoluteDate<T> date) {
+        // Extract recurrent variables
+        final T one  = date.getField().getOne();
+        final T zero = date.getField().getZero();
+
+        // Define default orbit
+        final FieldPVCoordinates<T> pv =
+                        new FieldPVCoordinates<>(new FieldVector3D<>(one.multiply(6778000), zero, zero),
+                                                 new FieldVector3D<>(zero, one.multiply(7668.631425), zero));
+
+        final Frame frame = FramesFactory.getGCRF();
+
+        final T DEFAULT_MU = one.multiply(398600e9); // m**3/s**2
+
+        return new FieldCartesianOrbit<>(pv, frame, date, DEFAULT_MU);
+    }
+
+    /**
      * Method created to test issue 949.
      *
      * @return additional state provider with custom init() method defined which use the initial state

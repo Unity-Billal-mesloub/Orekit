@@ -86,7 +86,7 @@ public interface ShiftablePVCoordinatesHolder<T extends PVCoordinatesProvider>
 
     @Override
     default TimeStampedPVCoordinates getPVCoordinates(final AbsoluteDate date, final Frame frame) {
-        final ShiftablePVCoordinatesHolder<T> shifted = shiftedBy(date.durationFrom(getDate()));
+        final ShiftablePVCoordinatesHolder<T> shifted = shiftedBy(date.accurateDurationFrom(getDate()));
         final TimeStampedPVCoordinates pv = shifted.getPVCoordinates();
         if (frame ==  getFrame()) {
             return pv;
