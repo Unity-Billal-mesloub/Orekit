@@ -16,6 +16,9 @@
  */
 package org.orekit.propagation.events;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.ode.events.Action;
 import org.orekit.propagation.FieldSpacecraftState;
@@ -25,9 +28,6 @@ import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.functions.ShiftedEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /** Wrapper shifting events occurrences times.
  * <p>This class wraps an {@link FieldEventDetector event detector} to slightly
@@ -151,6 +151,15 @@ public class FieldEventShifter<T extends CalculusFieldElement<T>> implements Fie
      */
     public T getDecreasingTimeShift() {
         return decreasingOffset.negate();
+    }
+
+    /**
+     * Getter for shifted states in handler flag.
+     * @return flag
+     * @since 14.0
+     */
+    public boolean isUseShiftedStates() {
+        return useShiftedStates;
     }
 
     @Override

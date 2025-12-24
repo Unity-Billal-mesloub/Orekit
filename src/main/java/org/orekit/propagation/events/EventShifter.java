@@ -16,15 +16,15 @@
  */
 package org.orekit.propagation.events;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hipparchus.ode.events.Action;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.functions.BooleanEventFunction;
 import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.functions.ShiftedEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /** Wrapper shifting events occurrences times.
  * <p>This class wraps an {@link EventDetector event detector} to slightly
@@ -157,6 +157,15 @@ public class EventShifter implements DetectorModifier {
      */
     public double getDecreasingTimeShift() {
         return -decreasingOffset;
+    }
+
+    /**
+     * Getter for shifted states in handler flag.
+     * @return flag
+     * @since 14.0
+     */
+    public boolean isUseShiftedStates() {
+        return useShiftedStates;
     }
 
     /** {@inheritDoc} */

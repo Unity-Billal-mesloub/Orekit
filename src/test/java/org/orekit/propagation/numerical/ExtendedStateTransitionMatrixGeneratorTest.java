@@ -16,6 +16,11 @@
  */
 package org.orekit.propagation.numerical;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
@@ -70,25 +75,17 @@ import org.orekit.propagation.conversion.DormandPrince54IntegratorBuilder;
 import org.orekit.propagation.events.ApsideDetector;
 import org.orekit.propagation.events.EventDetectionSettings;
 import org.orekit.propagation.events.EventDetector;
-import org.orekit.propagation.events.FieldApsideDetector;
-import org.orekit.propagation.events.FieldEventDetectionSettings;
 import org.orekit.propagation.events.FieldEventDetector;
 import org.orekit.propagation.events.ParameterDrivenDateIntervalDetector;
 import org.orekit.propagation.events.handlers.ContinueOnEvent;
-import org.orekit.propagation.events.handlers.FieldStopOnEvent;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.Constants;
 import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeSpanMap;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ExtendedStateTransitionMatrixGeneratorTest {
 
@@ -555,21 +552,6 @@ class ExtendedStateTransitionMatrixGeneratorTest {
 
         protected ApsideTriggers(EventDetectionSettings detectionSettings) {
             super(new ApsideDetector(detectionSettings, new ContinueOnEvent()));
-        }
-
-        @Override
-        public List<ParameterDriver> getParametersDrivers() {
-            return Collections.emptyList();
-        }
-
-        private FieldApsideDetector buildFieldApsideDetector(Field field, EventDetector detector) {
-            return new FieldApsideDetector<>(new FieldEventDetectionSettings<>(field, detector.getDetectionSettings()),
-                    new FieldStopOnEvent());
-        }
-
-        @Override
-        protected <D extends FieldEventDetector<S>, S extends CalculusFieldElement<S>> D convertIntervalDetector(Field<S> field, ApsideDetector detector) {
-            return (D) buildFieldApsideDetector(field, detector);
         }
     }
 }

@@ -96,11 +96,10 @@ public class TimeIntervalsManeuverTrigger extends IntervalEventTrigger<BooleanDe
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    protected <D extends FieldEventDetector<S>, S extends CalculusFieldElement<S>> D convertIntervalDetector(final Field<S> field,
-                                                                                                             final BooleanDetector detector) {
+    protected <S extends CalculusFieldElement<S>> FieldEventDetector<S> convertIntervalDetector(final Field<S> field,
+                                                                                                final BooleanDetector detector) {
         final FieldEventHandler<S> arbitraryHandler = new FieldContinueOnEvent<>();
-        return (D) FieldBooleanDetector.orCombine(detector.getDetectors().stream()
+        return FieldBooleanDetector.orCombine(detector.getDetectors().stream()
                 .map(TimeIntervalDetector.class::cast)
                 .map(intervalDetector -> new FieldTimeIntervalDetector<>(new FieldEventDetectionSettings<>(field,
                         intervalDetector.getDetectionSettings()), arbitraryHandler, intervalDetector.getTimeInterval()))

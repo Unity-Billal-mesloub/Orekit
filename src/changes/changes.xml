@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
+        <action dev="serrof" type="update" issue="issue-1884">
+            Make IntervalEventTrigger and StartStopEventsTrigger non abstract.
+        </action>
         <action dev="serrof" type="add" issue="issue-1881">
             Add toEventDetector in FieldAbstractDetector.
         </action>

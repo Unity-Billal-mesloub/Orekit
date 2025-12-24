@@ -24,7 +24,6 @@ import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.orekit.propagation.events.EventDetectionSettings;
 import org.orekit.propagation.events.FieldEventDetectionSettings;
-import org.orekit.propagation.events.FieldEventDetector;
 import org.orekit.propagation.events.FieldParameterDrivenDateIntervalDetector;
 import org.orekit.propagation.events.ParameterDrivenDateIntervalDetector;
 import org.orekit.time.AbsoluteDate;
@@ -127,8 +126,8 @@ public class DateBasedManeuverTriggers extends IntervalEventTrigger<ParameterDri
 
     /** {@inheritDoc} */
     @Override
-    protected <D extends FieldEventDetector<S>, S extends CalculusFieldElement<S>> D convertIntervalDetector(final Field<S> field,
-                                                                                                             final ParameterDrivenDateIntervalDetector detector) {
+    protected <S extends CalculusFieldElement<S>> FieldParameterDrivenDateIntervalDetector<S> convertIntervalDetector(final Field<S> field,
+                                                                                                                      final ParameterDrivenDateIntervalDetector detector) {
 
         final FieldParameterDrivenDateIntervalDetector<S> fd =
                         new FieldParameterDrivenDateIntervalDetector<>(field, "",
@@ -139,11 +138,7 @@ public class DateBasedManeuverTriggers extends IntervalEventTrigger<ParameterDri
         fd.getStopDriver().setName(detector.getStopDriver().getName());
         fd.getMedianDriver().setName(detector.getMedianDriver().getName());
         fd.getDurationDriver().setName(detector.getDurationDriver().getName());
-
-        @SuppressWarnings("unchecked")
-        final D converted = (D) fd;
-        return converted;
-
+        return fd;
     }
 
     /** {@inheritDoc} */

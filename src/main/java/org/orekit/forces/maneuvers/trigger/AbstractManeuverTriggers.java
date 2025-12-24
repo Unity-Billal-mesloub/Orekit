@@ -27,8 +27,16 @@ import org.hipparchus.ode.events.Action;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.EventDetector;
+import org.orekit.propagation.events.EventEnablingPredicateFilter;
+import org.orekit.propagation.events.EventShifter;
+import org.orekit.propagation.events.EventSlopeFilter;
+import org.orekit.propagation.events.FieldEventDetectionSettings;
 import org.orekit.propagation.events.FieldEventDetector;
+import org.orekit.propagation.events.FieldEventEnablingPredicateFilter;
+import org.orekit.propagation.events.FieldEventShifter;
+import org.orekit.propagation.events.FieldEventSlopeFilter;
 import org.orekit.propagation.events.handlers.EventHandler;
+import org.orekit.propagation.events.handlers.FieldContinueOnEvent;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
@@ -231,6 +239,37 @@ public abstract class AbstractManeuverTriggers implements ResettableManeuverTrig
             }
         }
         return reset;
+    }
+
+    /**
+     * Attempts to create a working Fielded detector from a standard one.
+     * @param field field
+     * @param detector non-Field detector
+     * @return Field detector
+     * @param <T> field type
+     * @since 14.0
+     */
+    protected <T extends CalculusFieldElement<T>> FieldEventDetector<T> convertDetector(final Field<T> field,
+                                                                                        final EventDetector detector) {
+        if (detector instanceof EventEnablingPredicateFilter) {
+            final EventEnablingPredicateFilter predicateFilter = (EventEnablingPredicateFilter) detector;
+            final FieldEventDetector<T> fieldDetector = convertDetector(field, predicateFilter.getDetector());
+            return new FieldEventEnablingPredicateFilter<>(fieldDetector, (state, fieldEventDetector, g) -> predicateFilter
+                    .getPredicate().eventIsEnabled(state.toSpacecraftState(), null, g.getReal()));
+        } else if (detector instanceof EventSlopeFilter) {
+            final EventSlopeFilter<?> eventSlopeFilter = (EventSlopeFilter<?>) detector;
+            final FieldEventDetector<T> fieldDetector = convertDetector(field, eventSlopeFilter.getDetector());
+            return new FieldEventSlopeFilter<>(fieldDetector, eventSlopeFilter.getFilterType());
+        } else if (detector instanceof EventShifter) {
+            final EventShifter eventShifter = (EventShifter) detector;
+            final FieldEventDetector<T> fieldDetector = convertDetector(field, eventShifter.getDetector());
+            final T zero = field.getZero();
+            return new FieldEventShifter<>(fieldDetector, eventShifter.isUseShiftedStates(),
+                    zero.newInstance(eventShifter.getIncreasingTimeShift()), zero.newInstance(eventShifter.getDecreasingTimeShift()));
+        } else {
+            return FieldEventDetector.of(detector.getEventFunction(), new FieldContinueOnEvent<>(),
+                    new FieldEventDetectionSettings<>(field, detector.getDetectionSettings()));
+        }
     }
 
     /** Local abstract handler for triggers, with a cache for the reset.
