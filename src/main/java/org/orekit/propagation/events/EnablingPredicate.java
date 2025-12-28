@@ -41,7 +41,7 @@ public interface EnablingPredicate {
      * @return combined predicate
      * @since 13.1
      */
-    static EnablingPredicate orCombine(EnablingPredicate... enablingPredicates) {
+    static EnablingPredicate orCombine(final EnablingPredicate... enablingPredicates) {
         return (state, detector, g) -> Arrays.stream(enablingPredicates).anyMatch(p -> p.eventIsEnabled(state, detector, g));
     }
 
@@ -51,7 +51,7 @@ public interface EnablingPredicate {
      * @return combined predicate
      * @since 13.1
      */
-    static EnablingPredicate andCombine(EnablingPredicate... enablingPredicates) {
+    static EnablingPredicate andCombine(final EnablingPredicate... enablingPredicates) {
         return (state, detector, g) -> Arrays.stream(enablingPredicates).allMatch(p -> p.eventIsEnabled(state, detector, g));
     }
 }

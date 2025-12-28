@@ -45,7 +45,7 @@ public interface FieldEnablingPredicate<T extends CalculusFieldElement<T>> {
      * @since 13.1
      */
     @SafeVarargs
-    static <T extends CalculusFieldElement<T>> FieldEnablingPredicate<T> orCombine(FieldEnablingPredicate<T>... enablingPredicates) {
+    static <T extends CalculusFieldElement<T>> FieldEnablingPredicate<T> orCombine(final FieldEnablingPredicate<T>... enablingPredicates) {
         return (state, detector, g) -> Arrays.stream(enablingPredicates).anyMatch(p -> p.eventIsEnabled(state, detector, g));
     }
 
@@ -57,7 +57,7 @@ public interface FieldEnablingPredicate<T extends CalculusFieldElement<T>> {
      * @since 13.1
      */
     @SafeVarargs
-    static <T extends CalculusFieldElement<T>> FieldEnablingPredicate<T> andCombine(FieldEnablingPredicate<T>... enablingPredicates) {
+    static <T extends CalculusFieldElement<T>> FieldEnablingPredicate<T> andCombine(final FieldEnablingPredicate<T>... enablingPredicates) {
         return (state, detector, g) -> Arrays.stream(enablingPredicates).allMatch(p -> p.eventIsEnabled(state, detector, g));
     }
 }
