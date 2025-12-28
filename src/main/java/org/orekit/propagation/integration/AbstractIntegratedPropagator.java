@@ -1332,7 +1332,7 @@ public abstract class AbstractIntegratedPropagator extends AbstractPropagator {
      * If propagator-specific event handlers and step handlers are added to
      * the integrator in the try block, they will be removed automatically
      * when leaving the block, so the integrator only keeps its own handlers
-     * between calls to {@link AbstractIntegratedPropagator#propagate(AbsoluteDate, AbsoluteDate).
+     * between calls to {@link AbstractIntegratedPropagator#propagate(AbsoluteDate, AbsoluteDate)}.
      * </p>
      * @since 11.0
      */
