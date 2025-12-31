@@ -18,6 +18,7 @@ package org.orekit.propagation.events;
 
 import org.hipparchus.CalculusFieldElement;
 import org.orekit.frames.TopocentricFrame;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 
 /** Abstract class for detectors using a topocentric frame.
@@ -34,13 +35,17 @@ public abstract class FieldAbstractTopocentricDetector<D extends FieldAbstractDe
     private final TopocentricFrame topocentricFrame;
 
     /** Protected constructor with full parameters.
+     * @param eventFunction event function
      * @param detectionSettings event detection settings
      * @param handler event handler to call at event occurrences
      * @param topocentricFrame topocentric frame
+     * @since 14.0
      */
-    protected FieldAbstractTopocentricDetector(final FieldEventDetectionSettings<T> detectionSettings, final FieldEventHandler<T> handler,
+    protected FieldAbstractTopocentricDetector(final EventFunction eventFunction,
+                                               final FieldEventDetectionSettings<T> detectionSettings,
+                                               final FieldEventHandler<T> handler,
                                                final TopocentricFrame topocentricFrame) {
-        super(detectionSettings, handler);
+        super(eventFunction, detectionSettings, handler);
         this.topocentricFrame = topocentricFrame;
     }
 

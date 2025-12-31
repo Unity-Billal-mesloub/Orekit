@@ -19,7 +19,6 @@ package org.orekit.propagation.events;
 import org.hipparchus.ode.events.Action;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.functions.PenumbraEventFunction;
 import org.orekit.propagation.events.functions.UmbraEventFunction;
@@ -65,9 +64,6 @@ public class EclipseDetector extends AbstractDetector<EclipseDetector> {
     /** Margin to apply to eclipse angle. */
     private final double margin;
 
-    /** Event function. */
-    private final EventFunction eventFunction;
-
     /** Build a new eclipse detector.
      * <p>The new instance is a total eclipse (umbra) detector with default
      * values for maximal checking interval ({@link #DEFAULT_MAX_CHECK})
@@ -109,12 +105,11 @@ public class EclipseDetector extends AbstractDetector<EclipseDetector> {
      */
     protected EclipseDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                               final OccultationEngine occultationEngine, final double margin, final boolean totalEclipse) {
-        super(detectionSettings, handler);
+        super(EventFunctionModifier.addReal(totalEclipse ? new UmbraEventFunction(occultationEngine) :
+                new PenumbraEventFunction(occultationEngine), margin), detectionSettings, handler);
         this.occultationEngine = occultationEngine;
         this.margin            = margin;
         this.totalEclipse      = totalEclipse;
-        this.eventFunction = EventFunctionModifier.addReal(totalEclipse ? new UmbraEventFunction(occultationEngine) :
-                new PenumbraEventFunction(occultationEngine), margin);
     }
 
     /** {@inheritDoc} */
@@ -185,11 +180,6 @@ public class EclipseDetector extends AbstractDetector<EclipseDetector> {
      */
     public boolean getTotalEclipse() {
         return totalEclipse;
-    }
-
-    @Override
-    public EventFunction getEventFunction() {
-        return eventFunction;
     }
 
     @Override

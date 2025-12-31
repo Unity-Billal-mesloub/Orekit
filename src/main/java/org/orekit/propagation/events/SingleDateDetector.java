@@ -35,9 +35,6 @@ public class SingleDateDetector extends AbstractDetector<SingleDateDetector> imp
     /** Date to detect. */
     private final AbsoluteDate date;
 
-    /** Event function. */
-    private final SingleDateEventFunction dateEvent;
-
     /** Full constructor.
      * @param detectionSettings event detection settings
      * @param eventHandler event handler
@@ -45,9 +42,8 @@ public class SingleDateDetector extends AbstractDetector<SingleDateDetector> imp
      */
     public SingleDateDetector(final EventDetectionSettings detectionSettings, final EventHandler eventHandler,
                               final AbsoluteDate date) {
-        super(detectionSettings, eventHandler);
+        super(new SingleDateEventFunction(date), detectionSettings, eventHandler);
         this.date = date;
-        this.dateEvent = new SingleDateEventFunction(date);
     }
 
     /** Build a new instance with default detection settings.
@@ -74,14 +70,8 @@ public class SingleDateDetector extends AbstractDetector<SingleDateDetector> imp
 
     /** {@inheritDoc} */
     @Override
-    public SingleDateEventFunction getEventFunction() {
-        return dateEvent;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public double g(final SpacecraftState s) {
-        return dateEvent.value(s);
+        return getEventFunction().value(s);
     }
 
     /** {@inheritDoc} */

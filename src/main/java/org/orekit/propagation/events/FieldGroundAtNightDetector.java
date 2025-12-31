@@ -20,7 +20,6 @@ import org.hipparchus.CalculusFieldElement;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.models.AtmosphericRefractionModel;
 import org.orekit.propagation.FieldSpacecraftState;
-import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.functions.GroundAtNightEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
@@ -56,9 +55,6 @@ public class FieldGroundAtNightDetector<T extends CalculusFieldElement<T>>
     /** Atmospheric Model used for calculations, if defined. */
     private final AtmosphericRefractionModel refractionModel;
 
-    /** Event function. */
-    private final EventFunction eventFunction;
-
     /** Simple constructor.
      * @param topocentricFrame ground location to check
      * @param sun provider for Sun position
@@ -85,13 +81,12 @@ public class FieldGroundAtNightDetector<T extends CalculusFieldElement<T>>
                                          final AtmosphericRefractionModel refractionModel,
                                          final FieldEventDetectionSettings<T> detectionSettings,
                                          final FieldEventHandler<T> handler) {
-        super(detectionSettings, handler, topocentricFrame);
+        super(EventFunctionModifier.addFieldValue(new GroundAtNightEventFunction(topocentricFrame, sun,
+                        dawnDuskElevation.getReal(), refractionModel), dawnDuskElevation.getAddendum()),
+                detectionSettings, handler, topocentricFrame);
         this.sun               = sun;
         this.dawnDuskElevation = dawnDuskElevation;
         this.refractionModel   = refractionModel;
-        final GroundAtNightEventFunction baseFunction = new GroundAtNightEventFunction(getTopocentricFrame(),
-                sun, dawnDuskElevation.getReal(), refractionModel);
-        this.eventFunction = EventFunctionModifier.addFieldValue(baseFunction, dawnDuskElevation.getAddendum());
     }
 
     /** {@inheritDoc} */
@@ -100,11 +95,6 @@ public class FieldGroundAtNightDetector<T extends CalculusFieldElement<T>>
                                                    final FieldEventHandler<T> newHandler) {
         return new FieldGroundAtNightDetector<>(getTopocentricFrame(), sun, dawnDuskElevation, refractionModel,
                 detectionSettings, newHandler);
-    }
-
-    @Override
-    public EventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** {@inheritDoc}
@@ -118,7 +108,7 @@ public class FieldGroundAtNightDetector<T extends CalculusFieldElement<T>>
      */
     @Override
     public T g(final FieldSpacecraftState<T> state) {
-        return eventFunction.value(state);
+        return getEventFunction().value(state);
     }
 
     @Override

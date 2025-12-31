@@ -46,9 +46,6 @@ import org.orekit.propagation.events.handlers.FieldStopOnIncreasing;
 public class FieldElevationExtremumDetector<T extends CalculusFieldElement<T>>
     extends FieldAbstractTopocentricDetector<FieldElevationExtremumDetector<T>, T> {
 
-    /** Event function. */
-    private final ElevationExtremumEventFunction eventFunction;
-
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
      * ({@link #DEFAULT_MAX_CHECK}) and convergence threshold ({@link
@@ -86,8 +83,7 @@ public class FieldElevationExtremumDetector<T extends CalculusFieldElement<T>>
     protected FieldElevationExtremumDetector(final FieldEventDetectionSettings<T> detectionSettings,
                                              final FieldEventHandler<T> handler,
                                              final TopocentricFrame topo) {
-        super(detectionSettings, handler, topo);
-        this.eventFunction = new ElevationExtremumEventFunction(topo);
+        super(new ElevationExtremumEventFunction(topo), detectionSettings, handler, topo);
     }
 
     /** {@inheritDoc} */
@@ -103,11 +99,6 @@ public class FieldElevationExtremumDetector<T extends CalculusFieldElement<T>>
      */
     public T getElevation(final FieldSpacecraftState<T> s) {
         return getTopocentricFrame().getElevation(s.getPosition(), s.getFrame(), s.getDate());
-    }
-
-    @Override
-    public ElevationExtremumEventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Compute the value of the detection function.

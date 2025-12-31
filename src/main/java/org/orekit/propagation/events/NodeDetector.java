@@ -57,9 +57,6 @@ public class NodeDetector extends AbstractDetector<NodeDetector> {
     /** Frame in which the equator is defined. */
     private final Frame frame;
 
-    /** Event function. */
-    private final NodeEventFunction eventFunction;
-
     /** Build a new instance.
      * <p>The default {@link #getMaxCheckInterval() max check interval}
      * is set to 1800s, it can be changed using {@link #withMaxCheck(double)}
@@ -119,9 +116,8 @@ public class NodeDetector extends AbstractDetector<NodeDetector> {
      */
     protected NodeDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                            final Frame frame) {
-        super(detectionSettings, handler);
+        super(new NodeEventFunction(frame), detectionSettings, handler);
         this.frame = frame;
-        this.eventFunction = new NodeEventFunction(frame);
     }
 
     /** {@inheritDoc} */
@@ -175,11 +171,6 @@ public class NodeDetector extends AbstractDetector<NodeDetector> {
      */
     public Frame getFrame() {
         return frame;
-    }
-
-    @Override
-    public NodeEventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Compute the value of the switching function.

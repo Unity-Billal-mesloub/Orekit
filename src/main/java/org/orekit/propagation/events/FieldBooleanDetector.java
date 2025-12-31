@@ -69,9 +69,6 @@ public class FieldBooleanDetector<T extends CalculusFieldElement<T>> extends Fie
     /** Original detectors: the operands. */
     private final List<FieldEventDetector<T>> detectors;
 
-    /** Event function. */
-    private final BooleanEventFunction eventFunction;
-
     /**
      * Private constructor with all the parameters.
      *
@@ -79,15 +76,14 @@ public class FieldBooleanDetector<T extends CalculusFieldElement<T>> extends Fie
      * @param eventFunction reduced event function.
      * @param detectionSettings event detection settings.
      * @param newHandler   event handler.
-     * @since 13.0
+     * @since 14.0
      */
     protected FieldBooleanDetector(final List<FieldEventDetector<T>> detectors,
                                    final BooleanEventFunction eventFunction,
                                    final FieldEventDetectionSettings<T> detectionSettings,
                                    final FieldEventHandler<T> newHandler) {
-        super(detectionSettings, newHandler);
+        super(eventFunction, detectionSettings, newHandler);
         this.detectors = detectors;
-        this.eventFunction = eventFunction;
     }
 
     /**
@@ -230,11 +226,6 @@ public class FieldBooleanDetector<T extends CalculusFieldElement<T>> extends Fie
     }
 
     @Override
-    public BooleanEventFunction getEventFunction() {
-        return eventFunction;
-    }
-
-    @Override
     public T g(final FieldSpacecraftState<T> s) {
         return getEventFunction().value(s);
     }
@@ -242,7 +233,7 @@ public class FieldBooleanDetector<T extends CalculusFieldElement<T>> extends Fie
     @Override
     protected FieldBooleanDetector<T> create(final FieldEventDetectionSettings<T> detectionSettings,
                                              final FieldEventHandler<T> newHandler) {
-        return new FieldBooleanDetector<>(detectors, eventFunction, detectionSettings, newHandler);
+        return new FieldBooleanDetector<>(detectors, (BooleanEventFunction) getEventFunction(), detectionSettings, newHandler);
     }
 
     @Override

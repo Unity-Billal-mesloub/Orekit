@@ -23,7 +23,6 @@ import org.orekit.bodies.BodyShape;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.functions.AbstractGeodeticCrossingEventFunction;
-import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnIncreasing;
@@ -49,9 +48,6 @@ public class FieldLatitudeRangeCrossingDetector <T extends CalculusFieldElement<
      * Fixed latitude to be crossed, upper boundary in radians.
      */
     private final double toLatitude;
-
-    /** Event function. */
-    private final AbstractGeodeticCrossingEventFunction eventFunction;
 
     /**
      * Build a new detector.
@@ -109,12 +105,10 @@ public class FieldLatitudeRangeCrossingDetector <T extends CalculusFieldElement<
                                                  final BodyShape body,
                                                  final double fromLatitude,
                                                  final double toLatitude) {
-        super(detectionSettings, handler, body);
+        super(new LocalEventFunction(body, FastMath.min(fromLatitude, toLatitude), FastMath.max(fromLatitude, toLatitude)),
+                detectionSettings, handler, body);
         this.fromLatitude = fromLatitude;
         this.toLatitude = toLatitude;
-        final double sign = FastMath.signum(toLatitude - fromLatitude);
-        this.eventFunction = new LocalEventFunction(body, sign > 0 ? fromLatitude : toLatitude,
-                sign > 0 ? toLatitude : fromLatitude);
     }
 
     /**
@@ -143,11 +137,6 @@ public class FieldLatitudeRangeCrossingDetector <T extends CalculusFieldElement<
      */
     public double getToLatitude() {
         return toLatitude;
-    }
-
-    @Override
-    public EventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /**

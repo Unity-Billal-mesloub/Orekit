@@ -30,9 +30,6 @@ import org.orekit.propagation.events.handlers.StopOnIncreasing;
  */
 public class LatitudeExtremumDetector extends AbstractGeographicalDetector<LatitudeExtremumDetector> {
 
-    /** Event function. */
-    private final LatitudeExtremumEventFunction eventFunction;
-
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
      * ({@link #DEFAULT_MAX_CHECK}) and convergence threshold ({@link
@@ -65,13 +62,7 @@ public class LatitudeExtremumDetector extends AbstractGeographicalDetector<Latit
      */
     protected LatitudeExtremumDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                        final BodyShape body) {
-        super(detectionSettings, handler, body);
-        this.eventFunction = new LatitudeExtremumEventFunction(body);
-    }
-
-    @Override
-    public LatitudeExtremumEventFunction getEventFunction() {
-        return eventFunction;
+        super(new LatitudeExtremumEventFunction(body), detectionSettings, handler, body);
     }
 
     /** {@inheritDoc} */

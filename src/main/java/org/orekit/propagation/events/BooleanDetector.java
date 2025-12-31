@@ -64,9 +64,6 @@ public class BooleanDetector extends AbstractDetector<BooleanDetector> {
     /** Original detectors: the operands. */
     private final List<EventDetector> detectors;
 
-    /** Event function. */
-    private final BooleanEventFunction eventFunction;
-
     /**
      * Protected constructor with all the parameters.
      *
@@ -74,14 +71,14 @@ public class BooleanDetector extends AbstractDetector<BooleanDetector> {
      * @param eventFunction reduced event function according to boolean operator.
      * @param detectionSettings event detection settings.
      * @param newHandler   event handler.
+     * @since 14.0
      */
     protected BooleanDetector(final List<EventDetector> detectors,
                               final BooleanEventFunction eventFunction,
                               final EventDetectionSettings detectionSettings,
                               final EventHandler newHandler) {
-        super(detectionSettings, newHandler);
+        super(eventFunction, detectionSettings, newHandler);
         this.detectors = detectors;
-        this.eventFunction = eventFunction;
     }
 
     /**
@@ -211,11 +208,6 @@ public class BooleanDetector extends AbstractDetector<BooleanDetector> {
     }
 
     @Override
-    public BooleanEventFunction getEventFunction() {
-        return eventFunction;
-    }
-
-    @Override
     public double g(final SpacecraftState s) {
         return getEventFunction().value(s);
     }
@@ -223,7 +215,7 @@ public class BooleanDetector extends AbstractDetector<BooleanDetector> {
     @Override
     protected BooleanDetector create(final EventDetectionSettings detectionSettings,
                                      final EventHandler newHandler) {
-        return new BooleanDetector(detectors, eventFunction, detectionSettings, newHandler);
+        return new BooleanDetector(detectors, (BooleanEventFunction) getEventFunction(), detectionSettings, newHandler);
     }
 
     @Override

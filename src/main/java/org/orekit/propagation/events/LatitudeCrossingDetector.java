@@ -33,9 +33,6 @@ public class LatitudeCrossingDetector extends AbstractGeographicalDetector<Latit
     /** Fixed latitude to be crossed. */
     private final double latitude;
 
-    /** Event function. */
-    private final LatitudeValueCrossingEventFunction eventFunction;
-
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
      * ({@link #DEFAULT_MAX_CHECK}) and convergence threshold ({@link
@@ -73,9 +70,8 @@ public class LatitudeCrossingDetector extends AbstractGeographicalDetector<Latit
      */
     protected LatitudeCrossingDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                        final BodyShape body, final double latitude) {
-        super(detectionSettings, handler, body);
+        super(new LatitudeValueCrossingEventFunction(body, latitude), detectionSettings, handler, body);
         this.latitude = latitude;
-        this.eventFunction = new LatitudeValueCrossingEventFunction(body, latitude);
     }
 
     /** {@inheritDoc} */
@@ -90,11 +86,6 @@ public class LatitudeCrossingDetector extends AbstractGeographicalDetector<Latit
      */
     public double getLatitude() {
         return latitude;
-    }
-
-    @Override
-    public LatitudeValueCrossingEventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Compute the value of the detection function.

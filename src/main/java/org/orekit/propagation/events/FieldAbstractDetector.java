@@ -52,10 +52,25 @@ public abstract class FieldAbstractDetector<D extends FieldAbstractDetector<D, T
     private final FieldEventHandler<T> handler;
 
     /** Propagation direction. */
-    private boolean forward;
+    private boolean forward = true;
 
     /** Event function. */
     private final EventFunction defaultEventFunction;
+
+    /** Build a new instance with an event function.
+     * @param eventFunction event function
+     * @param detectionSettings event detection settings
+     * @param handler event handler to call at event occurrences
+     * @since 14.0
+     */
+    protected FieldAbstractDetector(final EventFunction eventFunction,
+                                    final FieldEventDetectionSettings<T> detectionSettings,
+                                    final FieldEventHandler<T> handler) {
+        checkStrictlyPositive(detectionSettings.getThreshold().getReal());
+        this.eventDetectionSettings = detectionSettings;
+        this.handler   = handler;
+        this.defaultEventFunction = eventFunction;
+    }
 
     /** Build a new instance.
      * @param detectionSettings event detection settings
@@ -67,7 +82,6 @@ public abstract class FieldAbstractDetector<D extends FieldAbstractDetector<D, T
         checkStrictlyPositive(detectionSettings.getThreshold().getReal());
         this.eventDetectionSettings = detectionSettings;
         this.handler   = handler;
-        this.forward   = true;
         this.defaultEventFunction = EventFunction.of(detectionSettings.getThreshold().getField(), this::g);
     }
 

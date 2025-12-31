@@ -41,9 +41,6 @@ public class FieldSingleDateDetector<T extends CalculusFieldElement<T>>
     /** Date to detect. */
     private final AbsoluteDate date;
 
-    /** Event function. */
-    private final SingleDateEventFunction dateEvent;
-
     /** Full constructor.
      * @param detectionSettings event detection settings
      * @param eventHandler event handler
@@ -51,9 +48,8 @@ public class FieldSingleDateDetector<T extends CalculusFieldElement<T>>
      */
     public FieldSingleDateDetector(final FieldEventDetectionSettings<T> detectionSettings, final FieldEventHandler<T> eventHandler,
                                    final AbsoluteDate date) {
-        super(detectionSettings, eventHandler);
+        super(new SingleDateEventFunction(date), detectionSettings, eventHandler);
         this.date = date;
-        this.dateEvent = new SingleDateEventFunction(date);
     }
 
     /** Build a new instance with default detection settings and handler (stop on event).
@@ -75,14 +71,8 @@ public class FieldSingleDateDetector<T extends CalculusFieldElement<T>>
 
     /** {@inheritDoc} */
     @Override
-    public SingleDateEventFunction getEventFunction() {
-        return dateEvent;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public T g(final FieldSpacecraftState<T> s) {
-        return dateEvent.value(s);
+        return getEventFunction().value(s);
     }
 
     /** {@inheritDoc} */

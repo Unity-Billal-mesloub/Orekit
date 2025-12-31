@@ -17,6 +17,7 @@
 package org.orekit.propagation.events;
 
 import org.orekit.frames.TopocentricFrame;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 
 /** Abstract class for detectors using a topocentric frame.
@@ -31,13 +32,16 @@ public abstract class AbstractTopocentricDetector<T extends AbstractDetector<T>>
     private final TopocentricFrame topocentricFrame;
 
     /** Protected constructor with full parameters.
+     * @param eventFunction event function
      * @param detectionSettings event detection settings
      * @param handler event handler to call at event occurrences
      * @param topocentricFrame topocentric frame
+     * @since 14.0
      */
-    protected AbstractTopocentricDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
+    protected AbstractTopocentricDetector(final EventFunction eventFunction,
+                                          final EventDetectionSettings detectionSettings, final EventHandler handler,
                                           final TopocentricFrame topocentricFrame) {
-        super(detectionSettings, handler);
+        super(eventFunction, detectionSettings, handler);
         this.topocentricFrame = topocentricFrame;
     }
 

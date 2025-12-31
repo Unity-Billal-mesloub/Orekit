@@ -36,9 +36,6 @@ public class TimeIntervalDetector extends AbstractDetector<TimeIntervalDetector>
     /** Time interval for detection. */
     private final TimeInterval timeInterval;
 
-    /** Time interval event function. */
-    private final TimeIntervalEventFunction eventFunction;
-
     /**
      * Constructor with default detection settings.
      * @param handler event handler
@@ -57,9 +54,8 @@ public class TimeIntervalDetector extends AbstractDetector<TimeIntervalDetector>
      */
     public TimeIntervalDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                 final TimeInterval timeInterval) {
-        super(detectionSettings, handler);
+        super(new TimeIntervalEventFunction(timeInterval), detectionSettings, handler);
         this.timeInterval = timeInterval;
-        this.eventFunction = new TimeIntervalEventFunction(timeInterval);
     }
 
     /**
@@ -76,12 +72,7 @@ public class TimeIntervalDetector extends AbstractDetector<TimeIntervalDetector>
     }
 
     @Override
-    public TimeIntervalEventFunction getEventFunction() {
-        return eventFunction;
-    }
-
-    @Override
     public double g(final SpacecraftState s) {
-        return eventFunction.value(s);
+        return getEventFunction().value(s);
     }
 }

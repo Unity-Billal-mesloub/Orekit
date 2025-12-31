@@ -35,9 +35,6 @@ import org.orekit.propagation.events.handlers.StopOnDecreasing;
  */
 public class AltitudeDetector extends AbstractGeographicalDetector<AltitudeDetector> {
 
-    /** Event function. */
-    private final AltitudeEventFunction eventFunction;
-
     /** Threshold altitude value (m). */
     private final double altitude;
 
@@ -99,9 +96,8 @@ public class AltitudeDetector extends AbstractGeographicalDetector<AltitudeDetec
     protected AltitudeDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                final double altitude,
                                final BodyShape bodyShape) {
-        super(detectionSettings, handler, bodyShape);
+        super(new AltitudeEventFunction(bodyShape, altitude), detectionSettings, handler, bodyShape);
         this.altitude  = altitude;
-        this.eventFunction = new AltitudeEventFunction(bodyShape, altitude);
     }
 
     /** {@inheritDoc} */
@@ -115,11 +111,6 @@ public class AltitudeDetector extends AbstractGeographicalDetector<AltitudeDetec
      */
     public double getAltitude() {
         return altitude;
-    }
-
-    @Override
-    public AltitudeEventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Compute the value of the switching function.

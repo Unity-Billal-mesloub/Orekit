@@ -21,7 +21,6 @@ import org.hipparchus.ode.events.Action;
 import org.orekit.bodies.BodyShape;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.events.functions.AltitudeEventFunction;
-import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
@@ -40,9 +39,6 @@ import org.orekit.propagation.events.handlers.FieldStopOnDecreasing;
  * @param <T> type of the field elements
  */
 public class FieldAltitudeDetector<T extends CalculusFieldElement<T>> extends FieldAbstractGeographicalDetector<FieldAltitudeDetector<T>, T> {
-
-    /** Event function. */
-    private final EventFunction eventFunction;
 
     /** Threshold altitude value (m). */
     private final T altitude;
@@ -110,10 +106,9 @@ public class FieldAltitudeDetector<T extends CalculusFieldElement<T>> extends Fi
      */
     protected FieldAltitudeDetector(final FieldEventDetectionSettings<T> detectionSettings,
                                     final FieldEventHandler<T> handler, final T altitude, final BodyShape bodyShape) {
-        super(detectionSettings, handler, bodyShape);
+        super(EventFunctionModifier.addFieldValue(new AltitudeEventFunction(bodyShape, altitude.getReal()),
+                altitude.getAddendum()), detectionSettings, handler, bodyShape);
         this.altitude  = altitude;
-        this.eventFunction = EventFunctionModifier.addFieldValue(new AltitudeEventFunction(bodyShape, altitude.getReal()),
-                altitude.getAddendum());
     }
 
     /** {@inheritDoc} */
@@ -128,11 +123,6 @@ public class FieldAltitudeDetector<T extends CalculusFieldElement<T>> extends Fi
      */
     public T getAltitude() {
         return altitude;
-    }
-
-    @Override
-    public EventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Compute the value of the switching function.

@@ -34,9 +34,6 @@ import org.orekit.propagation.events.handlers.FieldStopOnIncreasing;
 public class FieldLatitudeExtremumDetector<T extends CalculusFieldElement<T>>
         extends FieldAbstractGeographicalDetector<FieldLatitudeExtremumDetector<T>, T> {
 
-    /** Event function. */
-    private final LatitudeExtremumEventFunction eventFunction;
-
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
      * ({@link #DEFAULT_MAX_CHECK}) and convergence threshold ({@link
@@ -62,14 +59,7 @@ public class FieldLatitudeExtremumDetector<T extends CalculusFieldElement<T>>
      */
     public FieldLatitudeExtremumDetector(final FieldEventDetectionSettings<T> detectionSettings,
                                          final FieldEventHandler<T> handler, final BodyShape body) {
-        super(detectionSettings, handler, body);
-        this.eventFunction = new LatitudeExtremumEventFunction(body);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public LatitudeExtremumEventFunction getEventFunction() {
-        return eventFunction;
+        super(new LatitudeExtremumEventFunction(body), detectionSettings, handler, body);
     }
 
     /** {@inheritDoc} */

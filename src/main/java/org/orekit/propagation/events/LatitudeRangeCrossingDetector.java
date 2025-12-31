@@ -20,7 +20,6 @@ import org.hipparchus.util.FastMath;
 import org.orekit.bodies.BodyShape;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.functions.AbstractGeodeticCrossingEventFunction;
-import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnDecreasing;
 
@@ -38,9 +37,6 @@ public class LatitudeRangeCrossingDetector extends AbstractGeographicalDetector<
 
     /** Fixed latitude to be crossed, upper boundary in radians. */
     private final double toLatitude;
-
-    /** Event function. */
-    private final AbstractGeodeticCrossingEventFunction eventFunction;
 
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
@@ -83,12 +79,10 @@ public class LatitudeRangeCrossingDetector extends AbstractGeographicalDetector<
     protected LatitudeRangeCrossingDetector(final EventDetectionSettings detectionSettings,
                                             final EventHandler handler,
                                             final BodyShape body, final double fromLatitude, final double toLatitude) {
-        super(detectionSettings, handler, body);
+        super(new LocalEventFunction(body, FastMath.min(fromLatitude, toLatitude), FastMath.max(fromLatitude, toLatitude)),
+                detectionSettings, handler, body);
         this.fromLatitude = fromLatitude;
         this.toLatitude = toLatitude;
-        final double sign = FastMath.signum(toLatitude - fromLatitude);
-        this.eventFunction = new LocalEventFunction(body, sign > 0 ? fromLatitude : toLatitude,
-                sign > 0 ? toLatitude : fromLatitude);
     }
 
     /** {@inheritDoc} */
@@ -110,11 +104,6 @@ public class LatitudeRangeCrossingDetector extends AbstractGeographicalDetector<
      */
     public double getToLatitude() {
         return toLatitude;
-    }
-
-    @Override
-    public EventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Compute the value of the detection function.

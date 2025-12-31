@@ -40,9 +40,6 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
     /** Fixed latitude to be crossed. */
     private final double latitude;
 
-    /** Event function. */
-    private final LatitudeValueCrossingEventFunction eventFunction;
-
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
      * ({@link #DEFAULT_MAX_CHECK}) and convergence threshold ({@link
@@ -89,9 +86,8 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
             final FieldEventHandler<T> handler,
             final BodyShape body,
             final double latitude) {
-        super(detectionSettings, handler, body);
+        super(new LatitudeValueCrossingEventFunction(body, latitude), detectionSettings, handler, body);
         this.latitude = latitude;
-        this.eventFunction = new LatitudeValueCrossingEventFunction(getBodyShape(), latitude);
     }
 
     /** {@inheritDoc} */
@@ -100,11 +96,6 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
             final FieldEventDetectionSettings<T> detectionSettings,
             final FieldEventHandler<T> newHandler) {
         return new FieldLatitudeCrossingDetector<>(detectionSettings, newHandler, getBodyShape(), latitude);
-    }
-
-    @Override
-    public LatitudeValueCrossingEventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Get the fixed latitude to be crossed (radians).

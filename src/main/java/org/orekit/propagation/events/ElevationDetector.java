@@ -20,7 +20,6 @@ import org.hipparchus.ode.events.Action;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.models.AtmosphericRefractionModel;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.events.functions.AbstractElevationEventFunction;
 import org.orekit.propagation.events.functions.MaskedElevationEventFunction;
 import org.orekit.propagation.events.functions.MinimumElevationEventFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
@@ -51,9 +50,6 @@ public class ElevationDetector extends AbstractTopocentricDetector<ElevationDete
 
     /** Atmospheric Model used for calculations, if defined. */
     private final AtmosphericRefractionModel refractionModel;
-
-    /** Event function. */
-    private final AbstractElevationEventFunction eventFunction;
 
     /**
      * Creates an instance of Elevation detector based on passed in topocentric frame
@@ -121,12 +117,12 @@ public class ElevationDetector extends AbstractTopocentricDetector<ElevationDete
                                 final double minElevation, final ElevationMask mask,
                                 final AtmosphericRefractionModel refractionModel,
                                 final TopocentricFrame topo) {
-        super(detectionSettings, handler, topo);
+        super(mask == null ? new MinimumElevationEventFunction(refractionModel, topo, minElevation) :
+                new MaskedElevationEventFunction(refractionModel, topo, mask),
+                detectionSettings, handler, topo);
         this.minElevation    = minElevation;
         this.elevationMask   = mask;
         this.refractionModel = refractionModel;
-        this.eventFunction = mask == null ? new MinimumElevationEventFunction(refractionModel, topo, minElevation) :
-                new MaskedElevationEventFunction(refractionModel, topo, mask);
     }
 
     /** {@inheritDoc} */
@@ -163,11 +159,6 @@ public class ElevationDetector extends AbstractTopocentricDetector<ElevationDete
      */
     public AtmosphericRefractionModel getRefractionModel() {
         return this.refractionModel;
-    }
-
-    @Override
-    public AbstractElevationEventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Compute the value of the switching function.

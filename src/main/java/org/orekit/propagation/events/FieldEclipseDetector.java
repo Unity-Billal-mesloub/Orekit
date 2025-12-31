@@ -21,7 +21,6 @@ import org.hipparchus.Field;
 import org.hipparchus.ode.events.Action;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.propagation.FieldSpacecraftState;
-import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.functions.PenumbraEventFunction;
 import org.orekit.propagation.events.functions.UmbraEventFunction;
@@ -54,9 +53,6 @@ public class FieldEclipseDetector<T extends CalculusFieldElement<T>> extends Fie
 
     /** Margin to apply to eclipse angle. */
     private final T margin;
-
-    /** Event function. */
-    private final EventFunction eventFunction;
 
     /** Build a new eclipse detector.
      * <p>The new instance is a total eclipse (umbra) detector with default
@@ -102,12 +98,11 @@ public class FieldEclipseDetector<T extends CalculusFieldElement<T>> extends Fie
      */
     protected FieldEclipseDetector(final FieldEventDetectionSettings<T> detectionSettings, final FieldEventHandler<T> handler,
                                    final OccultationEngine occultationEngine, final T margin, final boolean totalEclipse) {
-        super(detectionSettings, handler);
+        super(EventFunctionModifier.addFieldValue(totalEclipse ? new UmbraEventFunction(occultationEngine) :
+                new PenumbraEventFunction(occultationEngine), margin), detectionSettings, handler);
         this.occultationEngine = occultationEngine;
         this.margin            = margin;
         this.totalEclipse      = totalEclipse;
-        this.eventFunction = EventFunctionModifier.addFieldValue(totalEclipse ? new UmbraEventFunction(occultationEngine) :
-                new PenumbraEventFunction(occultationEngine), margin);
     }
 
     /** {@inheritDoc} */
@@ -182,11 +177,6 @@ public class FieldEclipseDetector<T extends CalculusFieldElement<T>> extends Fie
      */
     public boolean getTotalEclipse() {
         return totalEclipse;
-    }
-
-    @Override
-    public EventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Compute the value of the switching function.

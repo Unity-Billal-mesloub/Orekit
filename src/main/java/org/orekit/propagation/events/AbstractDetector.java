@@ -51,7 +51,7 @@ public abstract class AbstractDetector<T extends AbstractDetector<T>> implements
     private final EventFunction defaultEventFunction;
 
     /** Propagation direction. */
-    private boolean forward;
+    private boolean forward = true;
 
     /** Build a new instance.
      * @param maxCheck maximum checking interval, must be strictly positive (s)
@@ -73,8 +73,22 @@ public abstract class AbstractDetector<T extends AbstractDetector<T>> implements
         checkStrictlyPositive(detectionSettings.getThreshold());
         this.eventDetectionSettings = detectionSettings;
         this.handler   = handler;
-        this.forward   = true;
         this.defaultEventFunction = this::g;
+    }
+
+    /** Build a new instance.
+     * @param eventFunction event function
+     * @param detectionSettings event detection settings
+     * @param handler event handler to call at event occurrences
+     * @since 14.0
+     */
+    protected AbstractDetector(final EventFunction eventFunction,
+                               final EventDetectionSettings detectionSettings,
+                               final EventHandler handler) {
+        checkStrictlyPositive(detectionSettings.getThreshold());
+        this.eventDetectionSettings = detectionSettings;
+        this.handler   = handler;
+        this.defaultEventFunction = eventFunction;
     }
 
     /**

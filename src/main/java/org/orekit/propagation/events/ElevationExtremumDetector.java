@@ -40,9 +40,6 @@ import org.orekit.propagation.events.handlers.StopOnIncreasing;
  */
 public class ElevationExtremumDetector extends AbstractTopocentricDetector<ElevationExtremumDetector> {
 
-    /** Event function. */
-    private final ElevationExtremumEventFunction eventFunction;
-
     /** Build a new detector.
      * <p>The new instance uses default values for maximal checking interval
      * ({@link #DEFAULT_MAX_CHECK}) and convergence threshold ({@link
@@ -76,8 +73,7 @@ public class ElevationExtremumDetector extends AbstractTopocentricDetector<Eleva
      */
     protected ElevationExtremumDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                         final TopocentricFrame topo) {
-        super(detectionSettings, handler, topo);
-        this.eventFunction = new ElevationExtremumEventFunction(topo);
+        super(new ElevationExtremumEventFunction(topo), detectionSettings, handler, topo);
     }
 
     /** {@inheritDoc} */
@@ -93,11 +89,6 @@ public class ElevationExtremumDetector extends AbstractTopocentricDetector<Eleva
      */
     public double getElevation(final SpacecraftState s) {
         return getTopocentricFrame().getElevation(s.getPosition(), s.getFrame(), s.getDate());
-    }
-
-    @Override
-    public ElevationExtremumEventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Compute the value of the detection function.

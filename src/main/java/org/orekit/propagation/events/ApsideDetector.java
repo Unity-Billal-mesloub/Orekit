@@ -39,9 +39,6 @@ import org.orekit.propagation.events.handlers.StopOnIncreasing;
  */
 public class ApsideDetector extends AbstractDetector<ApsideDetector> {
 
-    /** Event function. */
-    private final ApsideEventFunction eventFunction;
-
     /** Build a new instance.
      * <p>The Keplerian period is used only to set an upper bound for the
      * max check interval to period/3 and to set the convergence threshold.</p>
@@ -49,8 +46,7 @@ public class ApsideDetector extends AbstractDetector<ApsideDetector> {
      * @since 12.1
      */
     public ApsideDetector(final double keplerianPeriod) {
-        super(keplerianPeriod / 3, 1e-13 * keplerianPeriod, DEFAULT_MAX_ITER, new StopOnIncreasing());
-        this.eventFunction = new ApsideEventFunction();
+        this(new EventDetectionSettings(keplerianPeriod / 3, 1e-13 * keplerianPeriod, DEFAULT_MAX_ITER), new StopOnIncreasing());
     }
 
     /** Build a new instance.
@@ -70,8 +66,7 @@ public class ApsideDetector extends AbstractDetector<ApsideDetector> {
      * @param orbit initial orbit
      */
     public ApsideDetector(final double threshold, final Orbit orbit) {
-        super(orbit.getKeplerianPeriod() / 3, threshold, DEFAULT_MAX_ITER, new StopOnIncreasing());
-        this.eventFunction = new ApsideEventFunction();
+        this(new EventDetectionSettings(orbit.getKeplerianPeriod() / 3, threshold, DEFAULT_MAX_ITER), new StopOnIncreasing());
     }
 
     /** Public constructor with full parameters.
@@ -83,8 +78,7 @@ public class ApsideDetector extends AbstractDetector<ApsideDetector> {
      * @since 13.0
      */
     public ApsideDetector(final EventDetectionSettings detectionSettings, final EventHandler handler) {
-        super(detectionSettings, handler);
-        this.eventFunction = new ApsideEventFunction();
+        super(new ApsideEventFunction(), detectionSettings, handler);
     }
 
     /** {@inheritDoc} */
@@ -103,9 +97,4 @@ public class ApsideDetector extends AbstractDetector<ApsideDetector> {
         return getEventFunction().value(s);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public ApsideEventFunction getEventFunction() {
-        return eventFunction;
-    }
 }

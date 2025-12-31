@@ -44,9 +44,6 @@ public class FieldTimeIntervalDetector<T extends CalculusFieldElement<T>>
     /** Time interval for detection. */
     private final TimeInterval timeInterval;
 
-    /** Time interval event function. */
-    private final TimeIntervalEventFunction eventFunction;
-
     /**
      * Constructor with default detection settings and handler.
      * @param field field
@@ -65,9 +62,8 @@ public class FieldTimeIntervalDetector<T extends CalculusFieldElement<T>>
     public FieldTimeIntervalDetector(final FieldEventDetectionSettings<T> detectionSettings,
                                      final FieldEventHandler<T> handler,
                                      final TimeInterval timeInterval) {
-        super(detectionSettings, handler);
+        super(new TimeIntervalEventFunction(timeInterval), detectionSettings, handler);
         this.timeInterval = timeInterval;
-        this.eventFunction = new TimeIntervalEventFunction(timeInterval);
     }
 
     /**
@@ -102,13 +98,8 @@ public class FieldTimeIntervalDetector<T extends CalculusFieldElement<T>>
     }
 
     @Override
-    public TimeIntervalEventFunction getEventFunction() {
-        return eventFunction;
-    }
-
-    @Override
     public T g(final FieldSpacecraftState<T> s) {
-        return eventFunction.value(s);
+        return getEventFunction().value(s);
     }
 
     @Override

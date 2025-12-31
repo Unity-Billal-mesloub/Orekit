@@ -54,9 +54,6 @@ import org.orekit.propagation.events.intervals.FieldAdaptableInterval;
  */
 public class FieldNodeDetector<T extends CalculusFieldElement<T>> extends FieldAbstractDetector<FieldNodeDetector<T>, T> {
 
-    /** Event function. */
-    private final NodeEventFunction eventFunction;
-
     /** Frame in which the equator is defined. */
     private final Frame frame;
 
@@ -113,9 +110,8 @@ public class FieldNodeDetector<T extends CalculusFieldElement<T>> extends FieldA
      */
     protected FieldNodeDetector(final FieldEventDetectionSettings<T> detectionSettings,
                                 final FieldEventHandler<T> handler, final Frame frame) {
-        super(detectionSettings, handler);
+        super(new NodeEventFunction(frame), detectionSettings, handler);
         this.frame = frame;
-        this.eventFunction = new NodeEventFunction(frame);
     }
 
     /** {@inheritDoc} */
@@ -170,11 +166,6 @@ public class FieldNodeDetector<T extends CalculusFieldElement<T>> extends FieldA
      */
     public Frame getFrame() {
         return frame;
-    }
-
-    @Override
-    public NodeEventFunction getEventFunction() {
-        return eventFunction;
     }
 
     /** Compute the value of the switching function.
