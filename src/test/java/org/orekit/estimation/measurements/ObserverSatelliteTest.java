@@ -1,4 +1,4 @@
-/* Copyright 2002-2025 Brianna Aubin
+/* Copyright 2002-2026 Brianna Aubin
  * Licensed to Hawkeye 360 (HE360) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
