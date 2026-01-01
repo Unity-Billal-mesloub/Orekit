@@ -27,8 +27,6 @@ import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.DetectorModifier;
 import org.orekit.propagation.events.EventDetector;
 import org.orekit.propagation.events.FieldEventDetector;
-import org.orekit.propagation.events.functions.EventFunction;
-import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.time.AbsoluteDate;
@@ -201,9 +199,6 @@ abstract class AbstractSwitchingAttitudeProvider implements AttitudeProvider {
         /** Wrapped event detector. */
         private final EventDetector event;
 
-        /** Event function. */
-        private final SwitchEventFunction eventFunction;
-
         /**
          * Simple constructor.
          *
@@ -224,18 +219,12 @@ abstract class AbstractSwitchingAttitudeProvider implements AttitudeProvider {
             this.past = past;
             this.future = future;
             this.switchHandler = switchHandler;
-            this.eventFunction = new SwitchEventFunction(event.getEventFunction());
         }
 
         /** {@inheritDoc} */
         @Override
         public EventDetector getDetector() {
             return event;
-        }
-
-        @Override
-        public EventFunction getEventFunction() {
-            return eventFunction;
         }
 
         /**
@@ -293,26 +282,6 @@ abstract class AbstractSwitchingAttitudeProvider implements AttitudeProvider {
         public SpacecraftState resetState(final EventDetector detector, final SpacecraftState oldState) {
             // delegate to underlying event
             return getDetector().getHandler().resetState(getDetector(), oldState);
-        }
-
-        private static class SwitchEventFunction implements EventFunctionModifier {
-
-            /** Wrapped event function. */
-            private final EventFunction function;
-
-            SwitchEventFunction(final EventFunction function) {
-                this.function = function;
-            }
-
-            @Override
-            public EventFunction getBaseFunction() {
-                return function;
-            }
-
-            @Override
-            public boolean dependsOnMainVariablesOnly() {
-                return false;
-            }
         }
     }
 
