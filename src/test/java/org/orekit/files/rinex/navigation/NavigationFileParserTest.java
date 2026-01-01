@@ -1032,8 +1032,8 @@ public class NavigationFileParserTest {
         Assertions.assertEquals(-4.846630453041e-10, navICL1.getIDot(),       1.0e-22);
         Assertions.assertEquals( 0.000000000000e+00, navICL1.getDeltaN0Dot(), 1.0e-15);
         Assertions.assertEquals( 1,                  navICL1.getReferenceSignalFlag());
-        Assertions.assertEquals(0, navICL1.getSvHealth());
-        Assertions.assertTrue(Double.isNaN(navICL1.getSvAccuracy()));
+        Assertions.assertEquals(0,                   navICL1.getL1SpsHealth());
+        Assertions.assertEquals(15,                  navICL1.getUrai());
 
         // as reference signal flag is set to 1, ISC S are *not* broadcast
         Assertions.assertTrue(Double.isNaN(navICL1.getTGD()));

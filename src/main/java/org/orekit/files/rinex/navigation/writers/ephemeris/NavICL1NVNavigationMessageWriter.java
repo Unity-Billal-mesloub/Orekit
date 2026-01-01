@@ -19,7 +19,6 @@ package org.orekit.files.rinex.navigation.writers.ephemeris;
 import org.orekit.files.rinex.navigation.RinexNavigationHeader;
 import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.RinexNavigationWriter;
-import org.orekit.files.rinex.navigation.parsers.ephemeris.NavICLnavParser;
 import org.orekit.propagation.analytical.gnss.data.NavICL1NvNavigationMessage;
 import org.orekit.utils.units.Unit;
 
@@ -69,17 +68,8 @@ public class NavICL1NVNavigationMessageWriter
         throws IOException {
         writer.indentLine(header);
 
-        // convert accuracy to index
-        int index = 0;
-        while (index < NavICLnavParser.NAVIC_URA.length - 1) {
-            if (message.getSvAccuracy() <= NavICLnavParser.NAVIC_URA[index]) {
-                break;
-            }
-            ++index;
-        }
-        writer.writeInt(index);
-
-        writer.writeInt(message.getSvHealth());
+        writer.writeInt(message.getUrai());
+        writer.writeInt(message.getL1SpsHealth());
         writer.writeDouble(message.getTGD(),    Unit.SECOND);
         writer.writeDouble(message.getTGDSL5(), Unit.SECOND);
         writer.finishLine();

@@ -16,7 +16,6 @@
  */
 package org.orekit.files.rinex.navigation.parsers.ephemeris;
 
-import org.hipparchus.util.FastMath;
 import org.orekit.files.rinex.navigation.RinexNavigation;
 import org.orekit.files.rinex.navigation.RinexNavigationParser;
 import org.orekit.files.rinex.navigation.parsers.ParseInfo;
@@ -54,8 +53,8 @@ public class NavICL1NvParser extends CivilianNavigationParser<NavICL1NvNavigatio
         final ParseInfo parseInfo = getParseInfo();
         final NavICL1NvNavigationMessage message = getMessage();
         final int uraIndex = parseInfo.parseInt1();
-        message.setSvAccuracy(NavICLnavParser.NAVIC_URA[FastMath.min(uraIndex, NavICLnavParser.NAVIC_URA.length - 1)]);
-        message.setSvHealth(parseInfo.parseInt2());
+        message.setUrai(uraIndex);
+        message.setL1SpsHealth(parseInfo.parseInt2());
         message.setTGD(parseInfo.parseDouble3(Unit.SECOND));
         message.setTGDSL5(parseInfo.parseDouble4(Unit.SECOND));
     }
