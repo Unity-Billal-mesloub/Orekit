@@ -26,9 +26,8 @@ import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.DetectorModifier;
 import org.orekit.propagation.events.EventDetector;
-import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.FieldEventDetector;
-import org.orekit.propagation.events.FieldEventDetectionSettings;
+import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
@@ -150,56 +149,23 @@ abstract class AbstractSwitchingAttitudeProvider implements AttitudeProvider {
      */
     protected <T extends CalculusFieldElement<T>> FieldEventDetector<T> getFieldEventDetector(final Field<T> field,
                                                                                               final AbstractAttitudeSwitch attitudeSwitch) {
-        return new FieldEventDetector<T>() {
-
+        final FieldEventHandler<T> fieldEventHandler = new FieldEventHandler<T>() {
             /** {@inheritDoc} */
             @Override
-            public void init(final FieldSpacecraftState<T> s0, final FieldAbsoluteDate<T> t) {
-                attitudeSwitch.init(s0.toSpacecraftState(), t.toAbsoluteDate());
-            }
-
-            @Override
-            public void finish(final FieldSpacecraftState<T> state) {
-                attitudeSwitch.finish(state.toSpacecraftState());
-            }
-
-            @Override
-            public EventFunction getEventFunction() {
-                return attitudeSwitch.getEventFunction();
-            }
-
-            @Override
-            public T g(final FieldSpacecraftState<T> s) {
-                return getEventFunction().value(s);
-            }
-
-            @Override
-            public FieldEventDetectionSettings<T> getDetectionSettings() {
-                return new FieldEventDetectionSettings<>(field, attitudeSwitch.getDetectionSettings());
+            public Action eventOccurred(final FieldSpacecraftState<T> s,
+                                        final FieldEventDetector<T> detector,
+                                        final boolean increasing) {
+                return attitudeSwitch.eventOccurred(s.toSpacecraftState(), attitudeSwitch, increasing);
             }
 
             /** {@inheritDoc} */
             @Override
-            public FieldEventHandler<T> getHandler() {
-                return new FieldEventHandler<T>() {
-                    /** {@inheritDoc} */
-                    @Override
-                    public Action eventOccurred(final FieldSpacecraftState<T> s,
-                                                final FieldEventDetector<T> detector,
-                                                final boolean increasing) {
-                        return attitudeSwitch.eventOccurred(s.toSpacecraftState(), attitudeSwitch, increasing);
-                    }
-
-                    /** {@inheritDoc} */
-                    @Override
-                    public FieldSpacecraftState<T> resetState(final FieldEventDetector<T> detector,
-                                                              final FieldSpacecraftState<T> oldState) {
-                        return new FieldSpacecraftState<>(field, attitudeSwitch.resetState(attitudeSwitch, oldState.toSpacecraftState()));
-                    }
-                };
+            public FieldSpacecraftState<T> resetState(final FieldEventDetector<T> detector,
+                                                      final FieldSpacecraftState<T> oldState) {
+                return new FieldSpacecraftState<>(field, attitudeSwitch.resetState(attitudeSwitch, oldState.toSpacecraftState()));
             }
-
         };
+        return FieldEventDetector.of(field, fieldEventHandler, attitudeSwitch);
     }
 
     /** Abstract class to manage attitude switches.

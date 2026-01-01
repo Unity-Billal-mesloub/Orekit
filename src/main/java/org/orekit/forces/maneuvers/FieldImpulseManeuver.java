@@ -168,8 +168,7 @@ public class FieldImpulseManeuver<T extends CalculusFieldElement<T>> extends Abs
      * @since 14.0
      */
     public FieldImpulseManeuver(final Field<T> field, final ImpulseManeuver maneuver) {
-        this(FieldEventDetector.of(maneuver.getDetector().getEventFunction(), convertHandler(maneuver.getDetector().getHandler()),
-                new FieldEventDetectionSettings<>(field, maneuver.getDetectionSettings())),
+        this(FieldEventDetector.of(field, convertHandler(maneuver.getDetector().getHandler()), maneuver.getDetector()),
                 maneuver.getAttitudeOverride(), FieldImpulseProvider.of(maneuver.getImpulseProvider()),
                 field.getZero().newInstance(maneuver.getIsp()), maneuver.getControl3DVectorCostType());
     }
