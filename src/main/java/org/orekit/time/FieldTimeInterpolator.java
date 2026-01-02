@@ -50,7 +50,8 @@ public interface FieldTimeInterpolator<T extends FieldTimeStamped<KK>, KK extend
      * @see TimeStamped
      * @see AbsoluteDate
      */
-    default T interpolate(final AbsoluteDate interpolationDate, final Stream<T> sample) {
+    default T interpolate(final AbsoluteDate interpolationDate,
+                          final Stream<? extends T> sample) {
         return interpolate(interpolationDate, sample.collect(Collectors.toList()));
     }
 
@@ -62,8 +63,9 @@ public interface FieldTimeInterpolator<T extends FieldTimeStamped<KK>, KK extend
      *
      * @return a new instance, interpolated at specified date
      */
-    default T interpolate(final AbsoluteDate interpolationDate, final Collection<T> sample) {
-        final Optional<T> optionalElement = sample.stream().findAny();
+    default T interpolate(final AbsoluteDate interpolationDate,
+                          final Collection<? extends T> sample) {
+        final Optional<? extends T> optionalElement = sample.stream().findAny();
         if (optionalElement.isPresent()) {
             final T element = optionalElement.get();
             return interpolate(new FieldAbsoluteDate<>(element.getDate().getField(), interpolationDate), sample);
@@ -82,7 +84,8 @@ public interface FieldTimeInterpolator<T extends FieldTimeStamped<KK>, KK extend
      * @see TimeStamped
      * @see AbsoluteDate
      */
-    T interpolate(FieldAbsoluteDate<KK> interpolationDate, Stream<T> sample);
+    T interpolate(FieldAbsoluteDate<KK> interpolationDate,
+                  Stream<? extends T> sample);
 
     /**
      * Get an interpolated instance.
@@ -92,7 +95,8 @@ public interface FieldTimeInterpolator<T extends FieldTimeStamped<KK>, KK extend
      *
      * @return a new instance, interpolated at specified date
      */
-    T interpolate(FieldAbsoluteDate<KK> interpolationDate, Collection<T> sample);
+    T interpolate(FieldAbsoluteDate<KK> interpolationDate,
+                  Collection<? extends T> sample);
 
     /**
      * Get all lowest level interpolators implemented by this instance, otherwise return a list with this instance only.
@@ -104,7 +108,7 @@ public interface FieldTimeInterpolator<T extends FieldTimeStamped<KK>, KK extend
      *
      * @return list of interpolators
      */
-    List<FieldTimeInterpolator<? extends FieldTimeStamped<KK>, KK>> getSubInterpolators();
+    List<FieldTimeInterpolator<?, KK>> getSubInterpolators();
 
     /**
      * Get the number of interpolation points. In the specific case where this interpolator contains multiple

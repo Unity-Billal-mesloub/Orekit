@@ -78,9 +78,9 @@ public abstract class AbstractFieldTimeInterpolator<T extends FieldTimeStamped<K
             final int sampleSize) {
 
         // Retrieve all sub-interpolators (or a singleton list with given interpolator if there are no sub-interpolators)
-        final List<FieldTimeInterpolator<? extends FieldTimeStamped<T>, T>> subInterpolators =
+        final List<FieldTimeInterpolator<?, T>> subInterpolators =
                 interpolator.getSubInterpolators();
-        for (final FieldTimeInterpolator<? extends FieldTimeStamped<T>, T> subInterpolator : subInterpolators) {
+        for (final FieldTimeInterpolator<?, T> subInterpolator : subInterpolators) {
             if (sampleSize < subInterpolator.getNbInterpolationPoints()) {
                 throw new OrekitIllegalArgumentException(OrekitMessages.NOT_ENOUGH_DATA, sampleSize);
             }
@@ -89,13 +89,15 @@ public abstract class AbstractFieldTimeInterpolator<T extends FieldTimeStamped<K
 
     /** {@inheritDoc} */
     @Override
-    public T interpolate(final FieldAbsoluteDate<KK> interpolationDate, final Stream<T> sample) {
+    public T interpolate(final FieldAbsoluteDate<KK> interpolationDate,
+                         final Stream<? extends T> sample) {
         return interpolate(interpolationDate, sample.collect(Collectors.toList()));
     }
 
     /** {@inheritDoc}. */
     @Override
-    public T interpolate(final FieldAbsoluteDate<KK> interpolationDate, final Collection<T> sample) {
+    public T interpolate(final FieldAbsoluteDate<KK> interpolationDate,
+                         final Collection<? extends T> sample) {
         final InterpolationData interpolationData = new InterpolationData(interpolationDate, sample);
         return interpolate(interpolationData);
     }
@@ -156,7 +158,7 @@ public abstract class AbstractFieldTimeInterpolator<T extends FieldTimeStamped<K
     }
 
     /** {@inheritDoc} */
-    public List<FieldTimeInterpolator<? extends FieldTimeStamped<KK>, KK>> getSubInterpolators() {
+    public List<FieldTimeInterpolator<?, KK>> getSubInterpolators() {
         return Collections.singletonList(this);
     }
 
@@ -193,8 +195,8 @@ public abstract class AbstractFieldTimeInterpolator<T extends FieldTimeStamped<K
      * @param <S> type of the field element
      */
     protected <S extends CalculusFieldElement<S>> void addOptionalSubInterpolatorIfDefined(
-            final FieldTimeInterpolator<? extends FieldTimeStamped<S>, S> subInterpolator,
-            final List<FieldTimeInterpolator<? extends FieldTimeStamped<S>, S>> subInterpolators) {
+            final FieldTimeInterpolator<?, S> subInterpolator,
+            final List<? super FieldTimeInterpolator<?, S>> subInterpolators) {
         // Add all lowest level sub interpolators
         if (subInterpolator != null) {
             subInterpolators.addAll(subInterpolator.getSubInterpolators());
@@ -255,7 +257,8 @@ public abstract class AbstractFieldTimeInterpolator<T extends FieldTimeStamped<K
          * @param interpolationDate interpolation date
          * @param sample time stamped sample
          */
-        protected InterpolationData(final FieldAbsoluteDate<KK> interpolationDate, final Collection<T> sample) {
+        protected InterpolationData(final FieldAbsoluteDate<KK> interpolationDate,
+                                    final Collection<? extends T> sample) {
             // Handle specific case that is not handled by the immutable time stamped cache constructor
             if (sample.isEmpty()) {
                 throw new OrekitIllegalArgumentException(OrekitMessages.NOT_ENOUGH_DATA, 0);
