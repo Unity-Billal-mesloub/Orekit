@@ -16,14 +16,14 @@
  */
 package org.orekit.control.indirect.adjoint.cost;
 
+import java.util.stream.Stream;
+
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.hipparchus.util.FastMath;
 import org.orekit.propagation.events.EventDetectionSettings;
 import org.orekit.propagation.events.FieldEventDetectionSettings;
 import org.orekit.propagation.events.FieldEventDetector;
-
-import java.util.stream.Stream;
 
 /**
  * Class for bounded energy cost with Cartesian coordinates.
@@ -97,9 +97,8 @@ public class FieldBoundedCartesianEnergy<T extends CalculusFieldElement<T>> exte
     /** {@inheritDoc} */
     @Override
     public Stream<FieldEventDetector<T>> getFieldEventDetectors(final Field<T> field) {
-        final T zero = field.getZero();
-        return Stream.of(new FieldSingularityDetector(getEventDetectionSettings(), zero),
-                new FieldSingularityDetector(getEventDetectionSettings(), maximumThrustMagnitude));
+        return Stream.of(buildSwitchDetector(buildSwitchFunction(field.getZero()), getEventDetectionSettings()),
+                buildSwitchDetector(buildSwitchFunction(maximumThrustMagnitude), getEventDetectionSettings()));
     }
 
     /** {@inheritDoc} */

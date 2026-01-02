@@ -20,6 +20,9 @@
   </properties>
   <body>
     <release version="14.0" date="TBD" description="TBD">
+        <action dev="serrof" type="update" issue="issue-1885">
+            Refactoring of indirect control switches.
+        </action>
         <action dev="serrof" type="update" issue="issue-1884">
             Make IntervalEventTrigger and StartStopEventsTrigger non abstract.
         </action>

@@ -16,38 +16,17 @@
  */
 package org.orekit.control.indirect.adjoint.cost;
 
-import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.orekit.propagation.events.functions.EventFunction;
 
-public class TestCost implements CartesianCost {
-
-    @Override
-    public String getAdjointName() {
-        return "";
-    }
-
-    @Override
-    public int getAdjointDimension() {
-        return getMassFlowRateFactor() == 0 ? 6 : 7;
-    }
+/**
+ * Abstract class for event function representing a control switch.
+ * @author Romain Serra
+ * @since 14.0
+ */
+public abstract class ControlSwitchFunction implements EventFunction {
 
     @Override
-    public double getMassFlowRateFactor() {
-        return 10.;
+    public boolean dependsOnMainVariablesOnly() {
+        return false;
     }
-
-    @Override
-    public Vector3D getThrustAccelerationVector(double[] adjointVariables, double mass) {
-        return new Vector3D(1, 2, 3);
-    }
-
-    @Override
-    public void updateAdjointDerivatives(double[] adjointVariables, double mass, double[] adjointDerivatives) {
-        // nothing to do
-    }
-
-    @Override
-    public double getHamiltonianContribution(double[] adjointVariables, double mass) {
-        return 0;
-    }
-
 }

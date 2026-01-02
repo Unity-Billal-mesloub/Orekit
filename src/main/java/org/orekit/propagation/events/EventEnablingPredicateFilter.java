@@ -80,6 +80,9 @@ public class EventEnablingPredicateFilter implements DetectorModifier {
     /** Specialized event handler. */
     private final LocalHandler handler;
 
+    /** Specialized event function. */
+    private final EventFunction eventFunction;
+
     /** Indicator for forward integration. */
     private boolean forward;
 
@@ -110,6 +113,7 @@ public class EventEnablingPredicateFilter implements DetectorModifier {
         this.handler = new LocalHandler();
         this.rawDetector  = rawDetector;
         this.predicate = enabler;
+        this.eventFunction = new LocalEventFunction();
         this.transformers = new Transformer[HISTORY_SIZE];
         this.updates      = new AbsoluteDate[HISTORY_SIZE];
     }
@@ -154,19 +158,10 @@ public class EventEnablingPredicateFilter implements DetectorModifier {
         return predicate;
     }
 
+    /**  {@inheritDoc} */
     @Override
     public EventFunction getEventFunction() {
-        return new EventFunction() {
-            @Override
-            public double value(final SpacecraftState state) {
-                return g(state);
-            }
-
-            @Override
-            public boolean dependsOnMainVariablesOnly() {
-                return false;
-            }
-        };
+        return eventFunction;
     }
 
     /**  {@inheritDoc} */
@@ -331,6 +326,21 @@ public class EventEnablingPredicateFilter implements DetectorModifier {
      */
     public boolean isForward() {
         return forward;
+    }
+
+    /** Local event function.
+     * @since 14.0
+     */
+    private class LocalEventFunction implements EventFunction {
+        @Override
+        public double value(final SpacecraftState state) {
+            return g(state);
+        }
+
+        @Override
+        public boolean dependsOnMainVariablesOnly() {
+            return false;
+        }
     }
 
     /** Local handler. */

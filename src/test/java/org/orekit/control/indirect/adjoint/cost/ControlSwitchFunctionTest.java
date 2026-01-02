@@ -16,38 +16,24 @@
  */
 package org.orekit.control.indirect.adjoint.cost;
 
-import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.junit.jupiter.api.Test;
+import org.orekit.propagation.SpacecraftState;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class TestCost implements CartesianCost {
+class ControlSwitchFunctionTest {
 
-    @Override
-    public String getAdjointName() {
-        return "";
+    @Test
+    void testDependsOnMainVariablesOnly() {
+        // GIVEN
+        final ControlSwitchFunction switchFunction = new ControlSwitchFunction() {
+            @Override
+            public double value(SpacecraftState state) {
+                return 0;
+            }
+        };
+        // WHEN
+        final boolean flag = switchFunction.dependsOnMainVariablesOnly();
+        // THEN
+        assertFalse(flag);
     }
-
-    @Override
-    public int getAdjointDimension() {
-        return getMassFlowRateFactor() == 0 ? 6 : 7;
-    }
-
-    @Override
-    public double getMassFlowRateFactor() {
-        return 10.;
-    }
-
-    @Override
-    public Vector3D getThrustAccelerationVector(double[] adjointVariables, double mass) {
-        return new Vector3D(1, 2, 3);
-    }
-
-    @Override
-    public void updateAdjointDerivatives(double[] adjointVariables, double mass, double[] adjointDerivatives) {
-        // nothing to do
-    }
-
-    @Override
-    public double getHamiltonianContribution(double[] adjointVariables, double mass) {
-        return 0;
-    }
-
 }

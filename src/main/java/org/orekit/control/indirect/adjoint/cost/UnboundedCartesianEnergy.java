@@ -16,11 +16,11 @@
  */
 package org.orekit.control.indirect.adjoint.cost;
 
+import java.util.stream.Stream;
+
 import org.hipparchus.util.FastMath;
 import org.orekit.propagation.events.EventDetectionSettings;
 import org.orekit.propagation.events.EventDetector;
-
-import java.util.stream.Stream;
 
 /**
  * Class for unbounded energy cost with Cartesian coordinates.
@@ -66,6 +66,6 @@ public class UnboundedCartesianEnergy extends CartesianEnergyConsideringMass {
     /** {@inheritDoc} */
     @Override
     public Stream<EventDetector> getEventDetectors() {
-        return Stream.of(new SingularityDetector(getEventDetectionSettings(), 0.));
+        return Stream.of(buildSwitchDetector(new SingularitySwitchFunction(0.), getEventDetectionSettings()));
     }
 }
