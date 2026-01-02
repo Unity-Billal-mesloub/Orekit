@@ -17,6 +17,7 @@
 package org.orekit.propagation.events;
 
 import org.hipparchus.CalculusFieldElement;
+import org.hipparchus.Field;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
@@ -104,6 +105,62 @@ public interface FieldEventDetector <T extends CalculusFieldElement<T>> {
         };
     }
 
+    /**
+     * Builds instance from non-Field event detector.
+     * @param field field
+     * @param eventHandler handler
+     * @param detector non-Field detector
+     * @param <S> field type
+     * @return detector
+     * @since 14.0
+     */
+    static <S extends CalculusFieldElement<S>> FieldEventDetector<S> of(final Field<S> field,
+                                                                        final FieldEventHandler<S> eventHandler,
+                                                                        final EventDetector detector) {
+        final FieldEventDetectionSettings<S> fieldEventDetectionSettings = new FieldEventDetectionSettings<>(field,
+                detector.getDetectionSettings());
+
+        return new FieldEventDetector<S>() {
+
+            @Override
+            public void init(final FieldSpacecraftState<S> s0, final FieldAbsoluteDate<S> t) {
+                FieldEventDetector.super.init(s0, t);
+                detector.init(s0.toSpacecraftState(), t.toAbsoluteDate());
+            }
+
+            @Override
+            public void reset(final FieldSpacecraftState<S> state, final FieldAbsoluteDate<S> target) {
+                FieldEventDetector.super.reset(state, target);
+                detector.reset(state.toSpacecraftState(), target.toAbsoluteDate());
+            }
+
+            @Override
+            public void finish(final FieldSpacecraftState<S> state) {
+                FieldEventDetector.super.finish(state);
+                detector.finish(state.toSpacecraftState());
+            }
+
+            @Override
+            public EventFunction getEventFunction() {
+                return detector.getEventFunction();
+            }
+
+            @Override
+            public S g(final FieldSpacecraftState<S> s) {
+                return getEventFunction().value(s);
+            }
+
+            @Override
+            public FieldEventHandler<S> getHandler() {
+                return eventHandler;
+            }
+
+            @Override
+            public FieldEventDetectionSettings<S> getDetectionSettings() {
+                return fieldEventDetectionSettings;
+            }
+        };
+    }
     /** Initialize event detector at the start of a propagation.
      * <p>
      * This method is called once at the start of the propagation. It

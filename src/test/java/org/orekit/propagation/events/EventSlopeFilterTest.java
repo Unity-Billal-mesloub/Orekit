@@ -51,6 +51,18 @@ class EventSlopeFilterTest {
     private double sunRadius = 696000000.;
     private double earthRadius = 6400000.;
 
+    @Test
+    void testDependsOnTimeOnly() {
+        // GIVEN
+        final DateDetector detector = new DateDetector();
+        final EventSlopeFilter<DateDetector> template = new EventSlopeFilter<>(detector, FilterType.TRIGGER_ONLY_DECREASING_EVENTS);
+        final EventDetectionSettings detectionSettings = Mockito.mock();
+        // WHEN
+        final EventSlopeFilter<DateDetector> eventSlopeFilter = template.withDetectionSettings(detectionSettings);
+        // THEN
+        Assertions.assertTrue(eventSlopeFilter.getEventFunction().dependsOnTimeOnly());
+    }
+
     @ParameterizedTest
     @EnumSource(FilterType.class)
     void testWithDetectionSettings(final FilterType filterType) {
@@ -484,7 +496,7 @@ class EventSlopeFilterTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         try {
             Utils.setDataRoot("regular-data");
             double mu  = 3.9860047e14;
@@ -504,7 +516,7 @@ class EventSlopeFilterTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         iniDate    = null;
         propagator = null;
         earth      = null;

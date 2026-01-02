@@ -30,7 +30,6 @@ import org.orekit.propagation.events.EventDetector;
 import org.orekit.propagation.events.EventEnablingPredicateFilter;
 import org.orekit.propagation.events.EventShifter;
 import org.orekit.propagation.events.EventSlopeFilter;
-import org.orekit.propagation.events.FieldEventDetectionSettings;
 import org.orekit.propagation.events.FieldEventDetector;
 import org.orekit.propagation.events.FieldEventEnablingPredicateFilter;
 import org.orekit.propagation.events.FieldEventShifter;
@@ -267,8 +266,7 @@ public abstract class AbstractManeuverTriggers implements ResettableManeuverTrig
             return new FieldEventShifter<>(fieldDetector, eventShifter.isUseShiftedStates(),
                     zero.newInstance(eventShifter.getIncreasingTimeShift()), zero.newInstance(eventShifter.getDecreasingTimeShift()));
         } else {
-            return FieldEventDetector.of(detector.getEventFunction(), new FieldContinueOnEvent<>(),
-                    new FieldEventDetectionSettings<>(field, detector.getDetectionSettings()));
+            return FieldEventDetector.of(field, new FieldContinueOnEvent<>(), detector);
         }
     }
 

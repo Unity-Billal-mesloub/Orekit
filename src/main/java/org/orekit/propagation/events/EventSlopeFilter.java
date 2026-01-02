@@ -19,9 +19,12 @@ package org.orekit.propagation.events;
 
 import java.util.Arrays;
 
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.ode.events.Action;
+import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.time.AbsoluteDate;
 
@@ -226,7 +229,21 @@ public class EventSlopeFilter<T extends EventDetector> implements EventDetector 
 
     }
 
-    private class LocalEventFunction implements EventFunction {
+    /**
+     * Local event function.
+     * @since 14.0
+     */
+    private class LocalEventFunction implements EventFunctionModifier {
+
+        @Override
+        public EventFunction getBaseFunction() {
+            return rawDetector.getEventFunction();
+        }
+
+        @Override
+        public <S extends CalculusFieldElement<S>> S value(final FieldSpacecraftState<S> fieldState) {
+            return fieldState.getMass().newInstance(value(fieldState.toSpacecraftState()));
+        }
 
         /**  {@inheritDoc} */
         @Override
@@ -316,16 +333,6 @@ public class EventSlopeFilter<T extends EventDetector> implements EventDetector 
                 }
             }
 
-        }
-
-        @Override
-        public boolean dependsOnTimeOnly() {
-            return rawDetector.getEventFunction().dependsOnTimeOnly();
-        }
-
-        @Override
-        public boolean dependsOnMainVariablesOnly() {
-            return rawDetector.getEventFunction().dependsOnMainVariablesOnly();
         }
     }
 }
