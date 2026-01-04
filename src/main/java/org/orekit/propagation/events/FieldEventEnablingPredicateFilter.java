@@ -120,7 +120,8 @@ public class FieldEventEnablingPredicateFilter<T extends CalculusFieldElement<T>
         this.predicate = enabler;
         this.transformers = new Transformer[HISTORY_SIZE];
         this.updates      = (FieldAbsoluteDate<T>[]) Array.newInstance(FieldAbsoluteDate.class, HISTORY_SIZE);
-        this.eventFunction = new LocalEventFunction(EventFunction.of(detectionSettings.getThreshold().getField(), this::g));
+        this.eventFunction = new LocalEventFunction(EventFunction.of(detectionSettings.getThreshold().getField(), this::g),
+                predicate);
     }
 
     /**
@@ -342,8 +343,12 @@ public class FieldEventEnablingPredicateFilter<T extends CalculusFieldElement<T>
         /** Wrapped event function. */
         private final EventFunction baseFunction;
 
-        LocalEventFunction(final EventFunction baseFunction) {
+        /** Predicate. */
+        private final FieldEnablingPredicate<?> enablingPredicate;
+
+        LocalEventFunction(final EventFunction baseFunction, final FieldEnablingPredicate<?> enablingPredicate) {
             this.baseFunction = baseFunction;
+            this.enablingPredicate = enablingPredicate;
         }
 
         @Override
@@ -353,7 +358,7 @@ public class FieldEventEnablingPredicateFilter<T extends CalculusFieldElement<T>
 
         @Override
         public boolean dependsOnMainVariablesOnly() {
-            return false;
+            return baseFunction.dependsOnMainVariablesOnly() && enablingPredicate.dependsOnMainVariablesOnly();
         }
     }
 

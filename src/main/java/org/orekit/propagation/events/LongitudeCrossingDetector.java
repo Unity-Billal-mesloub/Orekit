@@ -96,8 +96,17 @@ public class LongitudeCrossingDetector extends AbstractGeographicalDetector<Long
 
         // we filter out spurious longitude crossings occurring at the antimeridian
         final RawLongitudeCrossingDetector raw = new RawLongitudeCrossingDetector();
-        final EnablingPredicate predicate =
-            (state, detector, g) -> FastMath.abs(g) < 0.5 * FastMath.PI;
+        final EnablingPredicate predicate = new EnablingPredicate() {
+            @Override
+            public boolean eventIsEnabled(final SpacecraftState state, final EventDetector detector, final double g) {
+                return FastMath.abs(g) < 0.5 * FastMath.PI;
+            }
+
+            @Override
+            public boolean dependsOnMainVariablesOnly() {
+                return true;
+            }
+        };
         this.filtering = new EventEnablingPredicateFilter(raw, predicate);
 
     }

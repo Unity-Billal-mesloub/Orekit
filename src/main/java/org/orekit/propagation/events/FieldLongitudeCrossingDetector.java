@@ -116,8 +116,17 @@ public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
 
         // we filter out spurious longitude crossings occurring at the antimeridian
         final FieldRawLongitudeCrossingDetector<T> raw = new FieldRawLongitudeCrossingDetector<>(detectionSettings);
-        final FieldEnablingPredicate<T> predicate =
-            (state, detector, g) -> FastMath.abs(g).getReal() < 0.5 * FastMath.PI;
+        final FieldEnablingPredicate<T> predicate = new FieldEnablingPredicate<T>() {
+            @Override
+            public boolean eventIsEnabled(final FieldSpacecraftState<T> state, final FieldEventDetector<T> detector, final T g) {
+                return FastMath.abs(g).getReal() < 0.5 * FastMath.PI;
+            }
+
+            @Override
+            public boolean dependsOnMainVariablesOnly() {
+                return true;
+            }
+        };
         this.filtering = new FieldEventEnablingPredicateFilter<>(raw, predicate);
 
     }

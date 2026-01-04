@@ -28,6 +28,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.orekit.Utils;
 import org.orekit.bodies.GeodeticPoint;
 import org.orekit.bodies.OneAxisEllipsoid;
@@ -50,6 +52,8 @@ import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
 import org.orekit.utils.FieldPVCoordinates;
 import org.orekit.utils.IERSConventions;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class FieldEventEnablingPredicateFilterTest {
 
@@ -81,6 +85,21 @@ class FieldEventEnablingPredicateFilterTest {
         final boolean value = filter.getEventFunction().dependsOnTimeOnly();
         // THEN
         Assertions.assertFalse(value);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    @SuppressWarnings("unchecked")
+    void testDependsOnMainVariablesOnly(final boolean flag) {
+        // GIVEN
+        final FieldEventDetector<Binary64> detector = new FieldDateDetector<>(Binary64Field.getInstance());
+        final FieldEnablingPredicate<Binary64> enablingPredicate = mock();
+        when(enablingPredicate.dependsOnMainVariablesOnly()).thenReturn(flag);
+        final FieldEventEnablingPredicateFilter<Binary64> predicateFilter = new FieldEventEnablingPredicateFilter<>(detector, enablingPredicate);
+        // WHEN
+        final boolean value = predicateFilter.getEventFunction().dependsOnMainVariablesOnly();
+        // THEN
+        Assertions.assertEquals(flag, value);
     }
 
     @Test

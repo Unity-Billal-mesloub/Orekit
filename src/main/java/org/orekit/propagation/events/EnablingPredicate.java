@@ -37,13 +37,35 @@ public interface EnablingPredicate {
     boolean eventIsEnabled(SpacecraftState state, EventDetector detector, double g);
 
     /**
+     * Method returning true if and only if the predicate does not depend on dependent variables,
+     * other than the Cartesian coordinates (or equivalent), mass and attitude (excepts for its rates).
+     * It should thus return false if the STM or other secondary variables are needed to evaluate the predicate.
+     * This information is used for performance in propagation. The default implementation returns false.
+     * @return flag
+     * @since 14.0
+     */
+    default boolean dependsOnMainVariablesOnly() {
+        return false;
+    }
+
+    /**
      * Method combining predicated based on the OR logic operator.
      * @param enablingPredicates predicates
      * @return combined predicate
      * @since 13.1
      */
     static EnablingPredicate orCombine(final EnablingPredicate... enablingPredicates) {
-        return (state, detector, g) -> Arrays.stream(enablingPredicates).anyMatch(p -> p.eventIsEnabled(state, detector, g));
+        return new EnablingPredicate() {
+            @Override
+            public boolean eventIsEnabled(final SpacecraftState state, final EventDetector detector, final double g) {
+                return Arrays.stream(enablingPredicates).anyMatch(p -> p.eventIsEnabled(state, detector, g));
+            }
+
+            @Override
+            public boolean dependsOnMainVariablesOnly() {
+                return Arrays.stream(enablingPredicates).allMatch(EnablingPredicate::dependsOnMainVariablesOnly);
+            }
+        };
     }
 
     /**
@@ -53,6 +75,16 @@ public interface EnablingPredicate {
      * @since 13.1
      */
     static EnablingPredicate andCombine(final EnablingPredicate... enablingPredicates) {
-        return (state, detector, g) -> Arrays.stream(enablingPredicates).allMatch(p -> p.eventIsEnabled(state, detector, g));
+        return new EnablingPredicate() {
+            @Override
+            public boolean eventIsEnabled(final SpacecraftState state, final EventDetector detector, final double g) {
+                return Arrays.stream(enablingPredicates).allMatch(p -> p.eventIsEnabled(state, detector, g));
+            }
+
+            @Override
+            public boolean dependsOnMainVariablesOnly() {
+                return Arrays.stream(enablingPredicates).allMatch(EnablingPredicate::dependsOnMainVariablesOnly);
+            }
+        };
     }
 }

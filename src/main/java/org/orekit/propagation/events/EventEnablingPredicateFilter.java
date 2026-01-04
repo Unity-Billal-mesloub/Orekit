@@ -339,7 +339,7 @@ public class EventEnablingPredicateFilter implements DetectorModifier {
 
         @Override
         public boolean dependsOnMainVariablesOnly() {
-            return false;
+            return getDetector().getEventFunction().dependsOnMainVariablesOnly() && getPredicate().dependsOnMainVariablesOnly();
         }
     }
 

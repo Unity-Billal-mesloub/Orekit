@@ -16,6 +16,9 @@
  */
 package org.orekit.propagation.events;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.ode.events.Action;
 import org.hipparchus.util.FastMath;
@@ -53,9 +56,7 @@ import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
 import org.orekit.utils.IERSConventions;
 import org.orekit.utils.PVCoordinates;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.mockito.Mockito.when;
 
 class EventEnablingPredicateFilterTest {
 
@@ -87,16 +88,18 @@ class EventEnablingPredicateFilterTest {
         Assertions.assertFalse(value);
     }
 
-    @Test
-    void testDependsOnMainVariablesOnly() {
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void testDependsOnMainVariablesOnly(final boolean flag) {
         // GIVEN
         final EventDetector detector = new DateDetector();
         final EnablingPredicate enablingPredicate = Mockito.mock();
+        when(enablingPredicate.dependsOnMainVariablesOnly()).thenReturn(flag);
         final EventEnablingPredicateFilter predicateFilter = new EventEnablingPredicateFilter(detector, enablingPredicate);
         // WHEN
         final boolean value = predicateFilter.getEventFunction().dependsOnMainVariablesOnly();
         // THEN
-        Assertions.assertFalse(value);
+        Assertions.assertEquals(flag, value);
     }
 
     @Test
@@ -229,6 +232,7 @@ class EventEnablingPredicateFilterTest {
         DateDetector raw = new DateDetector(orbit.getDate().shiftedBy(3600.0)).
                         withMaxCheck(1000.0).
                         withHandler(new EventHandler() {
+                            @Override
                             public SpacecraftState resetState(EventDetector detector, SpacecraftState oldState) {
                                 reset.add(oldState.getDate());
                                 return oldState;
