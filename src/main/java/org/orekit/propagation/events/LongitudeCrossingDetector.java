@@ -17,10 +17,10 @@
 package org.orekit.propagation.events;
 
 import org.hipparchus.util.FastMath;
-import org.hipparchus.util.MathUtils;
 import org.orekit.bodies.BodyShape;
-import org.orekit.bodies.GeodeticPoint;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.LongitudeValueCrossingEventFunction;
 import org.orekit.propagation.events.handlers.ContinueOnEvent;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnIncreasing;
@@ -89,13 +89,17 @@ public class LongitudeCrossingDetector extends AbstractGeographicalDetector<Long
      */
     protected LongitudeCrossingDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                         final BodyShape body, final double longitude) {
-
         super(detectionSettings, handler, body);
 
         this.longitude = longitude;
 
-        // we filter out spurious longitude crossings occurring at the antimeridian
-        final RawLongitudeCrossingDetector raw = new RawLongitudeCrossingDetector();
+        // The value is the longitude difference between the spacecraft and the fixed
+        // longitude to be crossed, and it <em>does</em> change sign twice around
+        // the central body: once at expected longitude and once at antimeridian.
+        // The second sign change is a spurious one and is filtered out by the
+        // outer class
+        final EventFunction eventFunction = new LongitudeValueCrossingEventFunction(getBodyShape(), longitude);
+        final EventDetector raw = EventDetector.of(eventFunction, new ContinueOnEvent(), getDetectionSettings());
         final EnablingPredicate predicate = new EnablingPredicate() {
             @Override
             public boolean eventIsEnabled(final SpacecraftState state, final EventDetector detector, final double g) {
@@ -118,6 +122,11 @@ public class LongitudeCrossingDetector extends AbstractGeographicalDetector<Long
         return new LongitudeCrossingDetector(detectionSettings, newHandler, getBodyShape(), longitude);
     }
 
+    @Override
+    public EventFunction getEventFunction() {
+        return filtering.getEventFunction();
+    }
+
     /** Get the fixed longitude to be crossed (radians).
      * @return fixed longitude to be crossed (radians)
      */
@@ -135,36 +144,6 @@ public class LongitudeCrossingDetector extends AbstractGeographicalDetector<Long
     public void init(final SpacecraftState s0, final AbsoluteDate t) {
         super.init(s0, t);
         filtering.init(s0, t);
-    }
-
-    private class RawLongitudeCrossingDetector implements EventDetector {
-
-        /** Compute the value of the detection function.
-         * <p>
-         * The value is the longitude difference between the spacecraft and the fixed
-         * longitude to be crossed, and it <em>does</em> change sign twice around
-         * the central body: once at expected longitude and once at antimeridian.
-         * The second sign change is a spurious one and is filtered out by the
-         * outer class.
-         * </p>
-         * @param s the current state information: date, kinematics, attitude
-         * @return longitude difference between the spacecraft and the fixed
-         * longitude
-         */
-        public double g(final SpacecraftState s) {
-
-            // convert state to geodetic coordinates
-            final GeodeticPoint gp = getBodyShape().transform(s.getPosition(), s.getFrame(), s.getDate());
-
-            // longitude difference
-            return MathUtils.normalizeAngle(gp.getLongitude() - longitude, 0.0);
-
-        }
-
-        @Override
-        public EventHandler getHandler() {
-            return new ContinueOnEvent();
-        }
     }
 
 }

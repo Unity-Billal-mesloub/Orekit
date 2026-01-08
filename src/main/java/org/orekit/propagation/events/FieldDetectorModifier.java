@@ -64,7 +64,7 @@ public interface FieldDetectorModifier<T extends CalculusFieldElement<T>> extend
     /** {@inheritDoc} */
     @Override
     default T g(final FieldSpacecraftState<T> s) {
-        return getDetector().g(s);
+        return getEventFunction().value(s);
     }
 
     /** {@inheritDoc} */

@@ -92,11 +92,6 @@ public class NegateDetector extends AbstractDetector<NegateDetector> implements 
     }
 
     @Override
-    public double g(final SpacecraftState s) {
-        return getEventFunction().value(s);
-    }
-
-    @Override
     protected NegateDetector create(final EventDetectionSettings detectionSettings, final EventHandler newHandler) {
         return new NegateDetector(detectionSettings, newHandler, this.original);
     }

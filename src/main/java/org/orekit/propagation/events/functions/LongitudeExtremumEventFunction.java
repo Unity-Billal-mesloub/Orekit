@@ -17,9 +17,14 @@
 package org.orekit.propagation.events.functions;
 
 import org.hipparchus.CalculusFieldElement;
+import org.hipparchus.analysis.differentiation.FieldUnivariateDerivative1;
+import org.hipparchus.analysis.differentiation.UnivariateDerivative1;
+import org.hipparchus.analysis.differentiation.UnivariateDerivative1Field;
+import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.orekit.bodies.BodyShape;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
+import org.orekit.time.FieldAbsoluteDate;
 
 /** Class for longitude extremum event function.
  * @author Romain Serra
@@ -36,11 +41,17 @@ public class LongitudeExtremumEventFunction extends AbstractGeodeticExtremumEven
 
     @Override
     public double value(final SpacecraftState state) {
-        return transformToFieldGeodeticPoint(state).getLongitude().getFirstDerivative();
+        final UnivariateDerivative1Field field = UnivariateDerivative1Field.getInstance();
+        final UnivariateDerivative1 dt = new UnivariateDerivative1(0, 1);
+        final FieldAbsoluteDate<UnivariateDerivative1> fieldDate = new FieldAbsoluteDate<>(field, state.getDate()).shiftedBy(dt);
+        final FieldVector3D<UnivariateDerivative1> position = state.getPVCoordinates().toUnivariateDerivative1Vector();
+        return getBodyShape().getLongitude(position, state.getFrame(), fieldDate).getFirstDerivative();
     }
 
     @Override
     public <T extends CalculusFieldElement<T>> T value(final FieldSpacecraftState<T> fieldState) {
-        return transformToFieldGeodeticPoint(fieldState).getLongitude().getFirstDerivative();
+        final FieldAbsoluteDate<FieldUnivariateDerivative1<T>> fud1Date = fieldState.getDate().toFUD1Field();
+        final FieldVector3D<FieldUnivariateDerivative1<T>> fieldPosition = fieldState.getPVCoordinates().toUnivariateDerivative1Vector();
+        return getBodyShape().getLongitude(fieldPosition, fieldState.getFrame(), fud1Date).getFirstDerivative();
     }
 }
