@@ -163,12 +163,6 @@ public class EventShifter implements DetectorModifier {
         return useShiftedStates;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public double g(final SpacecraftState s) {
-        return getEventFunction().value(s);
-    }
-
     /**
      * Builds a new instance from the input detection settings.
      * @param settings event detection settings to be used

@@ -62,7 +62,7 @@ public interface DetectorModifier extends EventDetector {
     /** {@inheritDoc} */
     @Override
     default double g(final SpacecraftState s) {
-        return getDetector().g(s);
+        return getEventFunction().value(s);
     }
 
     /** {@inheritDoc} */

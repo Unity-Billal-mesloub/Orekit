@@ -96,11 +96,6 @@ public class FieldNegateDetector<T extends CalculusFieldElement<T>>  extends Fie
     }
 
     @Override
-    public T g(final FieldSpacecraftState<T> s) {
-        return getEventFunction().value(s);
-    }
-
-    @Override
     protected FieldNegateDetector<T> create(final FieldEventDetectionSettings<T> detectionSettings,
                                             final FieldEventHandler<T> newHandler) {
         return new FieldNegateDetector<>(detectionSettings, newHandler, original);

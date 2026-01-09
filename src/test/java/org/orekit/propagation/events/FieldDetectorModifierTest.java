@@ -27,6 +27,7 @@ import org.orekit.propagation.events.functions.EventFunction;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnEvent;
 import org.orekit.time.FieldAbsoluteDate;
+import static org.mockito.Mockito.when;
 
 class FieldDetectorModifierTest {
 
@@ -36,7 +37,7 @@ class FieldDetectorModifierTest {
         // GIVEN
         final FieldEventDetector<?> detector = Mockito.mock(FieldEventDetector.class);
         final FieldEventDetectionSettings detectionSettings = Mockito.mock(FieldEventDetectionSettings.class);
-        Mockito.when(detector.getDetectionSettings()).thenReturn(detectionSettings);
+        when(detector.getDetectionSettings()).thenReturn(detectionSettings);
         final TestFieldDetector<?> modifierDetector = new TestFieldDetector<>(detector);
         // WHEN
         final FieldEventDetectionSettings<?> actualSettings = modifierDetector.getDetectionSettings();
@@ -49,7 +50,7 @@ class FieldDetectorModifierTest {
         // GIVEN
         final FieldEventDetector<?> detector = Mockito.mock(FieldEventDetector.class);
         final EventFunction eventFunction = state -> 0.;
-        Mockito.when(detector.getEventFunction()).thenReturn(eventFunction);
+        when(detector.getEventFunction()).thenReturn(eventFunction);
         final TestFieldDetector<?> modifierDetector = new TestFieldDetector<>(detector);
         // WHEN
         final EventFunction actual = modifierDetector.getEventFunction();
@@ -63,7 +64,7 @@ class FieldDetectorModifierTest {
         // GIVEN
         final FieldEventDetector<?> detector = Mockito.mock(FieldEventDetector.class);
         final FieldEventHandler handler = Mockito.mock(FieldEventHandler.class);
-        Mockito.when(detector.getHandler()).thenReturn(handler);
+        when(detector.getHandler()).thenReturn(handler);
         final TestFieldDetector<?> modifierDetector = new TestFieldDetector<>(detector);
         // WHEN
         final FieldEventHandler<?> actualHandler = modifierDetector.getHandler();
@@ -76,7 +77,7 @@ class FieldDetectorModifierTest {
     void testInit() {
         // GIVEN
         final FieldEventDetector<?> detector = Mockito.mock(FieldEventDetector.class);
-        Mockito.when(detector.getHandler()).thenReturn(new FieldStopOnEvent<>());
+        when(detector.getHandler()).thenReturn(new FieldStopOnEvent<>());
         final FieldSpacecraftState mockedState = Mockito.mock(FieldSpacecraftState.class);
         final FieldAbsoluteDate mockedDate = Mockito.mock(FieldAbsoluteDate.class);
         final TestFieldDetector<?> modifierDetector = new TestFieldDetector<>(detector);
@@ -91,7 +92,7 @@ class FieldDetectorModifierTest {
     void testReset() {
         // GIVEN
         final FieldEventDetector<?> detector = Mockito.mock(FieldEventDetector.class);
-        Mockito.when(detector.getHandler()).thenReturn(new FieldStopOnEvent<>());
+        when(detector.getHandler()).thenReturn(new FieldStopOnEvent<>());
         final FieldSpacecraftState mockedState = Mockito.mock(FieldSpacecraftState.class);
         final FieldAbsoluteDate mockedDate = Mockito.mock(FieldAbsoluteDate.class);
         final TestFieldDetector<?> modifierDetector = new TestFieldDetector<>(detector);
@@ -109,7 +110,8 @@ class FieldDetectorModifierTest {
         final FieldAbsoluteDate<Binary64> date = FieldAbsoluteDate.getArbitraryEpoch(field);
         final FieldEventDetector<Binary64> detector = new FieldDateDetector<>(date);
         final FieldSpacecraftState<Binary64> mockedState = Mockito.mock(FieldSpacecraftState.class);
-        Mockito.when(mockedState.getDate()).thenReturn(date);
+        when(mockedState.getDate()).thenReturn(date);
+        when(mockedState.getMass()).thenReturn(Binary64.ONE);
         final TestFieldDetector<Binary64> modifierDetector = new TestFieldDetector<>(detector);
         // WHEN
         final double actualG = modifierDetector.g(mockedState).getReal();
@@ -122,7 +124,7 @@ class FieldDetectorModifierTest {
     void testFinish() {
         // GIVEN
         final FieldEventDetector<?> detector = Mockito.mock(FieldEventDetector.class);
-        Mockito.when(detector.getHandler()).thenReturn(new FieldStopOnEvent<>());
+        when(detector.getHandler()).thenReturn(new FieldStopOnEvent<>());
         final FieldSpacecraftState mockedState = Mockito.mock(FieldSpacecraftState.class);
         final TestFieldDetector<?> modifierDetector = new TestFieldDetector<>(detector);
         // WHEN

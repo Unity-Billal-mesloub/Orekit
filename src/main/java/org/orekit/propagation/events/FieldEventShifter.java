@@ -176,12 +176,6 @@ public class FieldEventShifter<T extends CalculusFieldElement<T>> implements Fie
         return new FieldEventShifter<>(settings, detector, useShiftedStates, getIncreasingTimeShift(), getDecreasingTimeShift());
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public T g(final FieldSpacecraftState<T> s) {
-        return getEventFunction().value(s);
-    }
-
     /** Local class for handling events. */
     private static class LocalHandler<W extends CalculusFieldElement<W>> implements FieldEventHandler<W> {
 

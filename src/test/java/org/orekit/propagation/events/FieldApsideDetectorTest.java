@@ -39,6 +39,8 @@ import org.orekit.propagation.FieldPropagator;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.analytical.FieldEcksteinHechlerPropagator;
 import org.orekit.propagation.events.FieldEventsLogger.FieldLoggedEvent;
+import org.orekit.propagation.events.functions.EventFunction;
+import org.orekit.propagation.events.functions.EventFunctionModifier;
 import org.orekit.propagation.events.handlers.ContinueOnEvent;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldContinueOnEvent;
@@ -50,7 +52,6 @@ import org.orekit.time.TimeScale;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
 import org.orekit.utils.FieldPVCoordinates;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FieldApsideDetectorTest {
@@ -177,11 +178,20 @@ class FieldApsideDetectorTest {
         }
 
         @Override
-        public T g(final FieldSpacecraftState<T> s) {
-            ++count;
-            return FieldDetectorModifier.super.g(s);
-        }
+        public EventFunction getEventFunction() {
+            return new EventFunctionModifier() {
+                @Override
+                public EventFunction getBaseFunction() {
+                    return detector.getEventFunction();
+                }
 
+                @Override
+                public <S extends CalculusFieldElement<S>> S value(FieldSpacecraftState<S> fieldState) {
+                    count++;
+                    return EventFunctionModifier.super.value(fieldState);
+                }
+            };
+        }
     }
 
     @Test

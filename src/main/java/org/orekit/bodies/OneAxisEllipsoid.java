@@ -1055,4 +1055,18 @@ public class OneAxisEllipsoid extends Ellipsoid implements BodyShape {
 
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public double getLongitude(final Vector3D point, final Frame frame, final AbsoluteDate date) {
+        final Vector3D pointInBodyFrame = frame.getStaticTransformTo(getFrame(), date).transformPosition(point);
+        return FastMath.atan2(pointInBodyFrame.getY(), pointInBodyFrame.getX());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T extends CalculusFieldElement<T>> T getLongitude(final FieldVector3D<T> point, final Frame frame,
+                                                              final FieldAbsoluteDate<T> date) {
+        final FieldVector3D<T> pointInBodyFrame = frame.getStaticTransformTo(getFrame(), date).transformPosition(point);
+        return FastMath.atan2(pointInBodyFrame.getY(), pointInBodyFrame.getX());
+    }
 }

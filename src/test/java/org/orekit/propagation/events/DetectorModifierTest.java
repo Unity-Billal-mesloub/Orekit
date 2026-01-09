@@ -16,6 +16,8 @@
  */
 package org.orekit.propagation.events;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.ode.events.Action;
 import org.hipparchus.ode.nonstiff.AdaptiveStepsizeIntegrator;
@@ -38,8 +40,7 @@ import org.orekit.propagation.numerical.NumericalPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.PVCoordinates;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import static org.mockito.Mockito.when;
 
 class DetectorModifierTest {
 
@@ -55,7 +56,7 @@ class DetectorModifierTest {
         // GIVEN
         final EventDetector detector = Mockito.mock(EventDetector.class);
         final EventDetectionSettings detectionSettings = Mockito.mock(EventDetectionSettings.class);
-        Mockito.when(detector.getDetectionSettings()).thenReturn(detectionSettings);
+        when(detector.getDetectionSettings()).thenReturn(detectionSettings);
         final DetectorModifier detectorModifier = new TestDetectorModifier(detector);
         // WHEN
         final EventDetectionSettings actualSettings = detectorModifier.getDetectionSettings();
@@ -68,7 +69,7 @@ class DetectorModifierTest {
         // GIVEN
         final EventDetector detector = Mockito.mock(EventDetector.class);
         final EventFunction eventFunction = Mockito.mock(EventFunction.class);
-        Mockito.when(detector.getEventFunction()).thenReturn(eventFunction);
+        when(detector.getEventFunction()).thenReturn(eventFunction);
         final DetectorModifier detectorModifier = new TestDetectorModifier(detector);
         // WHEN
         final EventFunction actualFunction = detectorModifier.getEventFunction();
@@ -80,7 +81,7 @@ class DetectorModifierTest {
     void testInit() {
         // GIVEN
         final EventDetector detector = Mockito.mock(EventDetector.class);
-        Mockito.when(detector.getHandler()).thenReturn(new StopOnEvent());
+        when(detector.getHandler()).thenReturn(new StopOnEvent());
         final SpacecraftState mockedState = Mockito.mock(SpacecraftState.class);
         final AbsoluteDate mockedDate = Mockito.mock(AbsoluteDate.class);
         final DetectorModifier detectorModifier = new TestDetectorModifier(detector);
@@ -109,7 +110,7 @@ class DetectorModifierTest {
         final EventDetector detector = Mockito.mock(EventDetector.class);
         final SpacecraftState mockedState = Mockito.mock(SpacecraftState.class);
         final double expectedG = 10.;
-        Mockito.when(detector.g(mockedState)).thenReturn(expectedG);
+        when(detector.getEventFunction()).thenReturn(state -> expectedG);
         final DetectorModifier detectorModifier = new TestDetectorModifier(detector);
         // WHEN
         final double actualG = detectorModifier.g(mockedState);
@@ -121,7 +122,7 @@ class DetectorModifierTest {
     void testFinish() {
         // GIVEN
         final EventDetector detector = Mockito.mock(EventDetector.class);
-        Mockito.when(detector.getHandler()).thenReturn(new StopOnEvent());
+        when(detector.getHandler()).thenReturn(new StopOnEvent());
         final SpacecraftState mockedState = Mockito.mock(SpacecraftState.class);
         final DetectorModifier detectorModifier = new TestDetectorModifier(detector);
         // WHEN
@@ -219,7 +220,7 @@ class DetectorModifierTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         iniDate = null;
         propagator = null;
     }
