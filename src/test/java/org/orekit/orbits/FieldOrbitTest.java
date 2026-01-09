@@ -185,7 +185,7 @@ class FieldOrbitTest {
         final FieldAbsoluteDate<Binary64>             actualDate = pv.getDate();
 
         // THEN
-        Assertions.assertEquals(0, actualDate.durationFrom(date1));
+        Assertions.assertEquals(0, actualDate.durationFrom(date1).getReal());
     }
 
     private static class TestFieldOrbit extends FieldOrbit<Complex> {
