@@ -20,14 +20,25 @@ package org.orekit.estimation.measurements;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-//import java.util.Map;
+import java.util.Map;
 
-//import org.hipparchus.analysis.differentiation.Gradient;
+import org.hipparchus.Field;
+import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.util.FastMath;
-//import org.orekit.time.AbsoluteDate;
+import org.orekit.orbits.CartesianOrbit;
+import org.orekit.orbits.FieldCartesianOrbit;
+import org.orekit.propagation.SpacecraftState;
+import org.orekit.time.AbsoluteDate;
 import org.orekit.time.clocks.QuadraticClockModel;
-//import org.orekit.time.clocks.QuadraticFieldClockModel;
+import org.orekit.time.clocks.QuadraticFieldClockModel;
+import org.orekit.utils.AbsolutePVCoordinates;
+import org.orekit.utils.FieldAbsolutePVCoordinates;
+import org.orekit.utils.FieldPVCoordinatesProvider;
+import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
+import org.orekit.utils.ParameterDriversProvider;
+import org.orekit.utils.TimeStampedFieldPVCoordinates;
+import org.orekit.utils.TimeStampedPVCoordinates;
 
 /** Abstract class underlying both observed and observing measurement
  * objects.  Contains the QuadraticClockModel and the ability to store a
@@ -37,7 +48,7 @@ import org.orekit.utils.ParameterDriver;
  * @since 14.0
  */
 
-abstract class MeasurementObject {
+abstract class MeasurementObject implements ParameterDriversProvider {
 
     /** Suffix for ground station position and clock offset parameters names. */
     public static final String OFFSET_SUFFIX = "-offset";
@@ -153,17 +164,15 @@ abstract class MeasurementObject {
      * must be span name and not driver name
      * @return emitting satellite clock provider
      */
-    /*
-    protected QuadraticFieldClockModel<Gradient> getQuadraticFieldClock(final int freeParameters,
-                                                                        final AbsoluteDate date,
-                                                                        final Map<String, Integer> indices) {
+    public QuadraticFieldClockModel<Gradient> getQuadraticFieldClock(final int freeParameters,
+                                                                     final AbsoluteDate date,
+                                                                     final Map<String, Integer> indices) {
         return getQuadraticClockModel().toGradientModel(freeParameters, indices, date);
     }
-    */
 
-    /** Return all parameter drivers associated with the MeasurementObject.
-     * @return list of parameter drivers
-     */
+
+    /** {@inheritDoc} */
+    @Override
     public List<ParameterDriver> getParametersDrivers() {
         return Collections.unmodifiableList(parameterDrivers);
     }
@@ -174,5 +183,43 @@ abstract class MeasurementObject {
      */
     protected final void addParameterDriver(final ParameterDriver parameterDriver) {
         parameterDrivers.add(parameterDriver);
+    }
+
+    /**
+     * Create PV provider from position-velocity-acceleration vector and template state.
+     * @param templateState template state
+     * @param pvCoordinates position-velocity-acceleration
+     * @return position-velocity-acceleration provider
+     * @since 14.0
+     */
+    public static PVCoordinatesProvider extractPVCoordinatesProvider(final SpacecraftState templateState,
+                                                                     final TimeStampedPVCoordinates pvCoordinates) {
+        if (templateState.isOrbitDefined()) {
+            final CartesianOrbit cartesianOrbit = new CartesianOrbit(pvCoordinates, templateState.getFrame(),
+                    templateState.getOrbit().getMu());
+            return templateState.getOrbit().getType().convertType(cartesianOrbit);
+        } else {
+            return new AbsolutePVCoordinates(templateState.getFrame(), pvCoordinates);
+        }
+    }
+
+    /**
+     * Create PV provider from position-velocity-acceleration vector and template state.
+     *
+     * @param templateState template state
+     * @param pvCoordinates position-velocity-acceleration
+     * @return position-velocity-acceleration provider
+     * @since 14.0
+     */
+    public static FieldPVCoordinatesProvider<Gradient> extractFieldPVCoordinatesProvider(final SpacecraftState templateState,
+                                                                                         final TimeStampedFieldPVCoordinates<Gradient> pvCoordinates) {
+        final Field<Gradient> field = pvCoordinates.getDate().getField();
+        if (templateState.isOrbitDefined()) {
+            final FieldCartesianOrbit<Gradient> cartesianOrbit = new FieldCartesianOrbit<>(pvCoordinates, templateState.getFrame(),
+                    field.getZero().newInstance(templateState.getOrbit().getMu()));
+            return templateState.getOrbit().getType().convertType(cartesianOrbit);
+        } else {
+            return new FieldAbsolutePVCoordinates<>(templateState.getFrame(), pvCoordinates);
+        }
     }
 }

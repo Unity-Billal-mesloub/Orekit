@@ -161,7 +161,7 @@ public class PV extends AbstractMeasurement<PV> {
      */
     public PV(final AbsoluteDate date, final Vector3D position, final Vector3D velocity,
               final double[][] covarianceMatrix, final double baseWeight, final ObservableSatellite satellite) {
-        super(date,
+        super(date, false,
               new double[] {
                   position.getX(), position.getY(), position.getZ(),
                   velocity.getX(), velocity.getY(), velocity.getZ()

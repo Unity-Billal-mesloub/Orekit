@@ -17,8 +17,12 @@
 package org.orekit.estimation.measurements.gnss;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.hipparchus.analysis.differentiation.Gradient;
+import org.orekit.estimation.measurements.AbstractMeasurement;
+import org.orekit.estimation.measurements.CommonParametersWithDerivatives;
+import org.orekit.estimation.measurements.CommonParametersWithoutDerivatives;
 import org.orekit.estimation.measurements.EstimatedMeasurement;
 import org.orekit.estimation.measurements.EstimatedMeasurementBase;
 import org.orekit.estimation.measurements.InterSatellitesRange;
@@ -50,10 +54,13 @@ import org.orekit.utils.TimeStampedPVCoordinates;
  * @author Bryan Cazabonne
  * @since 10.3
  */
-public class OneWayGNSSRange extends AbstractOneWayGNSSMeasurement<OneWayGNSSRange> {
+public class OneWayGNSSRange extends AbstractMeasurement<OneWayGNSSRange> {
 
     /** Type of the measurement. */
     public static final String MEASUREMENT_TYPE = "OneWayGNSSRange";
+
+    /** GNSS satellite sending range data. */
+    private final ObserverSatellite gnssSat;
 
     /** Simple constructor.
      * @param gnssSatellite GNSS observer satellite
@@ -69,7 +76,9 @@ public class OneWayGNSSRange extends AbstractOneWayGNSSMeasurement<OneWayGNSSRan
                            final double range, final double sigma,
                            final double baseWeight, final ObservableSatellite local) {
         // Call super constructor
-        super(gnssSatellite, date, range, sigma, baseWeight, local);
+        super(date, false, range, sigma, baseWeight, Collections.singletonList(local));
+
+        this.gnssSat = gnssSatellite;
     }
 
     /** {@inheritDoc} */
@@ -78,8 +87,8 @@ public class OneWayGNSSRange extends AbstractOneWayGNSSMeasurement<OneWayGNSSRan
                                                                                                 final int evaluation,
                                                                                                 final SpacecraftState[] states) {
 
-
-        final OnBoardCommonParametersWithoutDerivatives common = computeCommonParametersWithout(states, false);
+        final CommonParametersWithoutDerivatives common = gnssSat.
+            computeLocalParametersWithout(states, getSatellites().get(0), getDate(), false);
 
         // Estimated measurement
         final EstimatedMeasurementBase<OneWayGNSSRange> estimatedRange =
@@ -92,7 +101,8 @@ public class OneWayGNSSRange extends AbstractOneWayGNSSMeasurement<OneWayGNSSRan
                                                        });
 
         // Range value
-        final double range = (common.getTauD() + common.getLocalOffset() - common.getRemoteOffset()) *
+        final double range = (common.getTauD() + common.getLocalOffset().getOffset() -
+                              common.getRemoteOffset().getOffset()) *
                              Constants.SPEED_OF_LIGHT;
 
         // Set value of the estimated measurement
@@ -109,7 +119,9 @@ public class OneWayGNSSRange extends AbstractOneWayGNSSMeasurement<OneWayGNSSRan
                                                                           final int evaluation,
                                                                           final SpacecraftState[] states) {
 
-        final OnBoardCommonParametersWithDerivatives common = computeCommonParametersWith(states, false);
+        final CommonParametersWithDerivatives common = gnssSat.
+            computeLocalParametersWith(states, getSatellites().get(0), getDate(),
+                                       false, getParametersDrivers());
 
         // Estimated measurement
         final EstimatedMeasurement<OneWayGNSSRange> estimatedRange =
@@ -122,7 +134,8 @@ public class OneWayGNSSRange extends AbstractOneWayGNSSMeasurement<OneWayGNSSRan
                                                    });
 
         // Range value
-        final Gradient range            = common.getTauD().add(common.getLocalOffset()).subtract(common.getRemoteOffset()).
+        final Gradient range            = common.getTauD().add(common.getLocalOffset().getOffset()).
+                                          subtract(common.getRemoteOffset().getOffset()).
                                           multiply(Constants.SPEED_OF_LIGHT);
         final double[] rangeDerivatives = range.getGradient();
 

@@ -17,20 +17,19 @@
 package org.orekit.estimation.measurements;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
-import org.orekit.frames.FieldTransform;
-import org.orekit.frames.Transform;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
-import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.Constants;
-import org.orekit.utils.FieldAbsolutePVCoordinates;
+import org.orekit.utils.FieldPVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
+import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.TimeSpanMap.Span;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinates;
@@ -49,10 +48,13 @@ import org.orekit.utils.TimeStampedPVCoordinates;
  * @author Joris Olympio
  * @since 8.0
  */
-public class RangeRate extends GroundReceiverMeasurement<RangeRate> {
+public class RangeRate extends AbstractMeasurement<RangeRate> {
 
     /** Type of the measurement. */
     public static final String MEASUREMENT_TYPE = "RangeRate";
+
+    /** Ground station that receives signal from satellite. */
+    private final GroundStation station;
 
     /** Simple constructor.
      * @param station ground station from which measurement is performed
@@ -60,14 +62,24 @@ public class RangeRate extends GroundReceiverMeasurement<RangeRate> {
      * @param rangeRate observed value, m/s
      * @param sigma theoretical standard deviation
      * @param baseWeight base weight
-     * @param twoway if true, this is a two-way measurement
+     * @param twoWay if true, this is a two-way measurement
      * @param satellite satellite related to this measurement
      * @since 9.3
      */
     public RangeRate(final GroundStation station, final AbsoluteDate date,
                      final double rangeRate, final double sigma, final double baseWeight,
-                     final boolean twoway, final ObservableSatellite satellite) {
-        super(station, twoway, date, rangeRate, sigma, baseWeight, satellite);
+                     final boolean twoWay, final ObservableSatellite satellite) {
+        super(date, twoWay, rangeRate, sigma, baseWeight, Collections.singletonList(satellite));
+        addParametersDrivers(station.getParametersDrivers());
+
+        this.station = station;
+    }
+
+    /** Get the ground station that receives the signal.
+     * @return ground station
+     */
+    public final GroundStation getStation() {
+        return station;
     }
 
     /** {@inheritDoc} */
@@ -76,31 +88,28 @@ public class RangeRate extends GroundReceiverMeasurement<RangeRate> {
                                                                                           final int evaluation,
                                                                                           final SpacecraftState[] states) {
 
-        final GroundReceiverCommonParametersWithoutDerivatives common = computeCommonParametersWithout(states[0]);
+        final CommonParametersWithoutDerivatives common =
+            getStation().computeRemoteParametersWithout(states, getSatellites().get(0), getDate(), false);
         final TimeStampedPVCoordinates transitPV = common.getTransitPV();
 
         // one-way (downlink) range-rate
         final EstimatedMeasurementBase<RangeRate> evalOneWay1 =
                         oneWayTheoreticalEvaluation(iteration, evaluation, true,
-                                                    common.getStationDownlink(),
+                                                    common.getRemotePV(),
                                                     transitPV,
                                                     common.getTransitState());
         final EstimatedMeasurementBase<RangeRate> estimated;
         if (isTwoWay()) {
             // one-way (uplink) light time correction
-            final Transform offsetToInertialApproxUplink =
-                            getStation().getOffsetToInertial(common.getState().getFrame(),
-                                                             common.getStationDownlink().getDate().shiftedBy(-2 * common.getTauD()),
-                                                             false);
-            final AbsoluteDate approxUplinkDate = offsetToInertialApproxUplink.getDate();
+            final double clockOffset = getStation().getQuadraticClockModel().getOffset(getDate()).getOffset();
+            final AbsoluteDate noOffsetDate = common.getRemotePV().getDate().shiftedBy(-2 * common.getTauD());
+            final AbsoluteDate approxUplinkDate = noOffsetDate.shiftedBy(-clockOffset);
 
-            final TimeStampedPVCoordinates stationApproxUplink =
-                            offsetToInertialApproxUplink.transformPVCoordinates(new TimeStampedPVCoordinates(approxUplinkDate,
-                                                                                                             Vector3D.ZERO, Vector3D.ZERO, Vector3D.ZERO));
+            final PVCoordinatesProvider primaryCoordsProvider = getStation().getPVCoordinatesProvider();
+            final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(primaryCoordsProvider);
+            final double tauU = signalTimeOfFlight.compute(transitPV.getPosition(), transitPV.getDate(), common.getState().getFrame());
 
-            final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(new AbsolutePVCoordinates(common.getState().getFrame(), stationApproxUplink));
-            final double tauU = signalTimeOfFlight.compute(stationApproxUplink.getDate(), transitPV.getPosition(), transitPV.getDate(), common.getState().getFrame());
-
+            final TimeStampedPVCoordinates stationApproxUplink = primaryCoordsProvider.getPVCoordinates(approxUplinkDate, states[0].getFrame());
             final TimeStampedPVCoordinates stationUplink =
                             stationApproxUplink.shiftedBy(transitPV.getDate().durationFrom(approxUplinkDate) - tauU);
 
@@ -141,35 +150,28 @@ public class RangeRate extends GroundReceiverMeasurement<RangeRate> {
         //  - 0..2 - Position of the spacecraft in inertial frame
         //  - 3..5 - Velocity of the spacecraft in inertial frame
         //  - 6..n - station parameters (clock offset, clock drift, station offsets, pole, prime meridian...)
-        final GroundReceiverCommonParametersWithDerivatives common = computeCommonParametersWithDerivatives(state);
+        final CommonParametersWithDerivatives common = getStation().
+            computeRemoteParametersWith(states, getSatellites().get(0), getDate(), false, getParametersDrivers());
         final int nbParams = common.getTauD().getFreeParameters();
         final TimeStampedFieldPVCoordinates<Gradient> transitPV = common.getTransitPV();
 
         // one-way (downlink) range-rate
         final EstimatedMeasurement<RangeRate> evalOneWay1 =
                         oneWayTheoreticalEvaluation(iteration, evaluation, true,
-                                                    common.getStationDownlink(), transitPV,
+                                                    common.getRemotePV(), transitPV,
                                                     common.getTransitState(), common.getIndices(), nbParams);
         final EstimatedMeasurement<RangeRate> estimated;
         if (isTwoWay()) {
             // one-way (uplink) light time correction
-            final FieldTransform<Gradient> offsetToInertialApproxUplink =
-                            getStation().getOffsetToInertial(state.getFrame(),
-                                                             common.getStationDownlink().getDate().shiftedBy(common.getTauD().multiply(-2)),
-                                                             nbParams, common.getIndices());
-            final FieldAbsoluteDate<Gradient> approxUplinkDateDS =
-                            offsetToInertialApproxUplink.getFieldDate();
 
-            final FieldVector3D<Gradient> zero = FieldVector3D.getZero(common.getTauD().getField());
-            final TimeStampedFieldPVCoordinates<Gradient> stationApproxUplink =
-                            offsetToInertialApproxUplink.transformPVCoordinates(new TimeStampedFieldPVCoordinates<>(approxUplinkDateDS,
-                                                                                                                    zero, zero, zero));
-
-            final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(new FieldAbsolutePVCoordinates<>(state.getFrame(), stationApproxUplink));
-            final Gradient tauU = fieldComputer.compute(stationApproxUplink.getDate(), transitPV.getPosition(), transitPV.getDate(), state.getFrame());
+            final FieldAbsoluteDate<Gradient> approxUplinkDateDS = common.getRemotePV().getDate().shiftedBy(common.getTauD().multiply(-2.0));
+            final FieldPVCoordinatesProvider<Gradient> primaryCoordsProvider = getStation().getFieldPVCoordinatesProvider(nbParams, common.getIndices());
+            final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(primaryCoordsProvider);
+            final Gradient tauU = fieldComputer.compute(transitPV.getPosition(), transitPV.getDate(), state.getFrame());
 
             final TimeStampedFieldPVCoordinates<Gradient> stationUplink =
-                            stationApproxUplink.shiftedBy(transitPV.getDate().durationFrom(approxUplinkDateDS).subtract(tauU));
+                            primaryCoordsProvider.getPVCoordinates(approxUplinkDateDS, states[0].getFrame()).
+                                            shiftedBy(transitPV.getDate().durationFrom(approxUplinkDateDS).subtract(tauU));
 
             final EstimatedMeasurement<RangeRate> evalOneWay2 =
                             oneWayTheoreticalEvaluation(iteration, evaluation, false,
