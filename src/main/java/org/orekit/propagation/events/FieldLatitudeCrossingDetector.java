@@ -20,7 +20,7 @@ import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.orekit.bodies.BodyShape;
 import org.orekit.propagation.FieldSpacecraftState;
-import org.orekit.propagation.events.functions.LatitudeValueCrossingEventFunction;
+import org.orekit.propagation.events.functions.LatitudeValueCrossingFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
 import org.orekit.propagation.events.handlers.FieldStopOnIncreasing;
@@ -81,7 +81,7 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
             final FieldEventHandler<T> handler,
             final BodyShape body,
             final double latitude) {
-        this(new LatitudeValueCrossingEventFunction(body, latitude), detectionSettings, handler, body);
+        this(new LatitudeValueCrossingFunction(body, latitude), detectionSettings, handler, body);
     }
 
     /** Protected constructor with full parameters.
@@ -97,7 +97,7 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
      * @since 14.0
      */
     protected FieldLatitudeCrossingDetector(
-            final LatitudeValueCrossingEventFunction eventFunction,
+            final LatitudeValueCrossingFunction eventFunction,
             final FieldEventDetectionSettings<T> detectionSettings,
             final FieldEventHandler<T> handler,
             final BodyShape body) {
@@ -109,7 +109,7 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
     @Override
     protected FieldLatitudeCrossingDetector<T> create(final FieldEventDetectionSettings<T> detectionSettings,
                                                       final FieldEventHandler<T> newHandler) {
-        return new FieldLatitudeCrossingDetector<>((LatitudeValueCrossingEventFunction) getEventFunction(),
+        return new FieldLatitudeCrossingDetector<>((LatitudeValueCrossingFunction) getEventFunction(),
                 detectionSettings, newHandler, getBodyShape());
     }
 
@@ -135,7 +135,7 @@ public class FieldLatitudeCrossingDetector <T extends CalculusFieldElement<T>>
 
     @Override
     public LatitudeCrossingDetector toEventDetector(final EventHandler eventHandler) {
-        return new LatitudeCrossingDetector((LatitudeValueCrossingEventFunction) getEventFunction(),
+        return new LatitudeCrossingDetector((LatitudeValueCrossingFunction) getEventFunction(),
                 getDetectionSettings().toEventDetectionSettings(), eventHandler, getBodyShape());
     }
 }

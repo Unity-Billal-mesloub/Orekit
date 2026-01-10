@@ -20,7 +20,7 @@ import org.hipparchus.util.FastMath;
 import org.orekit.bodies.BodyShape;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.functions.EventFunction;
-import org.orekit.propagation.events.functions.LongitudeValueCrossingEventFunction;
+import org.orekit.propagation.events.functions.LongitudeValueCrossingFunction;
 import org.orekit.propagation.events.handlers.ContinueOnEvent;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnIncreasing;
@@ -98,7 +98,7 @@ public class LongitudeCrossingDetector extends AbstractGeographicalDetector<Long
         // the central body: once at expected longitude and once at antimeridian.
         // The second sign change is a spurious one and is filtered out by the
         // outer class
-        final EventFunction eventFunction = new LongitudeValueCrossingEventFunction(getBodyShape(), longitude);
+        final EventFunction eventFunction = new LongitudeValueCrossingFunction(getBodyShape(), longitude);
         final EventDetector raw = EventDetector.of(eventFunction, new ContinueOnEvent(), getDetectionSettings());
         final EnablingPredicate predicate = new EnablingPredicate() {
             @Override

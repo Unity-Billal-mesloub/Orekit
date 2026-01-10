@@ -17,44 +17,47 @@
 package org.orekit.propagation.events.functions;
 
 import org.hipparchus.CalculusFieldElement;
+import org.hipparchus.util.MathUtils;
 import org.orekit.bodies.BodyShape;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
 
-/** Class for geodetic latitude value-crossing event function.
- * It is negative under the critical value.
+/** Class for longitude value-crossing event function.
+ * It is negative under the critical value. It is also centered around it and bounded.
  * @author Romain Serra
  * @since 14.0
  */
-public class LatitudeValueCrossingEventFunction extends AbstractGeodeticEventFunction {
+public class LongitudeValueCrossingFunction extends AbstractGeodeticEventFunction {
 
-    /** Critical latitude for crossing event. */
-    private final double criticalLatitude;
+    /** Critical longitude for crossing event. */
+    private final double criticalLongitude;
 
     /** Constructor.
      * @param body body
-     * @param criticalLatitude latitude for crossing
+     * @param criticalLongitude longitude for crossing
      */
-    public LatitudeValueCrossingEventFunction(final BodyShape body, final double criticalLatitude) {
+    public LongitudeValueCrossingFunction(final BodyShape body, final double criticalLongitude) {
         super(body);
-        this.criticalLatitude = criticalLatitude;
+        this.criticalLongitude = criticalLongitude;
     }
 
     @Override
     public double value(final SpacecraftState state) {
-        return transformToGeodeticPoint(state).getLatitude() - criticalLatitude;
+        final double longitude = getBodyShape().getLongitude(state.getPosition(), state.getFrame(), state.getDate());
+        return MathUtils.normalizeAngle(longitude, criticalLongitude) - criticalLongitude;
     }
 
     @Override
     public <T extends CalculusFieldElement<T>> T value(final FieldSpacecraftState<T> fieldState) {
-        return transformToGeodeticPoint(fieldState).getLatitude().subtract(criticalLatitude);
+        final T longitude = getBodyShape().getLongitude(fieldState.getPosition(), fieldState.getFrame(), fieldState.getDate());
+        return MathUtils.normalizeAngle(longitude, longitude.newInstance(criticalLongitude)).subtract(criticalLongitude);
     }
 
     /**
-     * Getter for critical latitude.
-     * @return latitude
+     * Getter for critical longitude.
+     * @return longitude
      */
-    public double getCriticalLatitude() {
-        return criticalLatitude;
+    public double getCriticalLongitude() {
+        return criticalLongitude;
     }
 }

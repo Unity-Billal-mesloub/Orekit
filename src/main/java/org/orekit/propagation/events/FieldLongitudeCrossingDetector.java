@@ -22,7 +22,7 @@ import org.hipparchus.util.FastMath;
 import org.orekit.bodies.BodyShape;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.events.functions.EventFunction;
-import org.orekit.propagation.events.functions.LongitudeValueCrossingEventFunction;
+import org.orekit.propagation.events.functions.LongitudeValueCrossingFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.FieldContinueOnEvent;
 import org.orekit.propagation.events.handlers.FieldEventHandler;
@@ -119,7 +119,7 @@ public class FieldLongitudeCrossingDetector <T extends CalculusFieldElement<T>>
         // the central body: once at expected longitude and once at antimeridian.
         // The second sign change is a spurious one and is filtered out by the
         // outer class
-        final EventFunction eventFunction = new LongitudeValueCrossingEventFunction(getBodyShape(), longitude);
+        final EventFunction eventFunction = new LongitudeValueCrossingFunction(getBodyShape(), longitude);
         final FieldEventDetector<T> raw = FieldEventDetector.of(eventFunction, new FieldContinueOnEvent<>(), getDetectionSettings());
         final FieldEnablingPredicate<T> predicate = new FieldEnablingPredicate<T>() {
             @Override

@@ -29,14 +29,14 @@ import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class LongitudeValueCrossingEventFunctionTest {
+class LongitudeValueCrossingFunctionTest {
 
     @Test
     void testGetter() {
         // GIVEN
         final BodyShape bodyShape = new OneAxisEllipsoid(1000, 0., FramesFactory.getEME2000());
         final double expectedLongitude = -1;
-        final LongitudeValueCrossingEventFunction eventFunction = new LongitudeValueCrossingEventFunction(bodyShape, expectedLongitude);
+        final LongitudeValueCrossingFunction eventFunction = new LongitudeValueCrossingFunction(bodyShape, expectedLongitude);
         // WHEN
         final double actual = eventFunction.getCriticalLongitude();
         // THEN
@@ -49,7 +49,7 @@ class LongitudeValueCrossingEventFunctionTest {
         final Orbit orbit = TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH);
         final SpacecraftState state = new SpacecraftState(orbit);
         final BodyShape bodyShape = new OneAxisEllipsoid(1000, 0., FramesFactory.getEME2000());
-        final LongitudeValueCrossingEventFunction eventFunction = new LongitudeValueCrossingEventFunction(bodyShape, 0.);
+        final LongitudeValueCrossingFunction eventFunction = new LongitudeValueCrossingFunction(bodyShape, 0.);
         // WHEN
         final double value = eventFunction.value(state);
         // THEN
@@ -63,7 +63,7 @@ class LongitudeValueCrossingEventFunctionTest {
         final SpacecraftState state = new SpacecraftState(orbit);
         final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(Binary64Field.getInstance(), state);
         final BodyShape bodyShape = new OneAxisEllipsoid(1000, 0.1, FramesFactory.getEME2000());
-        final LongitudeValueCrossingEventFunction eventFunction = new LongitudeValueCrossingEventFunction(bodyShape, 1.);
+        final LongitudeValueCrossingFunction eventFunction = new LongitudeValueCrossingFunction(bodyShape, 1.);
         // WHEN
         final Binary64 value = eventFunction.value(fieldState);
         // THEN

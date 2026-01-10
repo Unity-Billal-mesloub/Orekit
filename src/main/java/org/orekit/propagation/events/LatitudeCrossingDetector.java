@@ -18,7 +18,7 @@ package org.orekit.propagation.events;
 
 import org.orekit.bodies.BodyShape;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.events.functions.LatitudeValueCrossingEventFunction;
+import org.orekit.propagation.events.functions.LatitudeValueCrossingFunction;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.events.handlers.StopOnIncreasing;
 
@@ -65,7 +65,7 @@ public class LatitudeCrossingDetector extends AbstractGeographicalDetector<Latit
      */
     public LatitudeCrossingDetector(final EventDetectionSettings detectionSettings, final EventHandler handler,
                                     final BodyShape body, final double latitude) {
-        this(new LatitudeValueCrossingEventFunction(body, latitude), detectionSettings, handler, body);
+        this(new LatitudeValueCrossingFunction(body, latitude), detectionSettings, handler, body);
     }
 
     /** Protected constructor with full parameters.
@@ -80,7 +80,7 @@ public class LatitudeCrossingDetector extends AbstractGeographicalDetector<Latit
      * @param body body on which the latitude is defined
      * @since 14.0
      */
-    protected LatitudeCrossingDetector(final LatitudeValueCrossingEventFunction eventFunction,
+    protected LatitudeCrossingDetector(final LatitudeValueCrossingFunction eventFunction,
                                        final EventDetectionSettings detectionSettings, final EventHandler handler,
                                        final BodyShape body) {
         super(eventFunction, detectionSettings, handler, body);
@@ -91,7 +91,7 @@ public class LatitudeCrossingDetector extends AbstractGeographicalDetector<Latit
     @Override
     protected LatitudeCrossingDetector create(final EventDetectionSettings detectionSettings,
                                               final EventHandler newHandler) {
-        return new LatitudeCrossingDetector((LatitudeValueCrossingEventFunction) getEventFunction(), detectionSettings,
+        return new LatitudeCrossingDetector((LatitudeValueCrossingFunction) getEventFunction(), detectionSettings,
                 newHandler, getBodyShape());
     }
 

@@ -29,10 +29,9 @@ import org.orekit.orbits.Orbit;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class LatitudeValueCrossingEventFunctionTest {
+class LatitudeValueCrossingFunctionTest {
 
     @BeforeEach
     void setUp() {
@@ -46,7 +45,7 @@ class LatitudeValueCrossingEventFunctionTest {
         final SpacecraftState state = new SpacecraftState(orbit);
         final FieldSpacecraftState<Binary64> fieldState = new FieldSpacecraftState<>(Binary64Field.getInstance(), state);
         final BodyShape bodyShape = ReferenceEllipsoid.getWgs84(FramesFactory.getGTOD(true));
-        final LatitudeValueCrossingEventFunction eventFunction = new LatitudeValueCrossingEventFunction(bodyShape, 1.);
+        final LatitudeValueCrossingFunction eventFunction = new LatitudeValueCrossingFunction(bodyShape, 1.);
         // WHEN
         final Binary64 value = eventFunction.value(fieldState);
         // THEN
