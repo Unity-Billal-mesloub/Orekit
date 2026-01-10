@@ -60,6 +60,10 @@ public class FDOATest {
                                                                1.0, 3.0, 300.0);
         propagator.clearStepHandlers();
 
+        for (final ObservedMeasurement<?> m : measurements) {
+            Assertions.assertTrue(((FDOA) m).getCentreFrequency() == CENTRE_FREQUENCY);
+        }
+
         // Prepare statistics for values difference
         final StreamingStatistics diffStat = new StreamingStatistics();
 

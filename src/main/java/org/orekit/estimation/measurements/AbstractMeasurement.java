@@ -61,44 +61,25 @@ public abstract class AbstractMeasurement<T extends ObservedMeasurement<T>> impl
     /** Enabling status. */
     private boolean enabled;
 
+    /** Whether measurement is two-way or not (true for two-way). */
+    private boolean isTwoWay;
+
     /** Simple constructor for mono-dimensional measurements.
      * <p>
      * At construction, a measurement is enabled.
      * </p>
      * @param date date of the measurement
+     * @param isTwoWay true for two-way measurement
      * @param observed observed value
      * @param sigma theoretical standard deviation
      * @param baseWeight base weight
      * @param satellites satellites related to this measurement
      * @since 9.3
      */
-    protected AbstractMeasurement(final AbsoluteDate date, final double observed,
+    protected AbstractMeasurement(final AbsoluteDate date, final boolean isTwoWay, final double observed,
                                   final double sigma, final double baseWeight,
                                   final List<ObservableSatellite> satellites) {
-
-        this.supportedParameters = new ArrayList<>();
-
-        // Add parameter drivers
-        satellites.forEach(s -> {
-            addParametersDrivers(s.getParametersDrivers());
-        });
-
-        this.date       = date;
-        this.observed   = new double[] {
-            observed
-        };
-        this.sigma      = new double[] {
-            sigma
-        };
-        this.baseWeight = new double[] {
-            baseWeight
-        };
-
-        this.satellites = satellites;
-
-        this.modifiers = new ArrayList<>();
-        setEnabled(true);
-
+        this(date, isTwoWay, new double[] {observed}, new double[] {sigma}, new double[] {baseWeight}, satellites);
     }
 
     /** Simple constructor, for multi-dimensional measurements.
@@ -106,27 +87,40 @@ public abstract class AbstractMeasurement<T extends ObservedMeasurement<T>> impl
      * At construction, a measurement is enabled.
      * </p>
      * @param date date of the measurement
+     * @param isTwoWay true for two-way measurement
      * @param observed observed value
      * @param sigma theoretical standard deviation
      * @param baseWeight base weight
      * @param satellites satellites related to this measurement
      * @since 9.3
      */
-    protected AbstractMeasurement(final AbsoluteDate date, final double[] observed,
+    protected AbstractMeasurement(final AbsoluteDate date, final boolean isTwoWay, final double[] observed,
                                   final double[] sigma, final double[] baseWeight,
                                   final List<ObservableSatellite> satellites) {
         this.supportedParameters = new ArrayList<>();
 
         this.date       = date;
+        this.isTwoWay   = isTwoWay;
         this.observed   = observed.clone();
         this.sigma      = sigma.clone();
         this.baseWeight = baseWeight.clone();
 
         this.satellites = satellites;
 
+        // Add parameter drivers
+        satellites.forEach(s -> {
+            addParametersDrivers(s.getParametersDrivers());
+        });
+
         this.modifiers = new ArrayList<>();
         setEnabled(true);
 
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isTwoWay() {
+        return isTwoWay;
     }
 
     /** {@inheritDoc} */

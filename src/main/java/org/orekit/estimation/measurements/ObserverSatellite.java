@@ -16,8 +16,23 @@
  */
 package org.orekit.estimation.measurements;
 
+import java.util.Map;
+
+import org.hipparchus.analysis.differentiation.Gradient;
+import org.hipparchus.analysis.differentiation.GradientField;
+import org.hipparchus.Field;
+import org.orekit.frames.FieldTransform;
+import org.orekit.frames.Frame;
+import org.orekit.frames.Transform;
+import org.orekit.time.AbsoluteDate;
+import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.clocks.QuadraticClockModel;
+import org.orekit.utils.ExtendedPositionProvider;
+import org.orekit.utils.FieldPVCoordinatesProvider;
+import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.PVCoordinatesProvider;
+import org.orekit.utils.TimeStampedFieldPVCoordinates;
+import org.orekit.utils.TimeStampedPVCoordinates;
 
 /** Class that accepts a PVCoordinatesProvider for a space-
  * based measurement receiver.
@@ -36,8 +51,7 @@ public class ObserverSatellite extends MeasurementObject implements Observer {
      * @since 14.0
      */
     public ObserverSatellite(final String name, final PVCoordinatesProvider pvCoordsProvider) {
-        super(name);
-        this.pvCoordsProvider = pvCoordsProvider;
+        this(name, pvCoordsProvider, createEmptyQuadraticClock(name));
     }
 
     /** Simple constructor.
@@ -61,6 +75,66 @@ public class ObserverSatellite extends MeasurementObject implements Observer {
     @Override
     public final PVCoordinatesProvider getPVCoordinatesProvider() {
         return pvCoordsProvider;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public FieldPVCoordinatesProvider<Gradient> getFieldPVCoordinatesProvider(final int freeParameters,
+                                                                              final Map<String, Integer> parameterIndices) {
+
+        // If a FieldPVCoordinatesProvider<Gradient> already exists, use it
+        if (pvCoordsProvider instanceof ExtendedPositionProvider) {
+            final Field<Gradient> check = GradientField.getField(freeParameters);
+            return ((ExtendedPositionProvider) pvCoordsProvider).toFieldPVCoordinatesProvider(check);
+        }
+
+        // Otherwise, convert the PVCoordinatesProvider to a FieldPVCoordinatesProvider<Gradient>
+        else {
+            return (date, frame) -> {
+
+                // apply the raw (no derivatives) remote provider
+                final AbsoluteDate             dateBase = date.toAbsoluteDate();
+                final TimeStampedPVCoordinates pvBase   = pvCoordsProvider.getPVCoordinates(dateBase, frame);
+                final TimeStampedFieldPVCoordinates<Gradient> pvWithoutDerivatives =
+                    new TimeStampedFieldPVCoordinates<>(date.getField(), pvBase);
+
+                // add derivatives, using a trick: we shift the date by 0, with derivatives
+                final Gradient zeroWithDerivatives = date.durationFrom(dateBase);
+                return pvWithoutDerivatives.shiftedBy(zeroWithDerivatives);
+
+            };
+
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Transform getOffsetToInertial(final Frame inertial,
+                                         final AbsoluteDate date,
+                                         final boolean clockOffsetAlreadyApplied) {
+
+        // take clock offset into account
+        final AbsoluteDate offsetCompensatedDate = clockOffsetAlreadyApplied ?
+                                                   date :
+                                                   new AbsoluteDate(date, -getClockOffsetDriver().getValue());
+
+        // Return transform that will give PV coords of emitter when pos = 0, vel = 0 is entered
+        final PVCoordinates coords = getPVCoordinates(offsetCompensatedDate, inertial);
+        return new Transform(offsetCompensatedDate, coords.getPosition(), coords.getVelocity(), coords.getAcceleration());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public FieldTransform<Gradient> getOffsetToInertial(final Frame inertial,
+                                                        final FieldAbsoluteDate<Gradient> offsetCompensatedDate,
+                                                        final int freeParameters,
+                                                        final Map<String, Integer> indices) {
+
+        final AbsoluteDate    clockDate = offsetCompensatedDate.toAbsoluteDate();
+        final Field<Gradient> field     = offsetCompensatedDate.getField();
+        final Transform       transform = getOffsetToInertial(inertial, clockDate, true);
+
+        return new FieldTransform<>(field, transform);
     }
 
 }

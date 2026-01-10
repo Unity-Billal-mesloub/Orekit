@@ -60,7 +60,7 @@ class AbstractMeasurementTest {
     private static class TestMeasurementModel extends AbstractMeasurement<TestMeasurementModel> {
 
         TestMeasurementModel(AbsoluteDate date, double observed, List<ObservableSatellite> satellites) {
-            super(date, observed, 1., 1., satellites);
+            super(date, false, observed, 1., 1., satellites);
         }
 
         @Override

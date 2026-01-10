@@ -19,6 +19,8 @@ package org.orekit.estimation.measurements.gnss;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.orekit.estimation.measurements.CommonParametersWithDerivatives;
+import org.orekit.estimation.measurements.CommonParametersWithoutDerivatives;
 import org.orekit.estimation.measurements.EstimatedMeasurement;
 import org.orekit.estimation.measurements.EstimatedMeasurementBase;
 import org.orekit.estimation.measurements.ObservableSatellite;
@@ -65,7 +67,7 @@ public class InterSatellitesOneWayRangeRate
                                                                                                                final int evaluation,
                                                                                                                final SpacecraftState[] states) {
 
-        final OnBoardCommonParametersWithoutDerivatives common = computeCommonParametersWithout(states, false);
+        final CommonParametersWithoutDerivatives common = computeCommonParametersWithout(states, false);
 
         // prepare the evaluation
         final EstimatedMeasurementBase<InterSatellitesOneWayRangeRate> estimatedPhase =
@@ -81,7 +83,7 @@ public class InterSatellitesOneWayRangeRate
         // Range rate value
         final PVCoordinates delta = new PVCoordinates(common.getRemotePV(), common.getTransitPV());
         final double rangeRate = Vector3D.dotProduct(delta.getVelocity(), delta.getPosition().normalize()) +
-                                 Constants.SPEED_OF_LIGHT * (common.getLocalRate() - common.getRemoteRate());
+                                 Constants.SPEED_OF_LIGHT * (common.getLocalOffset().getRate() - common.getRemoteOffset().getRate());
 
         estimatedPhase.setEstimatedValue(rangeRate);
 
@@ -96,7 +98,7 @@ public class InterSatellitesOneWayRangeRate
                                                                                          final int evaluation,
                                                                                          final SpacecraftState[] states) {
 
-        final OnBoardCommonParametersWithDerivatives common = computeCommonParametersWith(states, false);
+        final CommonParametersWithDerivatives common = computeCommonParametersWith(states, false);
 
         // prepare the evaluation
         final EstimatedMeasurement<InterSatellitesOneWayRangeRate> estimatedPhase =
@@ -112,7 +114,8 @@ public class InterSatellitesOneWayRangeRate
         // Range rate value
         final FieldPVCoordinates<Gradient> delta = new FieldPVCoordinates<>(common.getRemotePV(), common.getTransitPV());
         final Gradient rangeRate = FieldVector3D.dotProduct(delta.getVelocity(), delta.getPosition().normalize()).
-                                   add(common.getLocalRate().subtract(common.getRemoteRate()).multiply(Constants.SPEED_OF_LIGHT));
+                                   add(common.getLocalOffset().getRate().subtract(common.getRemoteOffset().getRate()).
+                                   multiply(Constants.SPEED_OF_LIGHT));
 
         estimatedPhase.setEstimatedValue(rangeRate.getValue());
 

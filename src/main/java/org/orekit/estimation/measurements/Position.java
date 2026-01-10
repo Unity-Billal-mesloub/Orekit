@@ -104,7 +104,7 @@ public class Position extends AbstractMeasurement<Position> {
     public Position(final AbsoluteDate date, final Vector3D position,
                     final double[][] covarianceMatrix, final double baseWeight,
                     final ObservableSatellite satellite) {
-        super(date,
+        super(date, false,
               new double[] {
                   position.getX(), position.getY(), position.getZ()
               }, extractSigmas(covarianceMatrix),

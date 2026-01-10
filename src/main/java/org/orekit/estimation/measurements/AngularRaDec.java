@@ -17,6 +17,7 @@
 package org.orekit.estimation.measurements;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
@@ -42,13 +43,16 @@ import org.orekit.utils.TimeStampedPVCoordinates;
  * @author Maxime Journot
  * @since 9.0
  */
-public class AngularRaDec extends GroundReceiverMeasurement<AngularRaDec> {
+public class AngularRaDec extends AbstractMeasurement<AngularRaDec> {
 
     /** Type of the measurement. */
     public static final String MEASUREMENT_TYPE = "AngularRaDec";
 
     /** Reference frame in which the right ascension - declination angles are given. */
     private final Frame referenceFrame;
+
+    /** Ground station that receives signal from satellite. */
+    private final GroundStation station;
 
     /** Simple constructor.
      * @param station ground station from which measurement is performed
@@ -63,8 +67,12 @@ public class AngularRaDec extends GroundReceiverMeasurement<AngularRaDec> {
     public AngularRaDec(final GroundStation station, final Frame referenceFrame, final AbsoluteDate date,
                         final double[] angular, final double[] sigma, final double[] baseWeight,
                         final ObservableSatellite satellite) {
-        super(station, false, date, angular, sigma, baseWeight, satellite);
+        super(date, false, angular, sigma, baseWeight, Collections.singletonList(satellite));
         this.referenceFrame = referenceFrame;
+
+        addParametersDrivers(station.getParametersDrivers());
+
+        this.station = station;
     }
 
     /** Get the reference frame in which the right ascension - declination angles are given.
@@ -74,21 +82,29 @@ public class AngularRaDec extends GroundReceiverMeasurement<AngularRaDec> {
         return referenceFrame;
     }
 
+    /** Get the ground station that receives the signal.
+     * @return ground station
+     */
+    public final GroundStation getStation() {
+        return station;
+    }
+
     /** {@inheritDoc} */
     @Override
     protected EstimatedMeasurementBase<AngularRaDec> theoreticalEvaluationWithoutDerivatives(final int iteration,
                                                                                              final int evaluation,
                                                                                              final SpacecraftState[] states) {
 
-        final GroundReceiverCommonParametersWithoutDerivatives common = computeCommonParametersWithout(states[0]);
+        final CommonParametersWithoutDerivatives common =
+            getStation().computeRemoteParametersWithout(states, getSatellites().get(0), getDate(), false);
         final TimeStampedPVCoordinates transitPV = common.getTransitPV();
 
         // Station-satellite vector expressed in inertial frame
-        final Vector3D staSatInertial = transitPV.getPosition().subtract(common.getStationDownlink().getPosition());
+        final Vector3D staSatInertial = transitPV.getPosition().subtract(common.getRemotePV().getPosition());
 
         // Field transform from inertial to reference frame at station's reception date
         final StaticTransform inertialToReferenceDownlink = common.getState().getFrame().
-                                                            getStaticTransformTo(referenceFrame, common.getStationDownlink().getDate());
+                                                            getStaticTransformTo(referenceFrame, common.getRemotePV().getDate());
 
         // Station-satellite vector in reference frame
         final Vector3D staSatReference = inertialToReferenceDownlink.transformVector(staSatInertial);
@@ -106,7 +122,7 @@ public class AngularRaDec extends GroundReceiverMeasurement<AngularRaDec> {
                                                            common.getTransitState()
                                                        }, new TimeStampedPVCoordinates[] {
                                                            transitPV,
-                                                           common.getStationDownlink()
+                                                           common.getRemotePV()
                                                        });
 
         // azimuth - elevation values
@@ -131,15 +147,16 @@ public class AngularRaDec extends GroundReceiverMeasurement<AngularRaDec> {
         //  - 0..2 - Position of the spacecraft in inertial frame
         //  - 3..5 - Velocity of the spacecraft in inertial frame
         //  - 6..n - station parameters (clock offset, station offsets, pole, prime meridian...)
-        final GroundReceiverCommonParametersWithDerivatives common = computeCommonParametersWithDerivatives(state);
+        final CommonParametersWithDerivatives common = getStation().
+            computeRemoteParametersWith(states, getSatellites().get(0), getDate(), false, getParametersDrivers());
         final TimeStampedFieldPVCoordinates<Gradient> transitPV = common.getTransitPV();
 
         // Station-satellite vector expressed in inertial frame
-        final FieldVector3D<Gradient> staSatInertial = transitPV.getPosition().subtract(common.getStationDownlink().getPosition());
+        final FieldVector3D<Gradient> staSatInertial = transitPV.getPosition().subtract(common.getRemotePV().getPosition());
 
         // Field transform from inertial to reference frame at station's reception date
         final FieldStaticTransform<Gradient> inertialToReferenceDownlink =
-                        state.getFrame().getStaticTransformTo(referenceFrame, common.getStationDownlink().getDate());
+                        state.getFrame().getStaticTransformTo(referenceFrame, common.getRemotePV().getDate());
 
         // Station-satellite vector in reference frame
         final FieldVector3D<Gradient> staSatReference = inertialToReferenceDownlink.transformVector(staSatInertial);
@@ -158,7 +175,7 @@ public class AngularRaDec extends GroundReceiverMeasurement<AngularRaDec> {
                                                        common.getTransitState()
                                                    }, new TimeStampedPVCoordinates[] {
                                                        transitPV.toTimeStampedPVCoordinates(),
-                                                       common.getStationDownlink().toTimeStampedPVCoordinates()
+                                                       common.getRemotePV().toTimeStampedPVCoordinates()
                                                    });
 
         // azimuth - elevation values

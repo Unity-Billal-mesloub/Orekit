@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.orekit.estimation.measurements.EstimatedMeasurementBase;
 import org.orekit.estimation.measurements.EstimationModifier;
+import org.orekit.estimation.measurements.GroundStation;
 import org.orekit.estimation.measurements.gnss.Phase;
 import org.orekit.gnss.antenna.FrequencyPattern;
 import org.orekit.utils.ParameterDriver;
@@ -46,6 +47,11 @@ public class PhaseCentersPhaseModifier
     @Override
     public List<ParameterDriver> getParametersDrivers() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public GroundStation getObserver(final EstimatedMeasurementBase<Phase> estimated) {
+        return estimated.getObservedMeasurement().getStation();
     }
 
     /** {@inheritDoc} */

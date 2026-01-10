@@ -75,9 +75,6 @@ public class InterSatellitesRange extends AbstractMeasurement<InterSatellitesRan
     /** Type of the measurement. */
     public static final String MEASUREMENT_TYPE = "InterSatellitesRange";
 
-    /** Flag indicating whether it is a two-way measurement. */
-    private final boolean twoway;
-
     /** Simple constructor.
      * @param local satellite which receives the signal and performs the measurement
      * @param remote satellite which simply emits the signal in the one-way case,
@@ -94,25 +91,7 @@ public class InterSatellitesRange extends AbstractMeasurement<InterSatellitesRan
                                 final boolean twoWay,
                                 final AbsoluteDate date, final double range,
                                 final double sigma, final double baseWeight) {
-        super(date, range, sigma, baseWeight, Arrays.asList(local, remote));
-        // for one way and two ways measurements, the local satellite clock offsets affects the measurement
-        addParameterDriver(local.getClockOffsetDriver());
-        addParameterDriver(local.getClockDriftDriver());
-        addParameterDriver(local.getClockAccelerationDriver());
-        if (!twoWay) {
-            // for one way measurements, the remote satellite clock offsets also affects the measurement
-            addParameterDriver(remote.getClockOffsetDriver());
-            addParameterDriver(remote.getClockDriftDriver());
-            addParameterDriver(remote.getClockAccelerationDriver());
-        }
-        this.twoway = twoWay;
-    }
-
-    /** Check if the instance represents a two-way measurement.
-     * @return true if the instance represents a two-way measurement
-     */
-    public boolean isTwoWay() {
-        return twoway;
+        super(date, twoWay, range, sigma, baseWeight, Arrays.asList(local, remote));
     }
 
     /** {@inheritDoc} */
@@ -149,7 +128,7 @@ public class InterSatellitesRange extends AbstractMeasurement<InterSatellitesRan
         final EstimatedMeasurementBase<InterSatellitesRange> estimated;
 
         final double range;
-        if (twoway) {
+        if (isTwoWay()) {
             // Transit state (re)computed with derivative structures
             final TimeStampedPVCoordinates transitState = pvaR.shiftedBy(deltaMTauD);
 
@@ -254,7 +233,7 @@ public class InterSatellitesRange extends AbstractMeasurement<InterSatellitesRan
         final EstimatedMeasurement<InterSatellitesRange> estimated;
 
         final Gradient range;
-        if (twoway) {
+        if (isTwoWay()) {
             // Transit state (re)computed with derivative structures
             final TimeStampedFieldPVCoordinates<Gradient> transitStateDS = pvaR.shiftedBy(deltaMTauD);
 

@@ -103,7 +103,7 @@ public class BistaticRangeRateTest {
                                                                new BistaticRangeRateMeasurementCreator(context),
                                                                1.0, 3.0, 300.0);
         propagator.clearStepHandlers();
-
+        
         double maxRelativeError = 0;
         for (final ObservedMeasurement<?> measurement : measurements) {
 

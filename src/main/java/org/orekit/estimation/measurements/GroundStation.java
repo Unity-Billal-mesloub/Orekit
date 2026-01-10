@@ -46,8 +46,11 @@ import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.UT1Scale;
 import org.orekit.time.clocks.QuadraticClockModel;
+import org.orekit.utils.FieldPVCoordinatesProvider;
 import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
+import org.orekit.utils.TimeStampedFieldPVCoordinates;
+import org.orekit.utils.TimeStampedPVCoordinates;
 
 /** Class modeling a ground station that can perform some measurements.
  * <p>
@@ -363,12 +366,6 @@ public class GroundStation extends MeasurementObject implements Observer {
         return estimatedEarthFrameProvider.getPolarDriftYDriver();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public final PVCoordinatesProvider getPVCoordinatesProvider() {
-        return getBaseFrame();
-    }
-
     /** Get the base frame associated with the station.
      * <p>
      * The base frame corresponds to a null position offset, null
@@ -475,25 +472,38 @@ public class GroundStation extends MeasurementObject implements Observer {
 
     }
 
-    /** Get the transform between offset frame and inertial frame.
-     * <p>
-     * The offset frame takes the <em>current</em> position offset,
-     * polar motion and the meridian shift into account. The frame
-     * returned is disconnected from later changes in the parameters.
-     * When the {@link ParameterDriver parameters} managing these
-     * offsets are changed, the method must be called again to retrieve
-     * a new offset frame.
-     * </p>
-     * @param inertial inertial frame to transform to
-     * @param date date of the transform
-     * @param clockOffsetAlreadyApplied if true, the specified {@code date} is as read
-     * by the ground station clock (i.e. clock offset <em>not</em> compensated), if false,
-     * the specified {@code date} was already compensated and is a physical absolute date
-     * @return transform between offset frame and inertial frame, at <em>real</em> measurement
-     * date (i.e. with clock, Earth and station offsets applied)
-     */
-    public Transform getOffsetToInertial(final Frame inertial,
-                                         final AbsoluteDate date, final boolean clockOffsetAlreadyApplied) {
+    /** {@inheritDoc} */
+    @Override
+    public final PVCoordinatesProvider getPVCoordinatesProvider() {
+
+        // Returns a lambda function that compensates for the station displacement parameter values
+        return (date, frame) -> {
+            final Transform emitterToInertial =
+                getOffsetToInertial(frame, date, true);
+            return emitterToInertial.transformPVCoordinates(new TimeStampedPVCoordinates(date,
+                                                            Vector3D.ZERO, Vector3D.ZERO, Vector3D.ZERO));
+        };
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public FieldPVCoordinatesProvider<Gradient> getFieldPVCoordinatesProvider(final int freeParameters,
+                                                                              final Map<String, Integer> parameterIndices) {
+
+        // Returns a lambda function that compensates for the station displacement parameter values
+        return (date, frame) -> {
+            final FieldVector3D<Gradient> zero = FieldVector3D.getZero(date.getField());
+            final FieldTransform<Gradient> offsetToInertialDownlink =
+                            getOffsetToInertial(frame, date, freeParameters, parameterIndices);
+            return offsetToInertialDownlink.transformPVCoordinates(new TimeStampedFieldPVCoordinates<>(date,
+                                                                   zero, zero, zero));
+
+        };
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Transform getOffsetToInertial(final Frame inertial, final AbsoluteDate date, final boolean clockOffsetAlreadyApplied) {
 
         // take clock offset into account
         final AbsoluteDate offsetCompensatedDate = clockOffsetAlreadyApplied ?
@@ -523,56 +533,14 @@ public class GroundStation extends MeasurementObject implements Observer {
                                       new Transform(offsetCompensatedDate, origin));
 
         // combine all transforms together
-        final Transform bodyToInert        = baseFrame.getParent().getTransformTo(inertial, offsetCompensatedDate);
+        final Transform bodyToInert = baseFrame.getParent().getTransformTo(inertial, offsetCompensatedDate);
 
         return new Transform(offsetCompensatedDate, offsetToIntermediate, new Transform(offsetCompensatedDate, intermediateToBody, bodyToInert));
 
     }
 
-    /** Get the transform between offset frame and inertial frame with derivatives.
-     * <p>
-     * As the East and North vectors are not well defined at pole, the derivatives
-     * of these two vectors diverge to infinity as we get closer to the pole.
-     * So this method should not be used for stations less than 0.0001 degree from
-     * either poles.
-     * </p>
-     * @param inertial inertial frame to transform to
-     * @param clockDate date of the transform as read by the ground station clock (i.e. clock offset <em>not</em> compensated)
-     * @param freeParameters total number of free parameters in the gradient
-     * @param indices indices of the estimated parameters in derivatives computations, must be driver
-     * span name in map, not driver name or will not give right results (see {@link ParameterDriver#getValue(int, Map)})
-     * @return transform between offset frame and inertial frame, at <em>real</em> measurement
-     * date (i.e. with clock, Earth and station offsets applied)
-     * @see #getOffsetToInertial(Frame, FieldAbsoluteDate, int, Map)
-     * @since 10.2
-     */
-    public FieldTransform<Gradient> getOffsetToInertial(final Frame inertial,
-                                                        final AbsoluteDate clockDate,
-                                                        final int freeParameters,
-                                                        final Map<String, Integer> indices) {
-        // take clock offset into account
-        final Gradient offset = getClockOffsetDriver().getValue(freeParameters, indices, clockDate);
-        final FieldAbsoluteDate<Gradient> offsetCompensatedDate =
-                        new FieldAbsoluteDate<>(clockDate, offset.negate());
-
-        return getOffsetToInertial(inertial, offsetCompensatedDate, freeParameters, indices);
-    }
-
-    /** Get the transform between offset frame and inertial frame with derivatives.
-     * <p>
-     * As the East and North vectors are not well defined at pole, the derivatives
-     * of these two vectors diverge to infinity as we get closer to the pole.
-     * So this method should not be used for stations less than 0.0001 degree from
-     * either poles.
-     * </p>
-     * @param inertial inertial frame to transform to
-     * @param offsetCompensatedDate date of the transform, clock offset and its derivatives already compensated
-     * @param freeParameters total number of free parameters in the gradient
-     * @param indices indices of the estimated parameters in derivatives computations, must be driver
-     * span name in map, not driver name or will not give right results (see {@link ParameterDriver#getValue(int, Map)})
-     * @return transform between offset frame and inertial frame, at specified date
-     * @since 10.2
-     */
+    /** {@inheritDoc} */
+    @Override
     public FieldTransform<Gradient> getOffsetToInertial(final Frame inertial,
                                                         final FieldAbsoluteDate<Gradient> offsetCompensatedDate,
                                                         final int freeParameters,
