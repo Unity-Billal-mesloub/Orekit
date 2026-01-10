@@ -17,6 +17,7 @@
 package org.orekit.estimation.measurements;
 
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.hipparchus.optim.ConvergenceChecker;
 import org.orekit.frames.Frame;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
@@ -25,6 +26,7 @@ import org.orekit.utils.PVCoordinatesProvider;
 
 /**
  * Class for computing signal time of flight with an adjustable emitter and a fixed receiver's position and date.
+ * The delay is calculated via a fixed-point algorithm with customizable settings (even enabling instantaneous transmission).
  * @since 14.0
  * @author Romain Serra
  */
@@ -34,10 +36,21 @@ public class SignalTravelTimeAdjustableEmitter extends AbstractSignalTravelTime 
     private final PVCoordinatesProvider adjustableEmitterPVProvider;
 
     /**
-     * Constructor.
+     * Constructor with default iteration settings.
      * @param adjustableEmitterPVProvider adjustable emitter
      */
     public SignalTravelTimeAdjustableEmitter(final PVCoordinatesProvider adjustableEmitterPVProvider) {
+        this(adjustableEmitterPVProvider, getDefaultConvergenceChecker());
+    }
+
+    /**
+     * Constructor.
+     * @param adjustableEmitterPVProvider adjustable emitter
+     * @param checker convergence checker for fixed-point algorithm
+     */
+    public SignalTravelTimeAdjustableEmitter(final PVCoordinatesProvider adjustableEmitterPVProvider,
+                                             final ConvergenceChecker<Double> checker) {
+        super(checker);
         this.adjustableEmitterPVProvider = adjustableEmitterPVProvider;
     }
 
@@ -50,7 +63,7 @@ public class SignalTravelTimeAdjustableEmitter extends AbstractSignalTravelTime 
         return new SignalTravelTimeAdjustableEmitter(new AbsolutePVCoordinates(state.getFrame(), state.getPVCoordinates()));
     }
 
-    /** Compute propagation delay on a link leg (typically downlink or uplink) without a guess.
+    /** Compute propagation delay on a link leg (typically downlink or uplink) without custom guess.
      * @param receiverPosition fixed position of receiver at {@code signalArrivalDate}
      * @param signalArrivalDate date at which the signal arrives to receiver
      * @param frame Inertial frame in which receiver is defined.
@@ -74,8 +87,6 @@ public class SignalTravelTimeAdjustableEmitter extends AbstractSignalTravelTime 
                           final AbsoluteDate signalArrivalDate, final Frame frame) {
 
         // initialize emission date search loop assuming the state is already correct
-        // this will be true for all but the first orbit determination iteration,
-        // and even for the first iteration the loop will converge very fast
         final double offset = signalArrivalDate.durationFrom(approxEmissionDate);
 
         return compute(adjustableEmitterPVProvider, offset, receiverPosition, approxEmissionDate, frame);

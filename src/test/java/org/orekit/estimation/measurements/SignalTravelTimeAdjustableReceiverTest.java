@@ -1,6 +1,7 @@
 package org.orekit.estimation.measurements;
 
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.hipparchus.optim.ConvergenceChecker;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -10,11 +11,25 @@ import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.Constants;
 import org.orekit.utils.PVCoordinates;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.orekit.utils.PVCoordinatesProvider;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class SignalTravelTimeAdjustableReceiverTest {
 
+    @Test
+    void testConstructorDefaultConvergenceChecker() {
+        // GIVEN
+        final SignalTravelTimeAdjustableReceiver adjustableReceiver = new SignalTravelTimeAdjustableReceiver(mock());
+        // WHEN
+        final ConvergenceChecker<Double> convergenceChecker = adjustableReceiver.getConvergenceChecker();
+        final double convergedValue = 0.;
+        // THEN
+        assertFalse(convergenceChecker.converged(0, convergedValue, convergedValue));  // enforces at least one iteration
+        assertTrue(convergenceChecker.converged(1, convergedValue, convergedValue));
+    }
 
     @Test
     void testComputeStatic() {
@@ -32,7 +47,7 @@ class SignalTravelTimeAdjustableReceiverTest {
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {-1e3, -1e1, 0., 1e1, 1e2, 1e4, 1e4})
+    @ValueSource(doubles = {-1e3, -1e1, 0., 1e1, 1e2, 1e3, 1e4})
     void testCompute(final double speedFactor) {
         // GIVEN
         final Frame frame = FramesFactory.getGCRF();
@@ -47,5 +62,30 @@ class SignalTravelTimeAdjustableReceiverTest {
         final AbsoluteDate receptionDate = emissionDate.shiftedBy(actual);
         final double expected = signalTimeOfFlight.compute(emitterPosition, emissionDate, receptionDate, frame);
         assertEquals(expected, actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-1e4, -1e3, -1e1, 0., 1e1, 1e2, 1e3, 1e4})
+    void testComputeVersusSimple(final double speedFactor) {
+        // GIVEN
+        final Frame frame = FramesFactory.getGCRF();
+        final AbsoluteDate emissionDate = AbsoluteDate.ARBITRARY_EPOCH;
+        final PVCoordinates pvCoordinates = new PVCoordinates(new Vector3D(1e4, 1e6, -1e5), Vector3D.PLUS_J.scalarMultiply(speedFactor));
+        final AbsolutePVCoordinates absolutePVCoordinates = new AbsolutePVCoordinates(frame, emissionDate, pvCoordinates);
+        final Vector3D emitterPosition = Vector3D.ZERO;
+        final SignalTravelTimeAdjustableReceiver signalTimeOfFlight = new SignalTravelTimeAdjustableReceiver(absolutePVCoordinates,
+                ((iteration, previous, current) -> iteration >= 1));
+        // WHEN
+        final double actual = signalTimeOfFlight.compute(emitterPosition, emissionDate, frame);
+        // THEN
+        final double guess = pvCoordinates.getPosition().getNorm2() / Constants.SPEED_OF_LIGHT;
+        final double expected = iterateOnce(emitterPosition, emissionDate, frame, absolutePVCoordinates, guess);
+        assertEquals(expected, actual, 1e-12);
+    }
+
+    protected double iterateOnce(final Vector3D position, final AbsoluteDate date, final Frame frame,
+                                 final PVCoordinatesProvider pvCoordinatesProvider, final double travelTimeGuess) {
+        final Vector3D shiftedEmitter = pvCoordinatesProvider.getPosition(date.shiftedBy(travelTimeGuess), frame);
+        return shiftedEmitter.subtract(position).getNorm2() / Constants.SPEED_OF_LIGHT;
     }
 }

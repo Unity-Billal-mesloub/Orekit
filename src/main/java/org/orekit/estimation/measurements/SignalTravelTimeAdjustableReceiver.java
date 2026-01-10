@@ -17,6 +17,7 @@
 package org.orekit.estimation.measurements;
 
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.hipparchus.optim.ConvergenceChecker;
 import org.orekit.frames.Frame;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
@@ -25,6 +26,7 @@ import org.orekit.utils.PVCoordinatesProvider;
 
 /**
  * Class for computing signal time of flight with an adjustable receiver and fixed emitter's position.
+ * The delay is calculated via a fixed-point algorithm with customizable settings (even enabling instantaneous transmission).
  * @since 14.0
  * @author Romain Serra
  */
@@ -33,7 +35,22 @@ public class SignalTravelTimeAdjustableReceiver extends AbstractSignalTravelTime
     /** Position/velocity provider of receiver. */
     private final PVCoordinatesProvider adjustableReceiverPVProvider;
 
+    /**
+     * Constructor.
+     * @param adjustableReceiverPVProvider adjustable receiver
+     */
     public SignalTravelTimeAdjustableReceiver(final PVCoordinatesProvider adjustableReceiverPVProvider) {
+        this(adjustableReceiverPVProvider, getDefaultConvergenceChecker());
+    }
+
+    /**
+     * Constructor.
+     * @param adjustableReceiverPVProvider adjustable receiver
+     * @param checker convergence checker for fixed-point algorithm
+     */
+    public SignalTravelTimeAdjustableReceiver(final PVCoordinatesProvider adjustableReceiverPVProvider,
+                                             final ConvergenceChecker<Double> checker) {
+        super(checker);
         this.adjustableReceiverPVProvider = adjustableReceiverPVProvider;
     }
 
@@ -46,7 +63,7 @@ public class SignalTravelTimeAdjustableReceiver extends AbstractSignalTravelTime
         return new SignalTravelTimeAdjustableReceiver(new AbsolutePVCoordinates(state.getFrame(), state.getPVCoordinates()));
     }
 
-    /** Compute propagation delay on a link leg (typically downlink or uplink) without a guess.
+    /** Compute propagation delay on a link leg (typically downlink or uplink) without custom guess.
      * @param emitterPosition fixed position of emitter
      * @param emissionDate emission date
      * @param frame inertial frame in which emitter is defined
@@ -54,7 +71,7 @@ public class SignalTravelTimeAdjustableReceiver extends AbstractSignalTravelTime
      */
     public double compute(final Vector3D emitterPosition, final AbsoluteDate emissionDate, final Frame frame) {
         final Vector3D receiverPosition = adjustableReceiverPVProvider.getPosition(emissionDate, frame);
-        final double distance = receiverPosition.subtract(emitterPosition).getNorm();
+        final double distance = receiverPosition.subtract(emitterPosition).getNorm2();
         final AbsoluteDate approxReceptionDate = emissionDate.shiftedBy(distance * C_RECIPROCAL);
         return compute(emitterPosition, emissionDate, approxReceptionDate, frame);
     }

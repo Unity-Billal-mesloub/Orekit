@@ -18,6 +18,7 @@ package org.orekit.estimation.measurements;
 
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.hipparchus.optim.ConvergenceChecker;
 import org.hipparchus.util.Binary64;
 import org.hipparchus.util.Binary64Field;
 import org.junit.jupiter.api.Test;
@@ -26,10 +27,23 @@ import org.orekit.orbits.KeplerianExtendedPositionProvider;
 import org.orekit.orbits.Orbit;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FieldSignalTravelTimeAdjustableReceiverTest {
+
+    @Test
+    void testConstructorDefaultConvergenceChecker() {
+        // GIVEN
+        final FieldSignalTravelTimeAdjustableReceiver<Binary64> adjustableReceiver = new FieldSignalTravelTimeAdjustableReceiver<>(null);
+        // WHEN
+        final ConvergenceChecker<Binary64> convergenceChecker = adjustableReceiver.getConvergenceChecker();
+        final Binary64 convergedValue = Binary64.ZERO;
+        // THEN
+        assertFalse(convergenceChecker.converged(0, convergedValue, convergedValue));  // enforces at least one iteration
+        assertTrue(convergenceChecker.converged(1, convergedValue, convergedValue));
+    }
 
     @Test
     void testCompute() {

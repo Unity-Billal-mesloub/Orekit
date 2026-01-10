@@ -18,6 +18,7 @@ package org.orekit.estimation.measurements;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
+import org.hipparchus.optim.ConvergenceChecker;
 import org.orekit.frames.Frame;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.time.FieldAbsoluteDate;
@@ -26,6 +27,7 @@ import org.orekit.utils.FieldPVCoordinatesProvider;
 
 /**
  * Class for computing signal time of flight with an adjustable emitter and a fixed receiver's position and date.
+ * The delay is calculated via a fixed-point algorithm with customizable settings (even enabling instantaneous transmission).
  * @since 14.0
  * @see SignalTravelTimeAdjustableEmitter
  * @author Romain Serra
@@ -37,10 +39,21 @@ public class FieldSignalTravelTimeAdjustableEmitter<T extends CalculusFieldEleme
     private final FieldPVCoordinatesProvider<T> adjustableEmitterPVProvider;
 
     /**
-     * Constructor.
+     * Constructor with default iteration settings.
      * @param adjustableEmitterPVProvider adjustable emitter
      */
     public FieldSignalTravelTimeAdjustableEmitter(final FieldPVCoordinatesProvider<T> adjustableEmitterPVProvider) {
+        this(adjustableEmitterPVProvider, getDefaultConvergenceChecker());
+    }
+
+    /**
+     * Constructor.
+     * @param adjustableEmitterPVProvider adjustable emitter
+     * @param convergenceChecker convergence checker for fixed-point algorithm
+     */
+    public FieldSignalTravelTimeAdjustableEmitter(final FieldPVCoordinatesProvider<T> adjustableEmitterPVProvider,
+                                                  final ConvergenceChecker<T> convergenceChecker) {
+        super(convergenceChecker);
         this.adjustableEmitterPVProvider = adjustableEmitterPVProvider;
     }
 
@@ -54,7 +67,7 @@ public class FieldSignalTravelTimeAdjustableEmitter<T extends CalculusFieldEleme
         return new FieldSignalTravelTimeAdjustableEmitter<>(new FieldAbsolutePVCoordinates<>(state.getFrame(), state.getPVCoordinates()));
     }
 
-    /** Compute propagation delay on a link leg (typically downlink or uplink) without a guess.
+    /** Compute propagation delay on a link leg (typically downlink or uplink) without custom guess.
      * @param receiverPosition fixed position of receiver at {@code signalArrivalDate}
      * @param signalArrivalDate date at which the signal arrives to receiver
      * @param frame Inertial frame in which receiver is defined.
@@ -79,8 +92,6 @@ public class FieldSignalTravelTimeAdjustableEmitter<T extends CalculusFieldEleme
                      final FieldAbsoluteDate<T> signalArrivalDate, final Frame frame) {
 
         // Initialize emission date search loop assuming the emitter PV is almost correct
-        // this will be true for all but the first orbit determination iteration,
-        // and even for the first iteration the loop will converge extremely fast
         final T offset = signalArrivalDate.durationFrom(approxEmissionDate);
 
         return compute(adjustableEmitterPVProvider, offset, receiverPosition, approxEmissionDate, frame);

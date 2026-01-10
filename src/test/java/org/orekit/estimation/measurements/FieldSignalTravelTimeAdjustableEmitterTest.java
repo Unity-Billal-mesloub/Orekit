@@ -20,6 +20,7 @@ import org.hipparchus.complex.Complex;
 import org.hipparchus.complex.ComplexField;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.hipparchus.optim.ConvergenceChecker;
 import org.hipparchus.util.Binary64;
 import org.hipparchus.util.Binary64Field;
 import org.junit.jupiter.api.Test;
@@ -32,10 +33,19 @@ import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.FieldAbsolutePVCoordinates;
 import org.orekit.utils.FieldPVCoordinates;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FieldSignalTravelTimeAdjustableEmitterTest {
+
+    @Test
+    void testGetter() {
+        // GIVEN
+        final ConvergenceChecker<Binary64> convergenceChecker = (iteration, previous, current) -> true;
+        // WHEN
+        final FieldSignalTravelTimeAdjustableEmitter<Binary64> emitter = new FieldSignalTravelTimeAdjustableEmitter<>(null, convergenceChecker);
+        // THEN
+        assertEquals(convergenceChecker, emitter.getConvergenceChecker());
+    }
 
     @Test
     void testComputeVersusReverse() {

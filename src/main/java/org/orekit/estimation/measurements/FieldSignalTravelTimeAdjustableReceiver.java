@@ -18,6 +18,7 @@ package org.orekit.estimation.measurements;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
+import org.hipparchus.optim.ConvergenceChecker;
 import org.orekit.frames.Frame;
 import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.time.FieldAbsoluteDate;
@@ -26,6 +27,7 @@ import org.orekit.utils.FieldPVCoordinatesProvider;
 
 /**
  * Class for computing signal time of flight with an adjustable receiver and a fixed emitter's position and date.
+ * The delay is calculated via a fixed-point algorithm with customizable settings (even enabling instantaneous transmission).
  * @since 14.0
  * @see SignalTravelTimeAdjustableReceiver
  * @author Romain Serra
@@ -38,10 +40,21 @@ public class FieldSignalTravelTimeAdjustableReceiver<T extends CalculusFieldElem
     private final FieldPVCoordinatesProvider<T> adjustableReceiverPVProvider;
 
     /**
-     * Constructor.
+     * Constructor with default iteration settings.
      * @param adjustableReceiverPVProvider adjustable receiver
      */
     public FieldSignalTravelTimeAdjustableReceiver(final FieldPVCoordinatesProvider<T> adjustableReceiverPVProvider) {
+        this(adjustableReceiverPVProvider, getDefaultConvergenceChecker());
+    }
+
+    /**
+     * Constructor.
+     * @param adjustableReceiverPVProvider adjustable receiver
+     * @param convergenceChecker convergence checker for fixed-point algorithm
+     */
+    public FieldSignalTravelTimeAdjustableReceiver(final FieldPVCoordinatesProvider<T> adjustableReceiverPVProvider,
+                                                   final ConvergenceChecker<T> convergenceChecker) {
+        super(convergenceChecker);
         this.adjustableReceiverPVProvider = adjustableReceiverPVProvider;
     }
 
@@ -55,7 +68,7 @@ public class FieldSignalTravelTimeAdjustableReceiver<T extends CalculusFieldElem
         return new FieldSignalTravelTimeAdjustableReceiver<>(new FieldAbsolutePVCoordinates<>(state.getFrame(), state.getPVCoordinates()));
     }
 
-    /** Compute propagation delay on a link leg (typically downlink or uplink) without a guess.
+    /** Compute propagation delay on a link leg (typically downlink or uplink) without custom guess.
      * @param emitterPosition fixed position of emitter
      * @param emissionDate emission date
      * @param frame inertial frame in which emitter is defined

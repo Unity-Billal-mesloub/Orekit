@@ -18,6 +18,7 @@ package org.orekit.estimation.measurements;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
+import org.hipparchus.optim.ConvergenceChecker;
 import org.hipparchus.util.FastMath;
 import org.orekit.frames.Frame;
 import org.orekit.time.FieldAbsoluteDate;
@@ -36,9 +37,39 @@ abstract class FieldAbstractSignalTravelTime<T extends CalculusFieldElement<T>> 
     protected static final double C_RECIPROCAL = 1.0 / Constants.SPEED_OF_LIGHT;
 
     /** Maximum number of iterations. */
-    private static final int MAX_ITER = 10;
+    private static final int DEFAULT_MAX_ITER = 10;
+
+    /** Convergence checker. */
+    private final ConvergenceChecker<T> convergenceChecker;
+
+    /**
+     * Constructor.
+     * @param convergenceChecker convergence checker
+     */
+    protected FieldAbstractSignalTravelTime(final ConvergenceChecker<T> convergenceChecker) {
+        this.convergenceChecker = convergenceChecker;
+    }
+
+    /**
+     * Get the default convergence checker.
+     * @return checker
+     * @param <S> field type
+     */
+    protected static <S extends CalculusFieldElement<S>> ConvergenceChecker<S> getDefaultConvergenceChecker() {
+        return (iteration, previous, current) -> iteration != 0 && (iteration > DEFAULT_MAX_ITER ||
+                (previous.subtract(current)).norm() <= 2 * FastMath.ulp(current).getReal());
+    }
+
+    /**
+     * Getter for the convergence checker.
+     * @return checker
+     */
+    public ConvergenceChecker<T> getConvergenceChecker() {
+        return convergenceChecker;
+    }
 
     /** Compute propagation delay on a link leg (typically downlink or uplink).
+     * The max. iteration number and convergence checker can be tweaked to emulate no-delay a.k.a. instantaneous transmission.
      * @param pvCoordinatesProvider adjustable emitter/receiver
      * @param initialOffset guess for the time off set
      * @param fixedPosition fixed receiver/emitter position
@@ -51,15 +82,15 @@ abstract class FieldAbstractSignalTravelTime<T extends CalculusFieldElement<T>> 
         T delay = initialOffset;
 
         // search signal transit date, computing the signal travel in the frame shared by emitter and receiver
-        T delta;
+        T previous = initialOffset.getField().getZero();
         int count = 0;
-        do {
-            final T previous           = delay.add(0.0);
+        while (!convergenceChecker.converged(count, previous, delay)) {
+            previous           = delay.add(0.0);
             final T shift = computeShift(initialOffset, delay);
             final FieldVector3D<T> position = pvCoordinatesProvider.getPosition(guessDate.shiftedBy(shift), frame);
             delay                           = position.distance(fixedPosition).multiply(C_RECIPROCAL);
-            delta                           = FastMath.abs(delay.subtract(previous));
-        } while (count++ < MAX_ITER && delta.norm() >= 2 * FastMath.ulp(delay.getReal()));
+            count++;
+        }
 
         return delay;
     }
