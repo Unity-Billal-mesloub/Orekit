@@ -25,18 +25,18 @@ import org.hipparchus.analysis.differentiation.GradientField;
 import org.orekit.estimation.measurements.AbstractMeasurement;
 import org.orekit.estimation.measurements.CommonParametersWithDerivatives;
 import org.orekit.estimation.measurements.CommonParametersWithoutDerivatives;
-import org.orekit.estimation.measurements.FieldSignalTravelTimeAdjustableEmitter;
 import org.orekit.estimation.measurements.ObservableSatellite;
 import org.orekit.estimation.measurements.ObservedMeasurement;
-import org.orekit.estimation.measurements.SignalTravelTimeAdjustableEmitter;
+import org.orekit.estimation.measurements.signal.FieldSignalTravelTimeAdjustableEmitter;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeAdjustableEmitter;
 import org.orekit.frames.Frame;
+import org.orekit.propagation.SpacecraftState;
+import org.orekit.time.AbsoluteDate;
+import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.clocks.ClockOffset;
 import org.orekit.time.clocks.FieldClockOffset;
 import org.orekit.time.clocks.QuadraticClockModel;
 import org.orekit.time.clocks.QuadraticFieldClockModel;
-import org.orekit.propagation.SpacecraftState;
-import org.orekit.time.AbsoluteDate;
-import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.FieldPVCoordinatesProvider;
 import org.orekit.utils.PVCoordinatesProvider;
@@ -151,8 +151,8 @@ public abstract class AbstractInterSatellitesMeasurement<T extends ObservedMeasu
         // Downlink delay
         final double deltaT = arrivalDate.durationFrom(states[0]);
         final TimeStampedPVCoordinates pvaDownlink = pvaLocal.shiftedBy(deltaT);
-        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(remotePV);
-        final double tauD = signalTimeOfFlight.compute(arrivalDate, pvaDownlink.getPosition(), arrivalDate, frame);
+        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = getSignalTravelTimeModel().getAdjustableEmitterComputer(remotePV);
+        final double tauD = signalTimeOfFlight.computeDelay(arrivalDate, pvaDownlink.getPosition(), arrivalDate, frame);
 
         // Remote satellite at signal emission
         final AbsoluteDate emissionDate = arrivalDate.shiftedBy(-tauD);
@@ -209,8 +209,8 @@ public abstract class AbstractInterSatellitesMeasurement<T extends ObservedMeasu
         // Downlink delay
         final Gradient deltaT = arrivalDate.durationFrom(states[0].getDate());
         final TimeStampedFieldPVCoordinates<Gradient> pvaDownlink = pvaLocal.shiftedBy(deltaT);
-        final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(remotePV);
-        final Gradient tauD = fieldComputer.compute(arrivalDate, pvaDownlink.getPosition(), arrivalDate, frame);
+        final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = getSignalTravelTimeModel().getAdjustableEmitterComputer(remotePV);
+        final Gradient tauD = fieldComputer.computeDelay(arrivalDate, pvaDownlink.getPosition(), arrivalDate, frame);
 
         // Remote satellite at signal emission
         final FieldAbsoluteDate<Gradient>        emissionDate      = arrivalDate.shiftedBy(tauD.negate());

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.estimation.measurements;
+package org.orekit.estimation.measurements.signal;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
@@ -55,7 +55,7 @@ abstract class FieldAbstractSignalTravelTime<T extends CalculusFieldElement<T>> 
      * @return checker
      * @param <S> field type
      */
-    protected static <S extends CalculusFieldElement<S>> ConvergenceChecker<S> getDefaultConvergenceChecker() {
+    static <S extends CalculusFieldElement<S>> ConvergenceChecker<S> getDefaultConvergenceChecker() {
         return (iteration, previous, current) -> iteration != 0 && (iteration > DEFAULT_MAX_ITER ||
                 (previous.subtract(current)).norm() <= 2 * FastMath.ulp(current).getReal());
     }

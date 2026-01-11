@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.hipparchus.analysis.differentiation.Gradient;
+import org.orekit.estimation.measurements.signal.FieldSignalTravelTimeAdjustableEmitter;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeAdjustableEmitter;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
@@ -121,8 +123,8 @@ public class BistaticRange extends AbstractMeasurement<BistaticRange> {
 
         // Uplink time of flight from emitter station to transit state
         final PVCoordinatesProvider emitterPVCoordinatesProvider = getEmitterStation().getPVCoordinatesProvider();
-        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(emitterPVCoordinatesProvider);
-        final double tauU = signalTimeOfFlight.compute(transitPV.getPosition(), transitDate, states[0].getFrame());
+        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = getSignalTravelTimeModel().getAdjustableEmitterComputer(emitterPVCoordinatesProvider);
+        final double tauU = signalTimeOfFlight.computeDelay(transitPV.getPosition(), transitDate, states[0].getFrame());
 
         // Secondary station PV in inertial frame at rebound date on secondary station
         final TimeStampedPVCoordinates emitterPV = emitterPVCoordinatesProvider.getPVCoordinates(transitDate.shiftedBy(-tauU), states[0].getFrame());
@@ -145,7 +147,6 @@ public class BistaticRange extends AbstractMeasurement<BistaticRange> {
         final double dtr = getReceiverStation().getClockOffsetDriver().getValue(common.getState().getDate());
 
         // Range value
-        //final double tau = commonR.getTauD() + tauU + dtr - dte;
         final double tau = common.getTauD() + tauU + dtr - dte;
         final double range = tau * Constants.SPEED_OF_LIGHT;
 
@@ -183,8 +184,8 @@ public class BistaticRange extends AbstractMeasurement<BistaticRange> {
         // does not QUITE equal transitPV
         // transitPV gradients do NOT equal pvaDownlink gradient once the movement to the proper time is made
         final FieldPVCoordinatesProvider<Gradient> emitterPVCoordsProvider = getEmitterStation().getFieldPVCoordinatesProvider(nbParams, common.getIndices());
-        final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(emitterPVCoordsProvider);
-        final Gradient tauU = fieldComputer.compute(transitPV.getPosition(), transitPV.getDate(), state.getFrame());
+        final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = getSignalTravelTimeModel().getAdjustableEmitterComputer(emitterPVCoordsProvider);
+        final Gradient tauU = fieldComputer.computeDelay(transitPV.getPosition(), transitPV.getDate(), state.getFrame());
 
         // Emitter coordinates at transmit time
         final TimeStampedFieldPVCoordinates<Gradient> emitterPV

@@ -23,6 +23,7 @@ import java.util.List;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeModel;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.ParameterDriver;
@@ -58,11 +59,14 @@ public abstract class AbstractMeasurement<T extends ObservedMeasurement<T>> impl
     /** Modifiers that apply to the measurement.*/
     private final List<EstimationModifier<T>> modifiers;
 
+    /** Whether measurement is two-way or not (true for two-way). */
+    private final boolean isTwoWay;
+
+    /** Signal travel time model. */
+    private final SignalTravelTimeModel signalTravelTimeModel;
+
     /** Enabling status. */
     private boolean enabled;
-
-    /** Whether measurement is two-way or not (true for two-way). */
-    private boolean isTwoWay;
 
     /** Simple constructor for mono-dimensional measurements.
      * <p>
@@ -74,7 +78,7 @@ public abstract class AbstractMeasurement<T extends ObservedMeasurement<T>> impl
      * @param sigma theoretical standard deviation
      * @param baseWeight base weight
      * @param satellites satellites related to this measurement
-     * @since 9.3
+     * @since 14.0
      */
     protected AbstractMeasurement(final AbsoluteDate date, final boolean isTwoWay, final double observed,
                                   final double sigma, final double baseWeight,
@@ -92,10 +96,30 @@ public abstract class AbstractMeasurement<T extends ObservedMeasurement<T>> impl
      * @param sigma theoretical standard deviation
      * @param baseWeight base weight
      * @param satellites satellites related to this measurement
-     * @since 9.3
+     * @since 14.0
      */
     protected AbstractMeasurement(final AbsoluteDate date, final boolean isTwoWay, final double[] observed,
                                   final double[] sigma, final double[] baseWeight,
+                                  final List<ObservableSatellite> satellites) {
+        this(date, isTwoWay, observed, sigma, baseWeight, new SignalTravelTimeModel(), satellites);
+    }
+
+    /** Simple constructor, for multi-dimensional measurements.
+     * <p>
+     * At construction, a measurement is enabled.
+     * </p>
+     * @param date date of the measurement
+     * @param isTwoWay true for two-way measurement
+     * @param observed observed value
+     * @param sigma theoretical standard deviation
+     * @param baseWeight base weight
+     * @param signalTravelTimeModel signal travel time model
+     * @param satellites satellites related to this measurement
+     * @since 14.0
+     */
+    protected AbstractMeasurement(final AbsoluteDate date, final boolean isTwoWay, final double[] observed,
+                                  final double[] sigma, final double[] baseWeight,
+                                  final SignalTravelTimeModel signalTravelTimeModel,
                                   final List<ObservableSatellite> satellites) {
         this.supportedParameters = new ArrayList<>();
 
@@ -104,13 +128,11 @@ public abstract class AbstractMeasurement<T extends ObservedMeasurement<T>> impl
         this.observed   = observed.clone();
         this.sigma      = sigma.clone();
         this.baseWeight = baseWeight.clone();
-
+        this.signalTravelTimeModel = signalTravelTimeModel;
         this.satellites = satellites;
 
         // Add parameter drivers
-        satellites.forEach(s -> {
-            addParametersDrivers(s.getParametersDrivers());
-        });
+        satellites.forEach(s -> addParametersDrivers(s.getParametersDrivers()));
 
         this.modifiers = new ArrayList<>();
         setEnabled(true);
@@ -151,6 +173,15 @@ public abstract class AbstractMeasurement<T extends ObservedMeasurement<T>> impl
     @Override
     public List<ParameterDriver> getParametersDrivers() {
         return Collections.unmodifiableList(supportedParameters);
+    }
+
+    /**
+     * Getter for the signal travel time model.
+     * @return signal model
+     * @since 14.0
+     */
+    public SignalTravelTimeModel getSignalTravelTimeModel() {
+        return signalTravelTimeModel;
     }
 
     /** {@inheritDoc} */

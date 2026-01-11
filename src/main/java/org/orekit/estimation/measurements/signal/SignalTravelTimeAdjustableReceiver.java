@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.estimation.measurements;
+package org.orekit.estimation.measurements.signal;
 
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.optim.ConvergenceChecker;
@@ -25,7 +25,7 @@ import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.PVCoordinatesProvider;
 
 /**
- * Class for computing signal time of flight with an adjustable receiver and fixed emitter's position.
+ * Class for computing signal time of travel with an adjustable receiver and fixed emitter's position.
  * The delay is calculated via a fixed-point algorithm with customizable settings (even enabling instantaneous transmission).
  * @since 14.0
  * @author Romain Serra
@@ -69,11 +69,11 @@ public class SignalTravelTimeAdjustableReceiver extends AbstractSignalTravelTime
      * @param frame inertial frame in which emitter is defined
      * @return <em>positive</em> delay between signal emission and signal reception dates
      */
-    public double compute(final Vector3D emitterPosition, final AbsoluteDate emissionDate, final Frame frame) {
+    public double computeDelay(final Vector3D emitterPosition, final AbsoluteDate emissionDate, final Frame frame) {
         final Vector3D receiverPosition = adjustableReceiverPVProvider.getPosition(emissionDate, frame);
         final double distance = receiverPosition.subtract(emitterPosition).getNorm2();
         final AbsoluteDate approxReceptionDate = emissionDate.shiftedBy(distance * C_RECIPROCAL);
-        return compute(emitterPosition, emissionDate, approxReceptionDate, frame);
+        return computeDelay(emitterPosition, emissionDate, approxReceptionDate, frame);
     }
 
     /** Compute propagation delay on a link leg (typically downlink or uplink).
@@ -83,8 +83,8 @@ public class SignalTravelTimeAdjustableReceiver extends AbstractSignalTravelTime
      * @param frame inertial frame in which emitter is defined
      * @return <em>positive</em> delay between signal emission and signal reception dates
      */
-    public double compute(final Vector3D emitterPosition, final AbsoluteDate emissionDate,
-                          final AbsoluteDate approxReceptionDate, final Frame frame) {
+    public double computeDelay(final Vector3D emitterPosition, final AbsoluteDate emissionDate,
+                               final AbsoluteDate approxReceptionDate, final Frame frame) {
         // initialize reception date search loop assuming the state is already correct
         final double offset = approxReceptionDate.durationFrom(emissionDate);
 

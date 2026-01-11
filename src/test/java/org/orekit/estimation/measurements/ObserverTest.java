@@ -21,16 +21,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.analysis.differentiation.GradientField;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.orekit.estimation.Context;
 import org.orekit.estimation.EstimationTestUtils;
+import org.orekit.estimation.measurements.signal.FieldSignalTravelTimeAdjustableEmitter;
+import org.orekit.estimation.measurements.signal.FieldSignalTravelTimeAdjustableReceiver;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeAdjustableEmitter;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeAdjustableReceiver;
 import org.orekit.orbits.CartesianOrbit;
 import org.orekit.orbits.Orbit;
 import org.orekit.orbits.OrbitType;
@@ -45,9 +49,9 @@ import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.time.clocks.FieldClockOffset;
 import org.orekit.time.clocks.QuadraticFieldClockModel;
 import org.orekit.utils.FieldPVCoordinatesProvider;
+import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
-import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.TimeStampedPVCoordinates;
 
 public class ObserverTest {
@@ -130,7 +134,7 @@ public class ObserverTest {
         // Time of flight from emitter to second station
         final PVCoordinatesProvider remoteGroundReceiverCoordsProvider = station.getPVCoordinatesProvider();
         final SignalTravelTimeAdjustableReceiver signalTimeOfFlight = new SignalTravelTimeAdjustableReceiver(remoteGroundReceiverCoordsProvider);
-        final double tau = signalTimeOfFlight.compute(states[0].getPosition(), initDate, states[0].getFrame());
+        final double tau = signalTimeOfFlight.computeDelay(states[0].getPosition(), initDate, states[0].getFrame());
         final AbsoluteDate measurementDate = initDate.shiftedBy(tau);
 
         final CommonParametersWithoutDerivatives common =
@@ -167,7 +171,7 @@ public class ObserverTest {
         // Time of flight from emitter to second station
         final PVCoordinatesProvider remotePV = observerSatellite.getPVCoordinatesProvider();
         final SignalTravelTimeAdjustableReceiver signalTimeOfFlight = new SignalTravelTimeAdjustableReceiver(remotePV);
-        final double tau = signalTimeOfFlight.compute(states[0].getPosition(), initDate, states[0].getFrame());
+        final double tau = signalTimeOfFlight.computeDelay(states[0].getPosition(), initDate, states[0].getFrame());
         final AbsoluteDate measurementDate = initDate.shiftedBy(tau);
 
         final CommonParametersWithoutDerivatives common =
@@ -216,9 +220,9 @@ public class ObserverTest {
                                         station.getFieldPVCoordinatesProvider(nbParams, paramIndices);
 
         // Time of flight from emitter to second station
-        final FieldSignalTravelTimeAdjustableReceiver<Gradient> signalTimeOfFlight = 
+        final FieldSignalTravelTimeAdjustableReceiver<Gradient> signalTimeOfFlight =
                                 new FieldSignalTravelTimeAdjustableReceiver<>(remoteEmitterPVCoordsProvider);
-        final Gradient tau = signalTimeOfFlight.compute(pvaLocal.getPosition(), gDate, states[0].getFrame());
+        final Gradient tau = signalTimeOfFlight.computeDelay(pvaLocal.getPosition(), gDate, states[0].getFrame());
         final FieldAbsoluteDate<Gradient> measurementDate = gDate.shiftedBy(tau);
 
         final CommonParametersWithDerivatives common =
@@ -275,7 +279,7 @@ public class ObserverTest {
                                         observerSatellite.getFieldPVCoordinatesProvider(nbParams, paramIndices);
         final FieldSignalTravelTimeAdjustableReceiver<Gradient> signalTimeOfFlight = 
                         new FieldSignalTravelTimeAdjustableReceiver<>(remotePVCoordsProvider);
-        final Gradient tau = signalTimeOfFlight.compute(pvaLocal.getPosition(), gDate, states[0].getFrame());
+        final Gradient tau = signalTimeOfFlight.computeDelay(pvaLocal.getPosition(), gDate, states[0].getFrame());
         final FieldAbsoluteDate<Gradient> measurementDate = gDate.shiftedBy(tau);
 
         final CommonParametersWithDerivatives common =
@@ -318,9 +322,9 @@ public class ObserverTest {
 
         // Time of flight from receiver to ground station emitter
         final PVCoordinatesProvider groundEmitterCoordsProvider = station.getPVCoordinatesProvider();
-        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = 
+        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight =
                         new SignalTravelTimeAdjustableEmitter(groundEmitterCoordsProvider);
-        final double tau = signalTimeOfFlight.compute(states[0].getPosition(), initDate, states[0].getFrame());
+        final double tau = signalTimeOfFlight.computeDelay(states[0].getPosition(), initDate, states[0].getFrame());
         final AbsoluteDate emissionDate = initDate.shiftedBy(-tau);
 
         final CommonParametersWithoutDerivatives common =
@@ -355,7 +359,7 @@ public class ObserverTest {
         final PVCoordinatesProvider remotePV = observerSatellite.getPVCoordinatesProvider();
         final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = 
                         new SignalTravelTimeAdjustableEmitter(remotePV);
-        final double tau = signalTimeOfFlight.compute(states[0].getPosition(), initDate, states[0].getFrame());
+        final double tau = signalTimeOfFlight.computeDelay(states[0].getPosition(), initDate, states[0].getFrame());
         final AbsoluteDate emissionDate = initDate.shiftedBy(-tau);
 
         final CommonParametersWithoutDerivatives common =
@@ -401,9 +405,9 @@ public class ObserverTest {
         final FieldPVCoordinatesProvider<Gradient> remoteEmitterPVCoordsProvider = station.getFieldPVCoordinatesProvider(nbParams, paramIndices);
 
         // Time of flight from emitter to second station
-        final FieldSignalTravelTimeAdjustableEmitter<Gradient> signalTimeOfFlight = 
+        final FieldSignalTravelTimeAdjustableEmitter<Gradient> signalTimeOfFlight =
                                 new FieldSignalTravelTimeAdjustableEmitter<>(remoteEmitterPVCoordsProvider);
-        final Gradient tau = signalTimeOfFlight.compute(pvaLocal.getPosition(), gDate, states[0].getFrame());
+        final Gradient tau = signalTimeOfFlight.computeDelay(pvaLocal.getPosition(), gDate, states[0].getFrame());
         final FieldAbsoluteDate<Gradient> emissionDate = gDate.shiftedBy(tau.negate());
 
         final CommonParametersWithDerivatives common =
@@ -456,7 +460,7 @@ public class ObserverTest {
         final FieldPVCoordinatesProvider<Gradient> remoteCoordsProvider = observerSatellite.getFieldPVCoordinatesProvider(nbParams, paramIndices);
         final FieldSignalTravelTimeAdjustableEmitter<Gradient> signalTimeOfFlight = 
                         new FieldSignalTravelTimeAdjustableEmitter<>(remoteCoordsProvider);
-        final Gradient tau = signalTimeOfFlight.compute(pvaLocal.getPosition(), gDate, states[0].getFrame());
+        final Gradient tau = signalTimeOfFlight.computeDelay(pvaLocal.getPosition(), gDate, states[0].getFrame());
         final FieldAbsoluteDate<Gradient> emissionDate = gDate.shiftedBy(tau.negate());
 
         final CommonParametersWithDerivatives common =

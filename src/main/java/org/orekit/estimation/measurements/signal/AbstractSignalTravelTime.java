@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.estimation.measurements;
+package org.orekit.estimation.measurements.signal;
 
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.optim.ConvergenceChecker;
@@ -53,7 +53,7 @@ abstract class AbstractSignalTravelTime {
      * Get the default convergence checker.
      * @return checker
      */
-    protected static ConvergenceChecker<Double> getDefaultConvergenceChecker() {
+    static ConvergenceChecker<Double> getDefaultConvergenceChecker() {
         return (iteration, previous, current) -> iteration != 0 && (iteration > DEFAULT_MAX_ITER ||
                 FastMath.abs(previous - current) <= 2 * FastMath.ulp(current));
     }

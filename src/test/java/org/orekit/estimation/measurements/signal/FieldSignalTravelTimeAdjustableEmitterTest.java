@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.estimation.measurements;
+package org.orekit.estimation.measurements.signal;
 
 import org.hipparchus.complex.Complex;
 import org.hipparchus.complex.ComplexField;
@@ -48,7 +48,7 @@ class FieldSignalTravelTimeAdjustableEmitterTest {
     }
 
     @Test
-    void testComputeVersusReverse() {
+    void testComputeDelayVersusReverse() {
         // GIVEN
         final Frame frame = FramesFactory.getGCRF();
         final ComplexField field = ComplexField.getInstance();
@@ -61,18 +61,18 @@ class FieldSignalTravelTimeAdjustableEmitterTest {
         final FieldVector3D<Complex> receiverPosition = new FieldVector3D<>(field, receiverPositionDouble);
         final FieldSignalTravelTimeAdjustableEmitter<Complex> signalTimeOfFlight = new FieldSignalTravelTimeAdjustableEmitter<>(absolutePVCoordinates);
         // WHEN
-        final Complex actual = signalTimeOfFlight.compute(receiverPosition, receptionDate, frame);
+        final Complex actual = signalTimeOfFlight.computeDelay(receiverPosition, receptionDate, frame);
         // THEN
         final FieldAbsolutePVCoordinates<Complex> reversed = new FieldAbsolutePVCoordinates<>(frame, receptionDate,
                 new FieldPVCoordinates<>(receiverPosition, FieldVector3D.getZero(field)));
         final FieldSignalTravelTimeAdjustableReceiver<Complex> signalTimeOfFlightAdjustableReceiver = new FieldSignalTravelTimeAdjustableReceiver<>(reversed);
         final FieldAbsoluteDate<Complex> emissionDate = receptionDate.shiftedBy(actual);
-        final Complex expected = signalTimeOfFlightAdjustableReceiver.compute(emitterPosition, emissionDate, frame);
+        final Complex expected = signalTimeOfFlightAdjustableReceiver.computeDelay(emitterPosition, emissionDate, frame);
         assertEquals(expected, actual);
     }
 
     @Test
-    void testCompute() {
+    void testComputeDelay() {
         // GIVEN
         final Orbit orbit = TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH);
         final KeplerianExtendedPositionProvider positionProvider = new KeplerianExtendedPositionProvider(orbit);
@@ -82,14 +82,14 @@ class FieldSignalTravelTimeAdjustableEmitterTest {
         final Vector3D receiver = new Vector3D(-1e3, 2e2, 2e4);
         final FieldVector3D<Binary64> fieldReceiver = new FieldVector3D<>(field, receiver);
         // WHEN
-        final Binary64 actual = fieldComputer.compute(fieldReceiver, fieldDate, orbit.getFrame());
+        final Binary64 actual = fieldComputer.computeDelay(fieldReceiver, fieldDate, orbit.getFrame());
         // THEN
-        final double expected = new SignalTravelTimeAdjustableEmitter(positionProvider).compute(receiver, fieldDate.toAbsoluteDate(), orbit.getFrame());
+        final double expected = new SignalTravelTimeAdjustableEmitter(positionProvider).computeDelay(receiver, fieldDate.toAbsoluteDate(), orbit.getFrame());
         assertEquals(expected, actual.getReal());
     }
 
     @Test
-    void testComputeWithGuess() {
+    void testComputeDelayWithGuess() {
         // GIVEN
         final Orbit orbit = TestUtils.getDefaultOrbit(AbsoluteDate.ARBITRARY_EPOCH);
         final KeplerianExtendedPositionProvider positionProvider = new KeplerianExtendedPositionProvider(orbit);
@@ -100,9 +100,9 @@ class FieldSignalTravelTimeAdjustableEmitterTest {
         final Vector3D receiver = new Vector3D(1e3, 2e4, 0);
         final FieldVector3D<Binary64> fieldReceiver = new FieldVector3D<>(field, receiver);
         // WHEN
-        final Binary64 actual = fieldComputer.compute(guessDate, fieldReceiver, fieldDate, orbit.getFrame());
+        final Binary64 actual = fieldComputer.computeDelay(guessDate, fieldReceiver, fieldDate, orbit.getFrame());
         // THEN
-        final double expected = new SignalTravelTimeAdjustableEmitter(positionProvider).compute(guessDate.toAbsoluteDate(),
+        final double expected = new SignalTravelTimeAdjustableEmitter(positionProvider).computeDelay(guessDate.toAbsoluteDate(),
                 receiver, fieldDate.toAbsoluteDate(), orbit.getFrame());
         assertEquals(expected, actual.getReal());
     }

@@ -36,6 +36,10 @@ import org.junit.jupiter.api.Test;
 import org.orekit.estimation.Context;
 import org.orekit.estimation.EstimationTestUtils;
 import org.orekit.estimation.measurements.modifiers.RangeTroposphericDelayModifier;
+import org.orekit.estimation.measurements.signal.FieldSignalTravelTimeAdjustableEmitter;
+import org.orekit.estimation.measurements.signal.FieldSignalTravelTimeAdjustableReceiver;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeAdjustableEmitter;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeAdjustableReceiver;
 import org.orekit.models.earth.troposphere.EstimatedModel;
 import org.orekit.models.earth.troposphere.ModifiedSaastamoinenModel;
 import org.orekit.models.earth.troposphere.NiellMappingFunctionModel;
@@ -221,7 +225,7 @@ class RangeTest {
             final TimeStampedPVCoordinates staPV = stationParameter.getOffsetToInertial(state.getFrame(), datemeas, false).
                                                    transformPVCoordinates(new TimeStampedPVCoordinates(datemeas, PVCoordinates.ZERO));
             final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = SignalTravelTimeAdjustableEmitter.of(state);
-            final double    downDelayE = signalTimeOfFlight.compute(state.getDate(), staPV.getPosition(), datemeas, state.getFrame());
+            final double    downDelayE = signalTimeOfFlight.computeDelay(state.getDate(), staPV.getPosition(), datemeas, state.getFrame());
             final Vector3D satPosE = propagator2.propagate(datemeas.shiftedBy(-downDelayE)).getPosition();
             Assertions.assertEquals(Vector3D.distance(satPosE, staPV.getPosition()), downDelayE * Constants.SPEED_OF_LIGHT, 2.0e-7);
 
@@ -231,7 +235,7 @@ class RangeTest {
             final FieldSpacecraftState<Binary64> stateF = new FieldSpacecraftState<>(field, state);
             final TimeStampedFieldPVCoordinates<Binary64> staPVF = new TimeStampedFieldPVCoordinates<>(field, staPV);
             final FieldSignalTravelTimeAdjustableEmitter<Binary64> fieldComputer = FieldSignalTravelTimeAdjustableEmitter.of(stateF);
-            final Binary64    downDelayEF = fieldComputer.compute(staPVF.getDate(), staPVF.getPosition(), datemeasF, state.getFrame());
+            final Binary64    downDelayEF = fieldComputer.computeDelay(staPVF.getDate(), staPVF.getPosition(), datemeasF, state.getFrame());
             final FieldVector3D<Binary64> satPosEF =
                 new FieldVector3D<>(field, propagator2.propagate(datemeas.shiftedBy(-downDelayEF.getReal())).getPosition());
             Assertions.assertEquals(FieldVector3D.distance(satPosEF, staPVF.getPosition()).getReal(),
@@ -240,7 +244,7 @@ class RangeTest {
 
             // adjust receiver, double version
             final SignalTravelTimeAdjustableReceiver computer = new SignalTravelTimeAdjustableReceiver(new AbsolutePVCoordinates(state.getFrame(), staPV));
-            final double    downDelayR = computer.compute(state.getPVCoordinates().getPosition(), state.getDate(), datemeas, state.getFrame());
+            final double    downDelayR = computer.computeDelay(state.getPVCoordinates().getPosition(), state.getDate(), datemeas, state.getFrame());
             final Vector3D staPosR = stationParameter.
                                      getOffsetToInertial(state.getFrame(), state.getDate().shiftedBy(downDelayR), false).
                                      transformPosition(Vector3D.ZERO);
@@ -250,7 +254,7 @@ class RangeTest {
             // adjust receiver, field version
             final FieldSignalTravelTimeAdjustableReceiver<Binary64> fieldAdjustableReceiverComputer = new FieldSignalTravelTimeAdjustableReceiver<>(new FieldAbsolutePVCoordinates<Binary64>(state.getFrame(),
                     staPVF));
-            final Binary64    downDelayRF = fieldAdjustableReceiverComputer.compute(stateF.getPVCoordinates().getPosition(), stateF.getDate(), datemeasF, state.getFrame());
+            final Binary64    downDelayRF = fieldAdjustableReceiverComputer.computeDelay(stateF.getPVCoordinates().getPosition(), stateF.getDate(), datemeasF, state.getFrame());
             final FieldVector3D<Binary64> staPosRF = new FieldVector3D<>(field,
                                                                          stationParameter.
                                                                              getOffsetToInertial(state.getFrame(),

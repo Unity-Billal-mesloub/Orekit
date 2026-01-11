@@ -24,6 +24,8 @@ import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.analysis.differentiation.GradientField;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.orekit.estimation.measurements.signal.FieldSignalTravelTimeAdjustableEmitter;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeAdjustableEmitter;
 import org.orekit.frames.FieldTransform;
 import org.orekit.frames.Frame;
 import org.orekit.frames.Transform;
@@ -248,7 +250,7 @@ public interface Observer {
         final double deltaT = arrivalDate.durationFrom(states[0]);
         final TimeStampedPVCoordinates pvaDownlink = pvaLocal.shiftedBy(deltaT);
         final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(remotePV);
-        final double tauD = signalTimeOfFlight.compute(arrivalDate, pvaDownlink.getPosition(), arrivalDate, frame);
+        final double tauD = signalTimeOfFlight.computeDelay(arrivalDate, pvaDownlink.getPosition(), arrivalDate, frame);
 
         // Remote object pos/vel at time of signal emission
         final AbsoluteDate emissionDate = arrivalDate.shiftedBy(-tauD);
@@ -305,7 +307,7 @@ public interface Observer {
         final TimeStampedFieldPVCoordinates<Gradient> pvaDownlink = pvaLocal.shiftedBy(deltaT);
         final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer =
                                         new FieldSignalTravelTimeAdjustableEmitter<>(remotePV);
-        final Gradient tauD = fieldComputer.compute(arrivalDate, pvaDownlink.getPosition(), arrivalDate, frame);
+        final Gradient tauD = fieldComputer.computeDelay(arrivalDate, pvaDownlink.getPosition(), arrivalDate, frame);
 
         // Remote observer at signal emission time
         final FieldAbsoluteDate<Gradient> emissionDate = arrivalDate.shiftedBy(tauD.negate());
@@ -355,7 +357,7 @@ public interface Observer {
 
         // Downlink delay / determine time of emission of signal by ObservableSatellite
         final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(pvCoordinatesProvider);
-        final double tauD = signalTimeOfFlight.compute(pva.getDate(), satelliteDownlink.getPosition(), downlinkDate, frame);
+        final double tauD = signalTimeOfFlight.computeDelay(pva.getDate(), satelliteDownlink.getPosition(), downlinkDate, frame);
 
         // Transit state & Transit state (re)computed with gradients
         final double          delta             = downlinkDate.durationFrom(states[0].getDate());
@@ -416,7 +418,7 @@ public interface Observer {
 
         // Downlink delay
         final FieldSignalTravelTimeAdjustableEmitter<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableEmitter<>(fieldPVCoordinatesProvider);
-        final Gradient tauD = fieldComputer.compute(pva.getDate(), satelliteDownlink.getPosition(), downlinkDate, frame);
+        final Gradient tauD = fieldComputer.computeDelay(pva.getDate(), satelliteDownlink.getPosition(), downlinkDate, frame);
 
         // Transit state & Transit state (re)computed with gradients
         final Gradient        delta        = downlinkDate.durationFrom(states[0].getDate());

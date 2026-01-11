@@ -20,12 +20,14 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.hipparchus.analysis.differentiation.Gradient;
+import org.orekit.estimation.measurements.signal.FieldSignalTravelTimeAdjustableReceiver;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeAdjustableReceiver;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.FieldPVCoordinatesProvider;
-import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.PVCoordinatesProvider;
+import org.orekit.utils.ParameterDriver;
 import org.orekit.utils.TimeSpanMap.Span;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinates;
@@ -105,8 +107,8 @@ public class TDOA extends AbstractMeasurement<TDOA> {
 
         // Time of flight from emitter to second station
         final PVCoordinatesProvider secondPVCoordinatesProvider = getSecondStation().getPVCoordinatesProvider();
-        final SignalTravelTimeAdjustableReceiver signalTimeOfFlight = new SignalTravelTimeAdjustableReceiver(secondPVCoordinatesProvider);
-        final double tau2 = signalTimeOfFlight.compute(emitterPV.getPosition(), emitterDate, states[0].getFrame());
+        final SignalTravelTimeAdjustableReceiver signalTimeOfFlight = getSignalTravelTimeModel().getAdjustableReceiverComputer(secondPVCoordinatesProvider);
+        final double tau2 = signalTimeOfFlight.computeDelay(emitterPV.getPosition(), emitterDate, states[0].getFrame());
 
         // Secondary station PV in inertial frame at receive at second station
         final TimeStampedPVCoordinates secondPV = secondPVCoordinatesProvider.getPVCoordinates(emitterDate.shiftedBy(tau2), states[0].getFrame());
@@ -156,8 +158,8 @@ public class TDOA extends AbstractMeasurement<TDOA> {
 
         // Obtain time at which signal arrives at second station from emitter
         final FieldPVCoordinatesProvider<Gradient> fieldPvCoordinatesProvider = getSecondStation().getFieldPVCoordinatesProvider(nbParams, common.getIndices());
-        final FieldSignalTravelTimeAdjustableReceiver<Gradient> fieldComputer = new FieldSignalTravelTimeAdjustableReceiver<Gradient>(fieldPvCoordinatesProvider);
-        final Gradient tau2 = fieldComputer.compute(emitterPV.getPosition(), emitterDate, emitterDate, states[0].getFrame());
+        final FieldSignalTravelTimeAdjustableReceiver<Gradient> fieldComputer = getSignalTravelTimeModel().getFieldAdjustableReceiverComputer(fieldPvCoordinatesProvider);
+        final Gradient tau2 = fieldComputer.computeDelay(emitterPV.getPosition(), emitterDate, emitterDate, states[0].getFrame());
 
         // Second station coordinates at receive time
         final TimeStampedFieldPVCoordinates<Gradient> secondPV =

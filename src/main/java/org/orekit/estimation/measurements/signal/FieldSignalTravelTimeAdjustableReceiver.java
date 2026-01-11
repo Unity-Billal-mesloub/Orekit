@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.orekit.estimation.measurements;
+package org.orekit.estimation.measurements.signal;
 
 import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
@@ -26,12 +26,11 @@ import org.orekit.utils.FieldAbsolutePVCoordinates;
 import org.orekit.utils.FieldPVCoordinatesProvider;
 
 /**
- * Class for computing signal time of flight with an adjustable receiver and a fixed emitter's position and date.
+ * Class for computing signal time of travel with an adjustable receiver and a fixed emitter's position and date.
  * The delay is calculated via a fixed-point algorithm with customizable settings (even enabling instantaneous transmission).
  * @since 14.0
  * @see SignalTravelTimeAdjustableReceiver
  * @author Romain Serra
- * @author Luc Maisonnobe
  */
 public class FieldSignalTravelTimeAdjustableReceiver<T extends CalculusFieldElement<T>>
         extends FieldAbstractSignalTravelTime<T> {
@@ -74,12 +73,12 @@ public class FieldSignalTravelTimeAdjustableReceiver<T extends CalculusFieldElem
      * @param frame inertial frame in which emitter is defined
      * @return <em>positive</em> delay between signal emission and signal reception dates
      */
-    public T compute(final FieldVector3D<T> emitterPosition, final FieldAbsoluteDate<T> emissionDate,
-                     final Frame frame) {
+    public T computeDelay(final FieldVector3D<T> emitterPosition, final FieldAbsoluteDate<T> emissionDate,
+                          final Frame frame) {
         final FieldVector3D<T> receiverPosition = adjustableReceiverPVProvider.getPosition(emissionDate, frame);
         final T distance = receiverPosition.subtract(emitterPosition).getNorm();
         final FieldAbsoluteDate<T> approxReceptionDate = emissionDate.shiftedBy(distance.multiply(C_RECIPROCAL));
-        return compute(emitterPosition, emissionDate, approxReceptionDate, frame);
+        return computeDelay(emitterPosition, emissionDate, approxReceptionDate, frame);
     }
 
     /** Compute propagation delay on a link leg (typically downlink or uplink).
@@ -89,10 +88,10 @@ public class FieldSignalTravelTimeAdjustableReceiver<T extends CalculusFieldElem
      * @param frame inertial frame in which emitter is defined
      * @return <em>positive</em> delay between signal emission and signal reception dates
      */
-    public T compute(final FieldVector3D<T> emitterPosition,
-                     final FieldAbsoluteDate<T> emissionDate,
-                     final FieldAbsoluteDate<T> approxReceptionDate,
-                     final Frame frame) {
+    public T computeDelay(final FieldVector3D<T> emitterPosition,
+                          final FieldAbsoluteDate<T> emissionDate,
+                          final FieldAbsoluteDate<T> approxReceptionDate,
+                          final Frame frame) {
         // initialize reception date search loop assuming the state is already correct
         final T offset = approxReceptionDate.durationFrom(emissionDate);
 
