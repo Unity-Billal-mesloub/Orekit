@@ -19,9 +19,7 @@ package org.orekit.estimation.measurements.signal;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.optim.ConvergenceChecker;
 import org.orekit.frames.Frame;
-import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
-import org.orekit.utils.AbsolutePVCoordinates;
 import org.orekit.utils.PVCoordinatesProvider;
 
 /**
@@ -52,15 +50,6 @@ public class SignalTravelTimeAdjustableReceiver extends AbstractSignalTravelTime
                                              final ConvergenceChecker<Double> checker) {
         super(checker);
         this.adjustableReceiverPVProvider = adjustableReceiverPVProvider;
-    }
-
-    /**
-     * Build instance from spacecraft state.
-     * @param state spacecraft state
-     * @return signal time computer
-     */
-    public static SignalTravelTimeAdjustableReceiver of(final SpacecraftState state) {
-        return new SignalTravelTimeAdjustableReceiver(new AbsolutePVCoordinates(state.getFrame(), state.getPVCoordinates()));
     }
 
     /** Compute propagation delay on a link leg (typically downlink or uplink) without custom guess.

@@ -16,22 +16,22 @@
  */
 package org.orekit.estimation.measurements;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Map;
 
 import org.hipparchus.analysis.differentiation.Gradient;
-import org.hipparchus.analysis.differentiation.GradientField;
-import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
-import org.hipparchus.util.FastMath;
 import org.hipparchus.util.MathUtils;
-import org.orekit.frames.FieldTransform;
+import org.orekit.bodies.BodyShape;
+import org.orekit.bodies.FieldGeodeticPoint;
+import org.orekit.bodies.GeodeticPoint;
+import org.orekit.estimation.measurements.model.TopocentricAzElModel;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeModel;
 import org.orekit.frames.Frame;
-import org.orekit.frames.Transform;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
-import org.orekit.utils.ParameterDriver;
-import org.orekit.utils.TimeSpanMap.Span;
+import org.orekit.time.FieldAbsoluteDate;
+import org.orekit.utils.FieldPVCoordinatesProvider;
+import org.orekit.utils.PVCoordinatesProvider;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinates;
 
@@ -43,13 +43,26 @@ import org.orekit.utils.TimeStampedPVCoordinates;
  * @author Thierry Ceolin
  * @since 8.0
  */
-public class AngularAzEl extends AbstractMeasurement<AngularAzEl> {
+public class AngularAzEl extends GroundBasedAngularMeasurement<AngularAzEl> {
 
     /** Type of the measurement. */
     public static final String MEASUREMENT_TYPE = "AngularAzEl";
 
-    /** Ground station that receives signal from satellite. */
-    private final GroundStation station;
+    /** Simple constructor.
+     * @param station ground station from which measurement is performed
+     * @param date date of the measurement
+     * @param angular observed value
+     * @param sigma theoretical standard deviation
+     * @param baseWeight base weight
+     * @param signalTravelTimeModel signal travel time model
+     * @param satellite satellite related to this measurement
+     * @since 14.0
+     */
+    public AngularAzEl(final GroundStation station, final AbsoluteDate date,
+                       final double[] angular, final double[] sigma, final double[] baseWeight,
+                       final SignalTravelTimeModel signalTravelTimeModel, final ObservableSatellite satellite) {
+        super(station, date, angular, sigma, baseWeight, signalTravelTimeModel, satellite);
+    }
 
     /** Simple constructor.
      * @param station ground station from which measurement is performed
@@ -63,18 +76,7 @@ public class AngularAzEl extends AbstractMeasurement<AngularAzEl> {
     public AngularAzEl(final GroundStation station, final AbsoluteDate date,
                        final double[] angular, final double[] sigma, final double[] baseWeight,
                        final ObservableSatellite satellite) {
-        super(date, false, angular, sigma, baseWeight, Collections.singletonList(satellite));
-
-        addParametersDrivers(station.getParametersDrivers());
-
-        this.station = station;
-    }
-
-    /** Get receiving ground station.
-     * @return ground station
-     */
-    public final GroundStation getStation() {
-        return station;
+        this(station, date, angular, sigma, baseWeight, new SignalTravelTimeModel(), satellite);
     }
 
     /** {@inheritDoc} */
@@ -82,50 +84,35 @@ public class AngularAzEl extends AbstractMeasurement<AngularAzEl> {
     protected EstimatedMeasurementBase<AngularAzEl> theoreticalEvaluationWithoutDerivatives(final int iteration,
                                                                                             final int evaluation,
                                                                                             final SpacecraftState[] states) {
+        // Compute emission date
+        final AbsoluteDate receptionDate = getCorrectedReceptionDate();
+        final PVCoordinatesProvider receiverPVProvider = getStation().getPVCoordinatesProvider();
+        final SpacecraftState state = states[0];
+        final Frame frame = state.getFrame();
+        final PVCoordinatesProvider emitter = MeasurementObject.extractPVCoordinatesProvider(state, state.getPVCoordinates());
+        final AbsoluteDate emissionDate = computeEmissionDate(frame, receiverPVProvider, receptionDate, emitter);
 
-        final CommonParametersWithoutDerivatives common =
-            getStation().computeRemoteParametersWithout(states, getSatellites().get(0), getDate(), false);
-        final TimeStampedPVCoordinates transitPV = common.getTransitPV();
-
-        // Get transform from local ground station frame
-        final Transform offsetToInertialDownlink = getStation().getOffsetToInertial(states[0].getFrame(), getDate(), false);
-
-        // Station topocentric frame (east-north-zenith) in inertial frame expressed as Gradient
-        final Vector3D east   = offsetToInertialDownlink.transformVector(Vector3D.PLUS_I);
-        final Vector3D north  = offsetToInertialDownlink.transformVector(Vector3D.PLUS_J);
-        final Vector3D zenith = offsetToInertialDownlink.transformVector(Vector3D.PLUS_K);
-
-        // Station-satellite vector expressed in inertial frame
-        final Vector3D staSat = transitPV.getPosition().subtract(common.getRemotePV().getPosition());
-
-        // Compute azimuth/elevation
-        final double baseAzimuth = FastMath.atan2(staSat.dotProduct(east), staSat.dotProduct(north));
-        final double twoPiWrap   = MathUtils.normalizeAngle(baseAzimuth, getObservedValue()[0]) - baseAzimuth;
-        final double azimuth     = baseAzimuth + twoPiWrap;
-        final double elevation   = FastMath.asin(staSat.dotProduct(zenith) / staSat.getNorm());
+        // Compute azimuth and elevation
+        final BodyShape bodyShape = getStation().getBaseFrame().getParentShape();
+        final TimeStampedPVCoordinates receiverPV = receiverPVProvider.getPVCoordinates(receptionDate, frame);
+        final GeodeticPoint geodeticPoint = bodyShape.transform(receiverPV.getPosition(), frame, receptionDate);
+        final TopocentricAzElModel measurementModel = new TopocentricAzElModel(frame, bodyShape, getSignalTravelTimeModel());
+        final double[] azEl = measurementModel.value(geodeticPoint, receptionDate, emitter, emissionDate);
 
         // Prepare the estimation
-        final EstimatedMeasurementBase<AngularAzEl> estimated =
-                        new EstimatedMeasurementBase<>(this, iteration, evaluation,
-                                                       new SpacecraftState[] {
-                                                           common.getTransitState()
-                                                       }, new TimeStampedPVCoordinates[] {
-                                                           transitPV,
-                                                           common.getRemotePV()
-                                                       });
-
-        // azimuth - elevation values
-        estimated.setEstimatedValue(azimuth, elevation);
-
+        final double shift = emissionDate.durationFrom(state);
+        final SpacecraftState shiftedState = state.shiftedBy(shift);
+        final EstimatedMeasurementBase<AngularAzEl> estimated = new EstimatedMeasurementBase<>(this, iteration, evaluation,
+                new SpacecraftState[] { shiftedState },
+                new TimeStampedPVCoordinates[] { shiftedState.getPVCoordinates(), receiverPV });
+        estimated.setEstimatedValue(wrapFirstAngle(azEl[0]), azEl[1]);
         return estimated;
-
     }
 
     /** {@inheritDoc} */
     @Override
     protected EstimatedMeasurement<AngularAzEl> theoreticalEvaluation(final int iteration, final int evaluation,
                                                                       final SpacecraftState[] states) {
-
         // Azimuth/elevation derivatives are computed with respect to spacecraft state in inertial frame
         // and station parameters
         // ----------------------
@@ -134,62 +121,38 @@ public class AngularAzEl extends AbstractMeasurement<AngularAzEl> {
         //  - 0..2 - Position of the spacecraft in inertial frame
         //  - 3..5 - Velocity of the spacecraft in inertial frame
         //  - 6..n - station parameters (clock offset, station offsets, pole, prime meridian...)
-        final CommonParametersWithDerivatives common = getStation().
-            computeRemoteParametersWith(states, getSatellites().get(0), getDate(), false, getParametersDrivers());
-        final TimeStampedFieldPVCoordinates<Gradient> transitPV = common.getTransitPV();
 
-        final int nbParams = 6 * states.length + common.getIndices().size();
-        final FieldTransform<Gradient> offsetToInertialDownlink = getStation().
-                        getOffsetToInertial(states[0].getFrame(), getDate(), nbParams, common.getIndices());
+        // Create the parameter indices map
+        final Map<String, Integer> paramIndices = getStation().getParamaterIndices(states, getParametersDrivers());
+        final int nbParams = 6 * states.length + paramIndices.size();
+        final SpacecraftState state = states[0];
+        final TimeStampedFieldPVCoordinates<Gradient> pva = AbstractMeasurement.getCoordinates(state, 0, nbParams);
 
-        // Station topocentric frame (east-north-zenith) in inertial frame expressed as Gradient
-        final GradientField field = common.getTauD().getField();
-        final FieldVector3D<Gradient> east   = offsetToInertialDownlink.transformVector(FieldVector3D.getPlusI(field));
-        final FieldVector3D<Gradient> north  = offsetToInertialDownlink.transformVector(FieldVector3D.getPlusJ(field));
-        final FieldVector3D<Gradient> zenith = offsetToInertialDownlink.transformVector(FieldVector3D.getPlusK(field));
+        // Compute emission date
+        final FieldPVCoordinatesProvider<Gradient> receiverPVProvider = getStation().getFieldPVCoordinatesProvider(nbParams,
+                paramIndices);
+        final Frame frame = state.getFrame();
+        final FieldAbsoluteDate<Gradient> receptionDate = getCorrectedReceptionDateField(nbParams, paramIndices);
+        final TimeStampedFieldPVCoordinates<Gradient> receiverPV = receiverPVProvider.getPVCoordinates(receptionDate, frame);
+        final FieldPVCoordinatesProvider<Gradient> emitter = MeasurementObject.extractFieldPVCoordinatesProvider(state, pva);
+        final Gradient signalTravelTime = getSignalTravelTimeModel().getAdjustableEmitterComputer(emitter)
+                .computeDelay(receptionDate, receiverPV.getPosition(), receptionDate, frame);
+        final FieldAbsoluteDate<Gradient> emissionDate = receptionDate.shiftedBy(signalTravelTime.negate());
 
-        // Station-satellite vector expressed in inertial frame
-        final FieldVector3D<Gradient> staSat = transitPV.getPosition().subtract(common.getRemotePV().getPosition());
-
-        // Compute azimuth/elevation
-        final Gradient baseAzimuth = staSat.dotProduct(east).atan2(staSat.dotProduct(north));
-        final double   twoPiWrap   = MathUtils.normalizeAngle(baseAzimuth.getReal(), getObservedValue()[0]) -
-                                                baseAzimuth.getReal();
-        final Gradient azimuth     = baseAzimuth.add(twoPiWrap);
-        final Gradient elevation   = staSat.dotProduct(zenith).divide(staSat.getNorm()).asin();
+        // Compute azimuth and elevation
+        final BodyShape bodyShape = getStation().getBaseFrame().getParentShape();
+        final FieldGeodeticPoint<Gradient> geodeticPoint = bodyShape.transform(receiverPV.getPosition(), frame, receptionDate);
+        final TopocentricAzElModel measurementModel = new TopocentricAzElModel(frame, bodyShape, getSignalTravelTimeModel());
+        final Gradient[] azEl = measurementModel.value(geodeticPoint, receptionDate, emitter, emissionDate);
 
         // Prepare the estimation
-        final EstimatedMeasurement<AngularAzEl> estimated =
-                        new EstimatedMeasurement<>(this, iteration, evaluation,
-                                                   new SpacecraftState[] {
-                                                       common.getTransitState()
-                                                   }, new TimeStampedPVCoordinates[] {
-                                                       transitPV.toTimeStampedPVCoordinates(),
-                                                       common.getRemotePV().toTimeStampedPVCoordinates()
-                                                   });
-
-        // azimuth - elevation values
-        estimated.setEstimatedValue(azimuth.getValue(), elevation.getValue());
-
-        // First order derivatives of azimuth/elevation with respect to state
-        final double[] azDerivatives = azimuth.getGradient();
-        final double[] elDerivatives = elevation.getGradient();
-        estimated.setStateDerivatives(0,
-                                      Arrays.copyOfRange(azDerivatives, 0, 6), Arrays.copyOfRange(elDerivatives, 0, 6));
-
-        // Set first order derivatives of azimuth/elevation with respect to state
-        for (final ParameterDriver driver : getParametersDrivers()) {
-
-            for (Span<String> span = driver.getNamesSpanMap().getFirstSpan(); span != null; span = span.next()) {
-                final Integer index = common.getIndices().get(span.getData());
-                if (index != null) {
-                    estimated.setParameterDerivatives(driver, span.getStart(), azDerivatives[index], elDerivatives[index]);
-                }
-            }
-        }
-
+        final double shift = emissionDate.toAbsoluteDate().durationFrom(state);
+        final SpacecraftState shiftedState = state.shiftedBy(shift);
+        final EstimatedMeasurement<AngularAzEl> estimated = new EstimatedMeasurement<>(this, iteration, evaluation,
+                new SpacecraftState[] { shiftedState },
+                new TimeStampedPVCoordinates[] {shiftedState.getPVCoordinates(), receiverPV.toTimeStampedPVCoordinates() });
+        fillEstimatedMeasurement(azEl[0], azEl[1], paramIndices, estimated);
         return estimated;
-
     }
 
     /** Calculate the Line Of Sight of the given measurement.

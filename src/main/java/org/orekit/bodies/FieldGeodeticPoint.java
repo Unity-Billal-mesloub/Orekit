@@ -31,6 +31,7 @@ import org.hipparchus.util.MathUtils;
  * @param <T> the type of the field elements
  * @since 7.1
  * @see BodyShape
+ * @see GeodeticPoint
  * @author Luc Maisonobe
  */
 public class FieldGeodeticPoint<T extends CalculusFieldElement<T>> {
@@ -126,11 +127,7 @@ public class FieldGeodeticPoint<T extends CalculusFieldElement<T>> {
      */
     public FieldVector3D<T> getZenith() {
         if (zenith == null) {
-            final FieldSinCos<T> scLat = FastMath.sinCos(latitude);
-            final FieldSinCos<T> scLon = FastMath.sinCos(longitude);
-            zenith = new FieldVector3D<>(scLon.cos().multiply(scLat.cos()),
-                                         scLon.sin().multiply(scLat.cos()),
-                                         scLat.sin());
+            zenith = new FieldVector3D<>(longitude, latitude);
         }
         return zenith;
     }

@@ -28,6 +28,7 @@ import org.orekit.Utils;
 import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.GeodeticPoint;
 import org.orekit.bodies.OneAxisEllipsoid;
+import org.orekit.errors.OrekitException;
 import org.orekit.estimation.measurements.signal.SignalTravelTimeModel;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
@@ -41,12 +42,23 @@ import org.orekit.utils.Constants;
 import org.orekit.utils.PVCoordinates;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-class RaDecMeasurementModelTest {
+class RaDecModelTest {
 
     @BeforeAll
     static void setUp() {
         Utils.setDataRoot("regular-data");
+    }
+
+    @Test
+    void testConstructorException() {
+        final Frame frame = mock();
+        when(frame.isPseudoInertial()).thenReturn(false);
+        final SignalTravelTimeModel signalTravelTimeModel = new SignalTravelTimeModel();
+        assertThrows(OrekitException.class, () -> new RaDecModel(frame, signalTravelTimeModel));
     }
 
     @Test
@@ -55,8 +67,8 @@ class RaDecMeasurementModelTest {
         final SignalTravelTimeModel instantaneousSignalModel = new SignalTravelTimeModel((iteration, previous, current) -> true,
                 (iteration, previous, current) -> true);
         final Frame frame = FramesFactory.getGCRF();
-        final RaDecMeasurementModel measurementModel = new RaDecMeasurementModel(frame, instantaneousSignalModel);
-        final Vector3D receiverPosition = Vector3D.ZERO;
+        final RaDecModel measurementModel = new RaDecModel(frame, instantaneousSignalModel);
+        final Vector3D receiverPosition = Vector3D.MINUS_J;
         final Vector3D emitterPosition = new Vector3D(1, 2, 3);
         final AbsolutePVCoordinates absolutePVCoordinates = new AbsolutePVCoordinates(frame, AbsoluteDate.ARBITRARY_EPOCH,
                 new PVCoordinates(emitterPosition));
@@ -64,7 +76,8 @@ class RaDecMeasurementModelTest {
         final double[] raDec = measurementModel.value(frame, receiverPosition, absolutePVCoordinates.getDate(),
                 absolutePVCoordinates, absolutePVCoordinates.getDate());
         // THEN
-        assertArrayEquals(new Vector3D(raDec[0], raDec[1]).toArray(), emitterPosition.normalize().toArray(), 1e-12);
+        final Vector3D lineOfSight = emitterPosition.subtract(receiverPosition).normalize();
+        assertArrayEquals(new Vector3D(raDec[0], raDec[1]).toArray(), lineOfSight.toArray(), 1e-12);
     }
 
     @Test
@@ -72,23 +85,24 @@ class RaDecMeasurementModelTest {
         // GIVEN
         final SignalTravelTimeModel signalTravelTimeModel = new SignalTravelTimeModel();
         final Frame referenceFrame  = FramesFactory.getEME2000();
-        final RaDecMeasurementModel measurementModel = new RaDecMeasurementModel(referenceFrame, signalTravelTimeModel);
+        final RaDecModel measurementModel = new RaDecModel(referenceFrame, signalTravelTimeModel);
         final AbsoluteDate date = AbsoluteDate.ARBITRARY_EPOCH;
         final Orbit orbit = TestUtils.getDefaultOrbit(date);
         final GradientField field = GradientField.getField(0);
         final FieldAbsoluteDate<Gradient> fieldDate = new FieldAbsoluteDate<>(field, date);
         final FieldOrbit<Gradient> fieldOrbit = new FieldCartesianOrbit<>(field, orbit);
+        final Frame earthFixedFrame = FramesFactory.getGTOD(true);
         final BodyShape bodyShape = new OneAxisEllipsoid(Constants.WGS84_EARTH_EQUATORIAL_RADIUS, Constants.WGS84_EARTH_FLATTENING,
-                FramesFactory.getGTOD(true));
+                earthFixedFrame);
         // WHEN & THEN
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 final GeodeticPoint geodeticPoint = new GeodeticPoint(FastMath.toRadians( -90. + j * 18.),
                         FastMath.toRadians(i * 36.), 0.);
                 final Vector3D position = bodyShape.transform(geodeticPoint);
-                final double[] raDec = measurementModel.value(bodyShape.getBodyFrame(), position, date, orbit, date);
+                final double[] raDec = measurementModel.value(earthFixedFrame, position, date, orbit, date);
                 final FieldVector3D<Gradient> fieldPosition = new FieldVector3D<>(field, position);
-                final Gradient[] gradientRaDec = measurementModel.value(bodyShape.getBodyFrame(), fieldPosition, fieldDate, fieldOrbit, fieldDate);
+                final Gradient[] gradientRaDec = measurementModel.value(earthFixedFrame, fieldPosition, fieldDate, fieldOrbit, fieldDate);
                 assertEquals(raDec[0], gradientRaDec[0].getValue(), 1e-12);
                 assertEquals(raDec[1], gradientRaDec[1].getValue(), 1e-12);
             }

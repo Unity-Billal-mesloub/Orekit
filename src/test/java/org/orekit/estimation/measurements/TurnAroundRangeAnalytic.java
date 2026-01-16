@@ -131,7 +131,7 @@ public class TurnAroundRangeAnalytic extends TurnAroundRange {
                                                                                               PVCoordinates.ZERO));
 
         // Downlink time of flight from primary station at t to spacecraft at t'
-        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = SignalTravelTimeAdjustableEmitter.of(state);
+        final SignalTravelTimeAdjustableEmitter signalTimeOfFlight = new SignalTravelTimeAdjustableEmitter(state.getOrbit());
         final double tMd    = signalTimeOfFlight.computeDelay(state.getDate(), primaryArrival.getPosition(), measurementDate, state.getFrame());
 
         // Time difference between t (date of the measurement) and t' (date tagged in spacecraft state)
@@ -751,7 +751,7 @@ public class TurnAroundRangeAnalytic extends TurnAroundRange {
                         transformPVCoordinates(new TimeStampedPVCoordinates(measurementDate, PVCoordinates.ZERO));
 
         // Downlink time of flight from primary station at t to spacecraft at t'
-        final SignalTravelTimeAdjustableEmitter signalTimeOfFlightDownlink = SignalTravelTimeAdjustableEmitter.of(state);
+        final SignalTravelTimeAdjustableEmitter signalTimeOfFlightDownlink = new SignalTravelTimeAdjustableEmitter(state.getOrbit());
         final double tMd    = signalTimeOfFlightDownlink.computeDelay(state.getDate(), QMt.getPosition(), measurementDate, state.getFrame());
 
         // Transit state from which the satellite reflected the signal from secondary to primary station
@@ -784,7 +784,7 @@ public class TurnAroundRangeAnalytic extends TurnAroundRange {
         final Vector3D QSA = secondaryTopoToInertArrivalDate.transformPosition(Vector3D.ZERO);
 
         // Dowlink time of flight from transitStateLeg1 to secondary station at secondaryStationArrivalDate
-        final SignalTravelTimeAdjustableEmitter signalTimeOfFlightLeg1 = SignalTravelTimeAdjustableEmitter.of(state2);
+        final SignalTravelTimeAdjustableEmitter signalTimeOfFlightLeg1 = new SignalTravelTimeAdjustableEmitter(state2.getOrbit());
         final double tSd = signalTimeOfFlightLeg1.computeDelay(state2.getDate(), QSA, tQSA, state2.getFrame());
 
 

@@ -16,40 +16,30 @@
  */
 package org.orekit.estimation.measurements;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 
 import org.hipparchus.analysis.differentiation.Gradient;
-import org.hipparchus.analysis.differentiation.GradientField;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
-import org.hipparchus.util.MathUtils;
-import org.orekit.estimation.measurements.model.RaDecMeasurementModel;
+import org.orekit.estimation.measurements.model.RaDecModel;
+import org.orekit.estimation.measurements.signal.SignalTravelTimeModel;
 import org.orekit.frames.Frame;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
-import org.orekit.time.clocks.ClockOffset;
-import org.orekit.time.clocks.FieldClockOffset;
-import org.orekit.time.clocks.QuadraticFieldClockModel;
 import org.orekit.utils.FieldPVCoordinatesProvider;
 import org.orekit.utils.PVCoordinatesProvider;
-import org.orekit.utils.ParameterDriver;
-import org.orekit.utils.TimeSpanMap.Span;
 import org.orekit.utils.TimeStampedFieldPVCoordinates;
 import org.orekit.utils.TimeStampedPVCoordinates;
 
 /** Class modeling a Right Ascension - Declination measurement from a ground point (station, telescope).
- * The angles are given in an inertial reference frame.
- * The motion of the spacecraft during the signal flight time is taken into
- * account. The date of the measurement corresponds to the reception on
- * ground of the reflected signal.
+ * The angles are given using the axes of an inertial reference frame.
+ * The date of the measurement corresponds to the reception on ground of the reflected signal.
  *
  * @author Thierry Ceolin
  * @author Maxime Journot
  * @since 9.0
  */
-public class AngularRaDec extends AbstractMeasurement<AngularRaDec> {
+public class AngularRaDec extends GroundBasedAngularMeasurement<AngularRaDec> {
 
     /** Type of the measurement. */
     public static final String MEASUREMENT_TYPE = "AngularRaDec";
@@ -61,9 +51,9 @@ public class AngularRaDec extends AbstractMeasurement<AngularRaDec> {
     private final GroundStation station;
 
     /** Perfect measurement model. */
-    private final RaDecMeasurementModel measurementModel;
+    private final RaDecModel measurementModel;
 
-    /** Simple constructor.
+    /** Simple constructor using default light time delay.
      * @param station ground station from which measurement is performed
      * @param referenceFrame Reference frame in which the right ascension - declination angles are given
      * @param date date of the measurement
@@ -76,12 +66,26 @@ public class AngularRaDec extends AbstractMeasurement<AngularRaDec> {
     public AngularRaDec(final GroundStation station, final Frame referenceFrame, final AbsoluteDate date,
                         final double[] angular, final double[] sigma, final double[] baseWeight,
                         final ObservableSatellite satellite) {
-        super(date, false, angular, sigma, baseWeight, Collections.singletonList(satellite));
+        this(station, referenceFrame, date, angular, sigma, baseWeight, new SignalTravelTimeModel(), satellite);
+    }
+
+    /** Constructor.
+     * @param station ground station from which measurement is performed
+     * @param referenceFrame Reference frame in which the right ascension - declination angles are given
+     * @param date date of the measurement
+     * @param angular observed value
+     * @param sigma theoretical standard deviation
+     * @param baseWeight base weight
+     * @param signalTravelTimeModel signal travel time model
+     * @param satellite satellite related to this measurement
+     * @since 14.0
+     */
+    public AngularRaDec(final GroundStation station, final Frame referenceFrame, final AbsoluteDate date,
+                        final double[] angular, final double[] sigma, final double[] baseWeight,
+                        final SignalTravelTimeModel signalTravelTimeModel, final ObservableSatellite satellite) {
+        super(station, date, angular, sigma, baseWeight, signalTravelTimeModel, satellite);
         this.referenceFrame = referenceFrame;
-        this.measurementModel = new RaDecMeasurementModel(referenceFrame, getSignalTravelTimeModel());
-
-        addParametersDrivers(station.getParametersDrivers());
-
+        this.measurementModel = new RaDecModel(referenceFrame, getSignalTravelTimeModel());
         this.station = station;
     }
 
@@ -92,66 +96,38 @@ public class AngularRaDec extends AbstractMeasurement<AngularRaDec> {
         return referenceFrame;
     }
 
-    /** Get the ground station that receives the signal.
-     * @return ground station
-     */
-    public final GroundStation getStation() {
-        return station;
-    }
-
     /** {@inheritDoc} */
     @Override
     protected EstimatedMeasurementBase<AngularRaDec> theoreticalEvaluationWithoutDerivatives(final int iteration,
                                                                                              final int evaluation,
                                                                                              final SpacecraftState[] states) {
-        // Compute actual reception time
-        final SpacecraftState state = states[0];
-        final ClockOffset localClock = station.getQuadraticClockModel().getOffset(state.getDate());
-        final AbsoluteDate receptionDate = getDate().shiftedBy(-localClock.getOffset());
-
-        // Compute signal travel time
-        final PVCoordinatesProvider emitter = MeasurementObject.extractPVCoordinatesProvider(state, state.getPVCoordinates());
+        // Compute emission date
+        final AbsoluteDate receptionDate = getCorrectedReceptionDate();
         final PVCoordinatesProvider receiver = station.getPVCoordinatesProvider();
-        final double signalTravelTime = getSignalTravelTimeModel().getAdjustableEmitterComputer(emitter)
-                .computeDelay(state.getDate(), receiver.getPosition(receptionDate, referenceFrame), receptionDate, referenceFrame);
-        final AbsoluteDate emissionDate = receptionDate.shiftedBy(-signalTravelTime);
+        final SpacecraftState state = states[0];
+        final PVCoordinatesProvider emitter = MeasurementObject.extractPVCoordinatesProvider(state, state.getPVCoordinates());
+        final AbsoluteDate emissionDate = computeEmissionDate(referenceFrame, receiver, receptionDate, emitter);
 
-        // Evaluate angular measurement model
+        // Evaluate angular measurement model (use state frame to avoid rounding error in case reference one is not Earth-centered)
         final Frame frame = state.getFrame();
-        final double[] raDec = measurementModel.value(frame, receiver.getPosition(receptionDate, frame), receptionDate,
-                emitter, emissionDate);
-
-        // Reset right ascension in correct interval
-        final double baseRightAscension = raDec[0];
-        final double twoPiWrap          = MathUtils.normalizeAngle(baseRightAscension, getObservedValue()[0]) - baseRightAscension;
-        final double rightAscension     = baseRightAscension + twoPiWrap;
+        final TimeStampedPVCoordinates receiverPV = receiver.getPVCoordinates(receptionDate, frame);
+        final double[] raDec = measurementModel.value(frame, receiverPV.getPosition(), receptionDate, emitter, emissionDate);
 
         // Prepare the estimation
-        final double shift = state.getDate().durationFrom(emissionDate);
-        final EstimatedMeasurementBase<AngularRaDec> estimated =
-                        new EstimatedMeasurementBase<>(this, iteration, evaluation,
-                                                       new SpacecraftState[] {
-                                                           state.shiftedBy(shift),
-                                                       }, new TimeStampedPVCoordinates[] {
-                                                           emitter.getPVCoordinates(emissionDate, frame),
-                                                           receiver.getPVCoordinates(receptionDate, frame)
-                                                       });
-
-        // RA - Dec values
-        estimated.setEstimatedValue(rightAscension, raDec[1]);
-
+        final double shift = emissionDate.durationFrom(state);
+        final SpacecraftState shiftedState = state.shiftedBy(shift);
+        final EstimatedMeasurementBase<AngularRaDec> estimated = new EstimatedMeasurementBase<>(this, iteration, evaluation,
+                new SpacecraftState[] { shiftedState },
+                new TimeStampedPVCoordinates[] { shiftedState.getPVCoordinates(), receiverPV });
+        estimated.setEstimatedValue(wrapFirstAngle(raDec[0]), raDec[1]);
         return estimated;
-
     }
 
     /** {@inheritDoc} */
     @Override
     protected EstimatedMeasurement<AngularRaDec> theoreticalEvaluation(final int iteration, final int evaluation,
                                                                        final SpacecraftState[] states) {
-
-        final SpacecraftState state = states[0];
-
-        // Right Ascension/declination (in reference frame )derivatives are computed with respect to spacecraft state in inertial frame
+        // Right Ascension/declination (in reference frame) derivatives are computed with respect to spacecraft state in inertial frame
         // and station parameters
         // ----------------------
         //
@@ -161,67 +137,30 @@ public class AngularRaDec extends AbstractMeasurement<AngularRaDec> {
         //  - 6..n - station parameters (clock offset, station offsets, pole, prime meridian...)
 
         // Create the parameter indices map
-        final Frame                frame        = states[0].getFrame();
         final Map<String, Integer> paramIndices = station.getParamaterIndices(states, getParametersDrivers());
         final int                  nbParams     = 6 * states.length + paramIndices.size();
+        final SpacecraftState state = states[0];
         final TimeStampedFieldPVCoordinates<Gradient> pva = AbstractMeasurement.getCoordinates(state, 0, nbParams);
 
-        // Compute actual reception time
-        final QuadraticFieldClockModel<Gradient> quadraticClockModel = station.getQuadraticFieldClock(nbParams, getDate(), paramIndices);
-        final FieldAbsoluteDate<Gradient> fieldDate = new FieldAbsoluteDate<>(GradientField.getField(nbParams), getDate());
-        final FieldClockOffset<Gradient> localClock = quadraticClockModel.getOffset(fieldDate);
-        final FieldAbsoluteDate<Gradient> receptionDate = fieldDate.shiftedBy(localClock.getOffset().negate());
-
-        // Compute signal travel time
+        // Compute emission date
+        final FieldAbsoluteDate<Gradient> receptionDate = getCorrectedReceptionDateField(nbParams, paramIndices);
         final FieldPVCoordinatesProvider<Gradient> receiver = station.getFieldPVCoordinatesProvider(nbParams, paramIndices);
         final FieldPVCoordinatesProvider<Gradient> emitter = MeasurementObject.extractFieldPVCoordinatesProvider(state, pva);
-        final Gradient signalTravelTime = getSignalTravelTimeModel().getAdjustableEmitterComputer(emitter)
-                .computeDelay(receptionDate, receiver.getPosition(receptionDate, referenceFrame), receptionDate, referenceFrame);
+        final FieldAbsoluteDate<Gradient> emissionDate = computeEmissionDateField(referenceFrame, receiver, receptionDate, emitter);
 
-        // Evaluate angular measurement model
-        final FieldAbsoluteDate<Gradient> emissionDate = receptionDate.shiftedBy(signalTravelTime.negate());
-        final Gradient[] raDec = measurementModel.value(frame, receiver.getPosition(receptionDate, frame), receptionDate,
-                emitter, emissionDate);
-
-        // Reset right ascension in correct interval
-        final Gradient baseRightAscension = raDec[0];
-        final double   twoPiWrap          = MathUtils.normalizeAngle(baseRightAscension.getReal(),
-                getObservedValue()[0]) - baseRightAscension.getReal();
-        final Gradient rightAscension     = baseRightAscension.add(twoPiWrap);
+        // Evaluate angular measurement model (use state frame to avoid rounding error in case reference one is not Earth-centered)
+        final Frame                frame        = states[0].getFrame();
+        final TimeStampedFieldPVCoordinates<Gradient> receiverPV = receiver.getPVCoordinates(receptionDate, frame);
+        final Gradient[] raDec = measurementModel.value(frame, receiverPV.getPosition(), receptionDate, emitter, emissionDate);
 
         // Prepare the estimation
-        final double shift = state.getDate().durationFrom(emissionDate.toAbsoluteDate());
-        final EstimatedMeasurement<AngularRaDec> estimated =
-                        new EstimatedMeasurement<>(this, iteration, evaluation,
-                                                   new SpacecraftState[] {
-                                                       state.shiftedBy(shift)
-                                                   }, new TimeStampedPVCoordinates[] {
-                                                       emitter.getPVCoordinates(emissionDate, frame).toTimeStampedPVCoordinates(),
-                                                       receiver.getPVCoordinates(receptionDate, frame).toTimeStampedPVCoordinates()
-                                                   });
-
-        // RA-Dec values
-        final Gradient declination = raDec[1];
-        estimated.setEstimatedValue(rightAscension.getValue(), declination.getValue());
-
-        // Partial derivatives of right ascension/declination in reference frame with respect to state
-        final double[] raDerivatives  = rightAscension.getGradient();
-        final double[] decDerivatives = declination.getGradient();
-        estimated.setStateDerivatives(0,
-                                      Arrays.copyOfRange(raDerivatives, 0, 6), Arrays.copyOfRange(decDerivatives, 0, 6));
-
-        // Partial derivatives with respect to parameters
-        for (final ParameterDriver driver : getParametersDrivers()) {
-            for (Span<String> span = driver.getNamesSpanMap().getFirstSpan(); span != null; span = span.next()) {
-                final Integer index = paramIndices.get(span.getData());
-                if (index != null) {
-                    estimated.setParameterDerivatives(driver, span.getStart(), raDerivatives[index], decDerivatives[index]);
-                }
-            }
-        }
-
+        final double shift = emissionDate.toAbsoluteDate().durationFrom(state);
+        final SpacecraftState shiftedState = state.shiftedBy(shift);
+        final EstimatedMeasurement<AngularRaDec> estimated = new EstimatedMeasurement<>(this, iteration, evaluation,
+                new SpacecraftState[] { shiftedState },
+                new TimeStampedPVCoordinates[] { shiftedState.getPVCoordinates(), receiverPV.toTimeStampedPVCoordinates() });
+        fillEstimatedMeasurement(raDec[0], raDec[1], paramIndices, estimated);
         return estimated;
-
     }
 
     /** Calculate the Line Of Sight of the given measurement.

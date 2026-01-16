@@ -124,9 +124,7 @@ public class GeodeticPoint implements Serializable {
      */
     public Vector3D getZenith() {
         if (zenith == null) {
-            final SinCos scLat = FastMath.sinCos(latitude);
-            final SinCos scLon = FastMath.sinCos(longitude);
-            zenith = new Vector3D(scLon.cos() * scLat.cos(), scLon.sin() * scLat.cos(), scLat.sin());
+            zenith = new Vector3D(longitude, latitude);
         }
         return zenith;
     }

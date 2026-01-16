@@ -19,8 +19,12 @@ package org.orekit.estimation.measurements.model;
 import org.hipparchus.analysis.differentiation.Gradient;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.orekit.errors.OrekitException;
+import org.orekit.errors.OrekitMessages;
 import org.orekit.estimation.measurements.signal.SignalTravelTimeModel;
+import org.orekit.frames.FieldStaticTransform;
 import org.orekit.frames.Frame;
+import org.orekit.frames.StaticTransform;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.FieldAbsoluteDate;
 import org.orekit.utils.FieldPVCoordinatesProvider;
@@ -32,22 +36,22 @@ import org.orekit.utils.PVCoordinatesProvider;
  * @since 14.0
  * @author Romain Serra
  */
-public class RaDecMeasurementModel {
+public class RaDecModel extends AbstractAngularMeasurementModel {
 
     /** Reference frame defining axis used with right ascension and declination. */
     private final Frame referenceFrame;
 
-    /** Signal travel time model. */
-    private final SignalTravelTimeModel signalTravelTimeModel;
-
     /**
      * Constructor.
-     * @param referenceFrame reference frame for RA-Dec
+     * @param referenceFrame reference frame for RA-Dec (must be inertial)
      * @param signalTravelTimeModel time delay computer
      */
-    public RaDecMeasurementModel(final Frame referenceFrame, final SignalTravelTimeModel signalTravelTimeModel) {
+    public RaDecModel(final Frame referenceFrame, final SignalTravelTimeModel signalTravelTimeModel) {
+        super(signalTravelTimeModel);
+        if (!referenceFrame.isPseudoInertial()) {
+            throw new OrekitException(OrekitMessages.NON_PSEUDO_INERTIAL_FRAME, referenceFrame.getName());
+        }
         this.referenceFrame = referenceFrame;
-        this.signalTravelTimeModel = signalTravelTimeModel;
     }
 
     /**
@@ -61,16 +65,11 @@ public class RaDecMeasurementModel {
      */
     public double[] value(final Frame frame, final Vector3D receiverPosition, final AbsoluteDate receptionDate,
                           final PVCoordinatesProvider emitter, final AbsoluteDate approxEmissionDate) {
-        // Refine time delay
-        final double signalTravelTime = signalTravelTimeModel.getAdjustableEmitterComputer(emitter)
-                .computeDelay(approxEmissionDate, receiverPosition, receptionDate, frame);
-        final AbsoluteDate emissionDate = receptionDate.shiftedBy(-signalTravelTime);
-
-        // Compute line of sight in reference frame
-        final Vector3D observedPosition = emitter.getPosition(emissionDate, frame);
-        final Vector3D apparentLineOfSightInInputFrame = observedPosition.subtract(receiverPosition).normalize();
-        final Vector3D apparentLineOfSight = frame.getStaticTransformTo(referenceFrame, receptionDate)
-                .transformVector(apparentLineOfSightInInputFrame);
+        // Compute line-of-sight
+        final Vector3D apparentLineOfSightInInputFrame = getEmitterToReceiverVector(frame, receiverPosition, receptionDate,
+                emitter, approxEmissionDate).normalize();
+        final StaticTransform toInertialFrameAtReception = frame.getStaticTransformTo(referenceFrame, receptionDate);
+        final Vector3D apparentLineOfSight = toInertialFrameAtReception.transformVector(apparentLineOfSightInInputFrame);
 
         // Compute right ascension and declination
         final double rightAscension = apparentLineOfSight.getAlpha();
@@ -91,16 +90,11 @@ public class RaDecMeasurementModel {
                             final FieldAbsoluteDate<Gradient> receptionDate,
                             final FieldPVCoordinatesProvider<Gradient> emitter,
                             final FieldAbsoluteDate<Gradient> approxEmissionDate) {
-        // Refine time delay
-        final Gradient signalTravelTime = signalTravelTimeModel.getAdjustableEmitterComputer(emitter)
-                .computeDelay(approxEmissionDate, receiverPosition, receptionDate, frame);
-        final FieldAbsoluteDate<Gradient> emissionDate = receptionDate.shiftedBy(signalTravelTime.negate());
-
-        // Compute line of sight in reference frame
-        final FieldVector3D<Gradient> observedPosition = emitter.getPosition(emissionDate, frame);
-        final FieldVector3D<Gradient> apparentLineOfSightInInputFrame = observedPosition.subtract(receiverPosition);
-        final FieldVector3D<Gradient> apparentLineOfSight = frame.getStaticTransformTo(referenceFrame, receptionDate)
-                .transformVector(apparentLineOfSightInInputFrame);
+        // Compute line-of-sight
+        final FieldVector3D<Gradient> apparentLineOfSightInInputFrame = getEmitterToReceiverVector(frame, receiverPosition,
+                receptionDate, emitter, approxEmissionDate).normalize();
+        final FieldStaticTransform<Gradient> toInertialFrameAtReception = frame.getStaticTransformTo(referenceFrame, receptionDate);
+        final FieldVector3D<Gradient> apparentLineOfSight = toInertialFrameAtReception.transformVector(apparentLineOfSightInInputFrame);
 
         // Compute right ascension and declination
         final Gradient rightAscension = apparentLineOfSight.getAlpha();

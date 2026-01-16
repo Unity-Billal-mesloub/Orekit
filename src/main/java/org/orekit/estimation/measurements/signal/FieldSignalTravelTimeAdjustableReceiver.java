@@ -20,9 +20,7 @@ import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.geometry.euclidean.threed.FieldVector3D;
 import org.hipparchus.optim.ConvergenceChecker;
 import org.orekit.frames.Frame;
-import org.orekit.propagation.FieldSpacecraftState;
 import org.orekit.time.FieldAbsoluteDate;
-import org.orekit.utils.FieldAbsolutePVCoordinates;
 import org.orekit.utils.FieldPVCoordinatesProvider;
 
 /**
@@ -55,16 +53,6 @@ public class FieldSignalTravelTimeAdjustableReceiver<T extends CalculusFieldElem
                                                    final ConvergenceChecker<T> convergenceChecker) {
         super(convergenceChecker);
         this.adjustableReceiverPVProvider = adjustableReceiverPVProvider;
-    }
-
-    /**
-     * Build instance from spacecraft state.
-     * @param state spacecraft state
-     * @param <S> field type
-     * @return signal travel time computer
-     */
-    public static <S extends CalculusFieldElement<S>> FieldSignalTravelTimeAdjustableReceiver<S> of(final FieldSpacecraftState<S> state) {
-        return new FieldSignalTravelTimeAdjustableReceiver<>(new FieldAbsolutePVCoordinates<>(state.getFrame(), state.getPVCoordinates()));
     }
 
     /** Compute propagation delay on a link leg (typically downlink or uplink) without custom guess.
